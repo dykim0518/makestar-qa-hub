@@ -51,6 +51,10 @@ export default function TriggerPage() {
   const [triggered, setTriggered] = useState(false);
   // 이미 실행 중인 테스트가 있는지 확인
   const [alreadyRunning, setAlreadyRunning] = useState(false);
+  // 트리거 시점의 이전 runId (이보다 새로운 run만 표시)
+  const [prevRunId, setPrevRunId] = useState<number | null>(null);
+  // 새 run 대기 중
+  const [waitingForNewRun, setWaitingForNewRun] = useState(false);
 
   const selectedSuite = SUITES.find((s) => s.value === suite);
 
@@ -62,8 +66,20 @@ export default function TriggerPage() {
       if (runs.length === 0) return;
 
       const run = runs[0];
-      setLatestRun(run);
       setAlreadyRunning(run.status === "running");
+
+      // 트리거 후 대기 중: 이전 run과 같으면 아직 새 run이 안 들어온 것
+      if (prevRunId !== null && run.runId === prevRunId && run.status !== "running") {
+        // 새 run 아직 미도착 → 대기 유지
+        return;
+      }
+
+      // 새 run 감지 → 대기 해제
+      if (waitingForNewRun && (run.runId !== prevRunId || run.status === "running")) {
+        setWaitingForNewRun(false);
+      }
+
+      setLatestRun(run);
 
       // running 상태 감지 시 자동 폴링 시작
       if (run.status === "running") {
@@ -80,28 +96,29 @@ export default function TriggerPage() {
     } finally {
       setCasesLoading(false);
     }
-  }, []);
+  }, [prevRunId, waitingForNewRun]);
 
   // 페이지 진입 시 실행 중인 테스트가 있는지 확인
   useEffect(() => {
     fetchLatestResults();
   }, [fetchLatestResults]);
 
-  // 폴링: running 상태일 때 5초, 아니면 15초
+  // 폴링: 새 run 대기 중이거나 running 상태일 때 5초, 아니면 15초
   const [polling, setPolling] = useState(false);
   useEffect(() => {
     if (!polling) return;
-    const isRunning = latestRun?.status === "running";
+    const fast = waitingForNewRun || latestRun?.status === "running";
     const interval = setInterval(async () => {
       await fetchLatestResults();
-    }, isRunning ? 5000 : 15000);
+    }, fast ? 5000 : 15000);
     return () => clearInterval(interval);
-  }, [polling, fetchLatestResults, latestRun?.status]);
+  }, [polling, fetchLatestResults, latestRun?.status, waitingForNewRun]);
 
   // running → completed 전환 시 자동으로 폴링 중지
   useEffect(() => {
     if (
       polling &&
+      !waitingForNewRun &&
       latestRun &&
       latestRun.status !== "running" &&
       testCases.length > 0
@@ -112,7 +129,7 @@ export default function TriggerPage() {
       }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [polling, latestRun, testCases.length, fetchLatestResults]);
+  }, [polling, waitingForNewRun, latestRun, testCases.length, fetchLatestResults]);
 
   async function handleTrigger() {
     setLoading(true);
@@ -127,12 +144,14 @@ export default function TriggerPage() {
       const data = await res.json();
       setResult(data);
       if (data.ok) {
+        // 현재 최신 runId를 기억 → 이보다 새로운 run만 표시
+        setPrevRunId(latestRun?.runId ?? null);
+        setWaitingForNewRun(true);
         setTriggered(true);
         setCasesLoading(true);
         setLatestRun(null);
         setTestCases([]);
         setPolling(true);
-        fetchLatestResults();
         // 10분 후 폴링 중지
         setTimeout(() => setPolling(false), 600000);
       }
@@ -337,13 +356,14 @@ export default function TriggerPage() {
               <div className="rounded-xl border border-dashed border-[var(--card-border)] bg-[var(--card)] p-10 text-center text-sm text-[var(--muted)]">
                 테스트를 실행하면 결과가 여기에 표시됩니다
               </div>
-            ) : casesLoading && !latestRun ? (
+            ) : waitingForNewRun || (casesLoading && !latestRun) ? (
               <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-10 text-center">
-                <svg className="mx-auto h-5 w-5 animate-spin text-[var(--muted)] mb-2" viewBox="0 0 24 24" fill="none">
+                <svg className="mx-auto h-6 w-6 animate-spin text-indigo-400 mb-3" viewBox="0 0 24 24" fill="none">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                <p className="text-xs text-[var(--muted)]">테스트 시작 대기 중...</p>
+                <p className="text-sm font-semibold text-slate-300 mb-1">테스트 시작 대기 중</p>
+                <p className="text-xs text-[var(--muted)]">GitHub Actions에서 실행이 시작되면 자동으로 결과가 표시됩니다</p>
               </div>
             ) : !latestRun ? (
               <div className="rounded-xl border border-dashed border-[var(--card-border)] bg-[var(--card)] p-10 text-center text-sm text-[var(--muted)]">
