@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { SummaryCards } from "./SummaryCards";
+import { TrendCharts } from "./TrendCharts";
 import { RunsTable } from "./RunsTable";
 import type { TestRun } from "@/db/schema";
 
@@ -100,6 +101,8 @@ export function DashboardContent({
         </div>
         <SummaryCards latestRun={latestRun} />
       </section>
+
+      <TrendCharts />
 
       <section>
         <div className="flex items-center justify-between mb-4">
