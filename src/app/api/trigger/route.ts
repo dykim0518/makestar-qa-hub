@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Octokit } from "octokit";
 
 const VALID_SUITES = ["cmr", "albumbuddy", "admin", "all"];
-const MAX_QUEUED_RUNS = 3;
+const MAX_QUEUED_RUNS = 5;
 
 export async function POST(request: NextRequest) {
   const pat = process.env.GITHUB_PAT;
