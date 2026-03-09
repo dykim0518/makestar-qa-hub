@@ -76,15 +76,33 @@ export default function TriggerPage() {
     fetchLatestResults();
   }, [fetchLatestResults]);
 
-  // 트리거 후 새 결과가 들어올 때까지 폴링
+  // 트리거 후 폴링: running 상태일 때 5초, 아니면 15초
   const [polling, setPolling] = useState(false);
   useEffect(() => {
     if (!polling) return;
+    const isRunning = latestRun?.status === "running";
     const interval = setInterval(async () => {
       await fetchLatestResults();
-    }, 15000);
+    }, isRunning ? 5000 : 15000);
     return () => clearInterval(interval);
-  }, [polling, fetchLatestResults]);
+  }, [polling, fetchLatestResults, latestRun?.status]);
+
+  // running → completed 전환 시 자동으로 폴링 중지
+  useEffect(() => {
+    if (
+      polling &&
+      latestRun &&
+      latestRun.status !== "running" &&
+      testCases.length > 0
+    ) {
+      // 완료 후 마지막 한 번 더 갱신하고 폴링 중지
+      const timer = setTimeout(() => {
+        fetchLatestResults();
+        setPolling(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [polling, latestRun, testCases.length, fetchLatestResults]);
 
   async function handleTrigger() {
     setLoading(true);
@@ -113,6 +131,9 @@ export default function TriggerPage() {
   const failedCases = testCases.filter((c) => c.status === "failed");
   const flakyCases = testCases.filter((c) => c.status === "flaky");
   const passedCases = testCases.filter((c) => c.status === "passed");
+  const isRunning = latestRun?.status === "running";
+  const completedCount = testCases.length;
+  const totalCount = latestRun?.total || 0;
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
@@ -228,7 +249,7 @@ export default function TriggerPage() {
                   {result.ok ? (
                     <div>
                       <p className="text-sm font-semibold text-emerald-400">{result.message}</p>
-                      <p className="mt-1 text-xs text-[var(--muted)]">완료 후 오른쪽 패널에 결과가 자동 갱신됩니다.</p>
+                      <p className="mt-1 text-xs text-[var(--muted)]">실행 중 결과가 실시간으로 오른쪽 패널에 표시됩니다.</p>
                       {result.actionsUrl && (
                         <a href={result.actionsUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
                           GitHub Actions에서 실시간 확인
@@ -251,9 +272,18 @@ export default function TriggerPage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
-                  최근 테스트 결과
+                  {isRunning ? "실시간 테스트 결과" : "최근 테스트 결과"}
                 </h2>
-                {polling && (
+                {isRunning && (
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-400">
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                    </span>
+                    실행 중
+                  </span>
+                )}
+                {polling && !isRunning && (
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-semibold text-indigo-400">
                     <svg className="h-2.5 w-2.5 animate-spin" viewBox="0 0 24 24" fill="none">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -304,9 +334,17 @@ export default function TriggerPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
-                    <span className="text-emerald-400 font-semibold">{latestRun.passed}</span>
-                    <span className="text-[var(--muted)]">/</span>
-                    <span className="text-slate-300">{latestRun.total}</span>
+                    {isRunning ? (
+                      <span className="text-slate-300 font-mono">
+                        {completedCount} / {totalCount}
+                      </span>
+                    ) : (
+                      <>
+                        <span className="text-emerald-400 font-semibold">{latestRun.passed}</span>
+                        <span className="text-[var(--muted)]">/</span>
+                        <span className="text-slate-300">{latestRun.total}</span>
+                      </>
+                    )}
                     {latestRun.failed > 0 && (
                       <span className="ml-1 rounded-full bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-bold text-rose-400">
                         {latestRun.failed} failed
@@ -315,8 +353,57 @@ export default function TriggerPage() {
                   </div>
                 </Link>
 
+                {/* 프로그레스 바 (running 상태일 때) */}
+                {isRunning && totalCount > 0 && (
+                  <div className="mb-3">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
+                        진행률
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">
+                        {Math.round((completedCount / totalCount) * 100)}%
+                      </span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-500"
+                        style={{ width: `${Math.min((completedCount / totalCount) * 100, 100)}%` }}
+                      />
+                    </div>
+                    <div className="flex items-center gap-3 mt-1.5 text-[10px] text-[var(--muted)]">
+                      {latestRun.passed > 0 && (
+                        <span className="flex items-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                          통과 {latestRun.passed}
+                        </span>
+                      )}
+                      {latestRun.failed > 0 && (
+                        <span className="flex items-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
+                          실패 {latestRun.failed}
+                        </span>
+                      )}
+                      {latestRun.flaky > 0 && (
+                        <span className="flex items-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                          Flaky {latestRun.flaky}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* 테스트 케이스 목록 */}
                 <div className="max-h-[calc(100vh-220px)] overflow-y-auto space-y-1 pr-1">
+                  {testCases.length === 0 && isRunning && (
+                    <div className="rounded-lg border border-dashed border-[var(--card-border)] bg-[var(--card)] p-8 text-center">
+                      <svg className="mx-auto h-5 w-5 animate-spin text-indigo-400 mb-2" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      <p className="text-xs text-[var(--muted)]">테스트 실행 준비 중...</p>
+                    </div>
+                  )}
                   {failedCases.length > 0 && (
                     <CaseGroup label="실패" count={failedCases.length} dotColor="bg-rose-400" cases={failedCases} />
                   )}
@@ -400,6 +487,14 @@ function CaseRow({ tc }: { tc: TestCaseResult }) {
 }
 
 function RunStatusDot({ status }: { status: string }) {
+  if (status === "running") {
+    return (
+      <span className="relative flex h-2.5 w-2.5">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-75" />
+        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-indigo-400" />
+      </span>
+    );
+  }
   if (status === "passed") {
     return <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />;
   }

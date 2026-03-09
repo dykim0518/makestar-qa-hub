@@ -69,6 +69,14 @@ export function getStatusConfig(status: string): {
         text: "text-slate-400",
         border: "border-slate-500/20",
       };
+    case "running":
+      return {
+        label: "Running",
+        dot: "bg-indigo-400",
+        bg: "bg-indigo-500/10",
+        text: "text-indigo-400",
+        border: "border-indigo-500/20",
+      };
     case "cancelled":
       return {
         label: "Cancelled",
