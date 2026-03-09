@@ -22,19 +22,68 @@ export function getPassRate(passed: number, total: number): string {
   return `${Math.round((passed / total) * 100)}%`;
 }
 
-export function getStatusColor(status: string): string {
+export function getPassRateNumber(passed: number, total: number): number {
+  if (total === 0) return 0;
+  return Math.round((passed / total) * 100);
+}
+
+export type StatusType = "passed" | "failed" | "flaky" | "skipped" | "cancelled";
+
+export function getStatusConfig(status: string): {
+  label: string;
+  dot: string;
+  bg: string;
+  text: string;
+  border: string;
+} {
   switch (status) {
     case "passed":
-      return "text-green-600 bg-green-50";
+      return {
+        label: "Passed",
+        dot: "bg-emerald-400",
+        bg: "bg-emerald-500/10",
+        text: "text-emerald-400",
+        border: "border-emerald-500/20",
+      };
     case "failed":
-      return "text-red-600 bg-red-50";
+      return {
+        label: "Failed",
+        dot: "bg-rose-400",
+        bg: "bg-rose-500/10",
+        text: "text-rose-400",
+        border: "border-rose-500/20",
+      };
     case "flaky":
-      return "text-yellow-600 bg-yellow-50";
+      return {
+        label: "Flaky",
+        dot: "bg-amber-400",
+        bg: "bg-amber-500/10",
+        text: "text-amber-400",
+        border: "border-amber-500/20",
+      };
     case "skipped":
-      return "text-gray-500 bg-gray-50";
+      return {
+        label: "Skipped",
+        dot: "bg-slate-400",
+        bg: "bg-slate-500/10",
+        text: "text-slate-400",
+        border: "border-slate-500/20",
+      };
     case "cancelled":
-      return "text-gray-500 bg-gray-50";
+      return {
+        label: "Cancelled",
+        dot: "bg-slate-400",
+        bg: "bg-slate-500/10",
+        text: "text-slate-400",
+        border: "border-slate-500/20",
+      };
     default:
-      return "text-gray-600 bg-gray-50";
+      return {
+        label: status,
+        dot: "bg-slate-400",
+        bg: "bg-slate-500/10",
+        text: "text-slate-400",
+        border: "border-slate-500/20",
+      };
   }
 }
