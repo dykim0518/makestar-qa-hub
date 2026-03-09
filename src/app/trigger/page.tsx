@@ -61,6 +61,11 @@ export default function TriggerPage() {
       const run = runs[0];
       setLatestRun(run);
 
+      // running 상태 감지 시 자동 폴링 시작
+      if (run.status === "running") {
+        setPolling(true);
+      }
+
       const casesRes = await fetch(`/api/runs/${run.runId}/tests`);
       if (casesRes.ok) {
         setTestCases(await casesRes.json());
@@ -76,7 +81,7 @@ export default function TriggerPage() {
     fetchLatestResults();
   }, [fetchLatestResults]);
 
-  // 트리거 후 폴링: running 상태일 때 5초, 아니면 15초
+  // 폴링: running 상태일 때 5초, 아니면 15초
   const [polling, setPolling] = useState(false);
   useEffect(() => {
     if (!polling) return;
@@ -95,7 +100,6 @@ export default function TriggerPage() {
       latestRun.status !== "running" &&
       testCases.length > 0
     ) {
-      // 완료 후 마지막 한 번 더 갱신하고 폴링 중지
       const timer = setTimeout(() => {
         fetchLatestResults();
         setPolling(false);
