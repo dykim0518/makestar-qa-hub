@@ -107,14 +107,6 @@ interface CoverageItem {
   caseRefs: string[];
 }
 
-interface GoogleIntegrationStatus {
-  configured: boolean;
-  hasEmail: boolean;
-  hasPrivateKey: boolean;
-  subjectConfigured: boolean;
-  serviceAccountEmailMasked: string | null;
-}
-
 function pct(value: number): string {
   return `${Math.round(value * 100)}%`;
 }
@@ -169,22 +161,17 @@ export function TcTemplateManager({
   const [validationSummary, setValidationSummary] = useState<ValidationSummary | null>(null);
   const [validationIssues, setValidationIssues] = useState<ValidationIssue[]>([]);
   const [validationCoverage, setValidationCoverage] = useState<CoverageItem[]>([]);
-  const [googleStatus, setGoogleStatus] = useState<GoogleIntegrationStatus | null>(null);
-
   const [newProjectName, setNewProjectName] = useState("");
   const [sheetUrl, setSheetUrl] = useState("");
   const [notionUrl, setNotionUrl] = useState("");
   const [figmaUrl, setFigmaUrl] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const [exportSheetTarget, setExportSheetTarget] = useState("");
-  const [exportedSheetUrl, setExportedSheetUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
 
   // Source add form visibility
   const [showSourceForm, setShowSourceForm] = useState<"" | "notion" | "figma" | "pdf">("");
   const [showTemplateForm, setShowTemplateForm] = useState(false);
-  const [showExportForm, setShowExportForm] = useState<string>("");
 
   const selectedProfile = useMemo(
     () => profiles.find((profile) => profile.id === selectedProfileId) ?? null,
@@ -254,13 +241,6 @@ export function TcTemplateManager({
     }
   }, []);
 
-  const fetchGoogleStatus = useCallback(async () => {
-    const res = await fetch("/api/tc/integrations/google/status");
-    if (!res.ok) return;
-    const data = await res.json();
-    setGoogleStatus(data);
-  }, []);
-
   const fetchRunCases = useCallback(async (runId: string) => {
     if (!runId) return;
     const res = await fetch(`/api/tc/runs/${runId}/cases`);
@@ -286,8 +266,7 @@ export function TcTemplateManager({
 
   useEffect(() => {
     fetchProjects();
-    fetchGoogleStatus();
-  }, [fetchProjects, fetchGoogleStatus]);
+  }, [fetchProjects]);
 
   useEffect(() => {
     if (!selectedProjectId) return;
@@ -448,7 +427,6 @@ export function TcTemplateManager({
   async function handleValidateRun(runId: string) {
     setBusy(true);
     setMessage("");
-    setExportedSheetUrl(null);
     try {
       const res = await fetch(`/api/tc/runs/${runId}/validate`, { method: "POST" });
       const data = await res.json();
@@ -458,40 +436,6 @@ export function TcTemplateManager({
       setValidationCoverage(data.coverage ?? []);
       setSelectedRunId(runId);
       setMessage(`검증 완료: 이슈 ${data.issueCount ?? 0}건`);
-    } finally { setBusy(false); }
-  }
-
-  async function handleExportGoogleSheet() {
-    if (!showExportForm) return;
-    if (!exportSheetTarget.trim()) {
-      setMessage("Google Sheet URL을 입력하세요.");
-      return;
-    }
-    if (!googleStatus?.configured) {
-      setMessage("Google Sheets 연동 키가 설정되지 않았습니다.");
-      return;
-    }
-    setBusy(true);
-    setMessage("");
-    setExportedSheetUrl(null);
-    try {
-      const res = await fetch(`/api/tc/runs/${showExportForm}/export/google-sheet`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sheetUrl: exportSheetTarget.trim(),
-          tcSheetName: "TC",
-          validationSheetName: "Validation_Report",
-          coverageSheetName: "Coverage_Matrix",
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setMessage(data.error || "Google Sheet 내보내기 실패"); return; }
-      setExportedSheetUrl(data.spreadsheetUrl || null);
-      setMessage("Google Sheet 내보내기가 완료되었습니다.");
-      setShowExportForm("");
-      setExportSheetTarget("");
-      await fetchValidation(showExportForm);
     } finally { setBusy(false); }
   }
 
@@ -773,16 +717,6 @@ export function TcTemplateManager({
                       >
                         CSV
                       </button>
-                      {googleStatus?.configured && (
-                        <button
-                          type="button"
-                          onClick={() => setShowExportForm(showExportForm === run.id ? "" : run.id)}
-                          disabled={busy}
-                          className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-300 hover:bg-emerald-500/20 disabled:opacity-40"
-                        >
-                          Sheets
-                        </button>
-                      )}
                       <Link
                         href={`/tc/runs/${run.id}`}
                         className="rounded-md border border-[var(--card-border)] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold text-slate-300 hover:bg-white/[0.08]"
@@ -806,26 +740,6 @@ export function TcTemplateManager({
                     <p className="mt-2 text-[10px] text-rose-400">{run.errorMessage}</p>
                   )}
 
-                  {/* Google Sheet export form (inline) */}
-                  {showExportForm === run.id && (
-                    <div className="mt-2 flex gap-2">
-                      <input
-                        className="flex-1 rounded-md border border-[var(--card-border)] bg-white/[0.02] px-2.5 py-1.5 text-xs outline-none focus:border-indigo-500/50"
-                        placeholder="Google Sheet URL"
-                        value={exportSheetTarget}
-                        onChange={(e) => setExportSheetTarget(e.target.value)}
-                      />
-                      <button type="button" onClick={handleExportGoogleSheet} disabled={busy || !exportSheetTarget.trim()} className="rounded-md bg-emerald-500/20 px-3 py-1.5 text-xs font-semibold text-emerald-300 whitespace-nowrap disabled:opacity-40">
-                        내보내기
-                      </button>
-                    </div>
-                  )}
-
-                  {exportedSheetUrl && showExportForm === run.id && (
-                    <p className="mt-2 text-[10px] text-emerald-300">
-                      <a href={exportedSheetUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">{exportedSheetUrl}</a>
-                    </p>
-                  )}
                 </div>
               );
             })}

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { AppHeader } from "./AppHeader";
+import { TcBuilderGuide } from "./TcBuilderGuide";
 
 interface TcBuilderShellProps {
   title: string;
@@ -19,6 +20,8 @@ export function TcBuilderShell({ title, subtitle, children }: TcBuilderShellProp
         </div>
         {children}
       </main>
+
+      <TcBuilderGuide />
     </div>
   );
 }
