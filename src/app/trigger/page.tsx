@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
+import { TriggerGuide } from "@/components/TriggerGuide";
 
 const SUITES = [
   { value: "cmr", label: "CMR (Makestar)", desc: "메인 사이트 모니터링" },
@@ -466,6 +467,8 @@ export default function TriggerPage() {
           </div>
         </div>
       </main>
+
+      <TriggerGuide />
     </div>
   );
 }

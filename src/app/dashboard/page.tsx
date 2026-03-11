@@ -1,4 +1,5 @@
 import { DashboardContent } from "@/components/DashboardContent";
+import { DashboardGuide } from "@/components/DashboardGuide";
 import { AppHeader } from "@/components/AppHeader";
 import type { TestRun } from "@/db/schema";
 
@@ -34,6 +35,8 @@ export default async function DashboardPage() {
       <main className="mx-auto max-w-7xl px-6 py-8">
         <DashboardContent initialRuns={runs} initialTotal={total} />
       </main>
+
+      <DashboardGuide />
     </div>
   );
 }
