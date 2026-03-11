@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Makestar QA Dashboard",
-  description: "Playwright E2E 테스트 결과 대시보드",
+  title: "Makestar QA Hub",
+  description: "E2E 테스트 실행·분석 및 TC 자동 생성 플랫폼",
 };
 
 export default function RootLayout({

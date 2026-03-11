@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/db";
 import { testRuns, testCases } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { AppHeader } from "@/components/AppHeader";
 import { RunCompare } from "@/components/RunCompare";
 import type { DiffCategory, CompareTest } from "@/app/api/runs/compare/route";
 
