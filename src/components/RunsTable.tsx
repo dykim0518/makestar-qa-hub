@@ -116,13 +116,23 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                   className={`transition-colors hover:bg-white/[0.02] ${hasFailure ? "bg-rose-500/[0.03]" : ""} ${isSelected ? "bg-indigo-500/[0.06]" : ""}`}
                 >
                   <td className="px-3 py-4 text-center">
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
+                    <button
+                      type="button"
+                      onClick={() => toggleSelect(run.runId)}
                       disabled={!isSelected && selected.size >= 2}
-                      onChange={() => toggleSelect(run.runId)}
-                      className="h-4 w-4 rounded border-slate-600 bg-transparent text-indigo-500 focus:ring-indigo-500/30 focus:ring-offset-0 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-                    />
+                      className={`group inline-flex h-[18px] w-[18px] items-center justify-center rounded-[5px] border transition-all duration-150
+                        ${isSelected
+                          ? "border-indigo-500 bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.3)]"
+                          : "border-white/15 bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.06]"
+                        }
+                        disabled:opacity-20 disabled:cursor-not-allowed`}
+                    >
+                      {isSelected && (
+                        <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none">
+                          <path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      )}
+                    </button>
                   </td>
                   <td className="relative whitespace-nowrap px-5 py-4 text-sm">
                     {indicatorColor && (
