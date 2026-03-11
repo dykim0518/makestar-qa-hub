@@ -133,6 +133,78 @@ export const tcTemplateProfiles = pgTable(
   ]
 );
 
+export const tcGenerationRuns = pgTable(
+  "tc_generation_runs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => tcProjects.id, { onDelete: "cascade" }),
+    profileId: uuid("profile_id").references(() => tcTemplateProfiles.id, {
+      onDelete: "set null",
+    }),
+    status: text("status").notNull().default("queued"), // queued | running | failed | completed
+    mode: text("mode").notNull().default("draft"), // draft | strict
+    totalCases: integer("total_cases").notNull().default(0),
+    errorMessage: text("error_message"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_tc_generation_runs_project").on(table.projectId),
+    index("idx_tc_generation_runs_status").on(table.status),
+  ]
+);
+
+export const tcGeneratedCases = pgTable(
+  "tc_generated_cases",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    runId: uuid("run_id")
+      .notNull()
+      .references(() => tcGenerationRuns.id, { onDelete: "cascade" }),
+    requirementId: uuid("requirement_id").references(() => tcRequirements.id, {
+      onDelete: "set null",
+    }),
+    no: text("no"),
+    traceability: text("traceability"),
+    depth1: text("depth1"),
+    depth2: text("depth2"),
+    depth3: text("depth3"),
+    preCondition: text("pre_condition"),
+    step: text("step").notNull(),
+    expectedResult: text("expected_result").notNull(),
+    result: text("result").notNull().default("Not Test"),
+    issueKey: text("issue_key"),
+    description: text("description"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_tc_generated_cases_run").on(table.runId),
+    index("idx_tc_generated_cases_requirement").on(table.requirementId),
+  ]
+);
+
+export const tcValidationIssues = pgTable(
+  "tc_validation_issues",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    runId: uuid("run_id")
+      .notNull()
+      .references(() => tcGenerationRuns.id, { onDelete: "cascade" }),
+    issueType: text("issue_type").notNull(), // duplicate | missing | format
+    severity: text("severity").notNull().default("medium"), // low | medium | high
+    targetRef: text("target_ref"),
+    message: text("message").notNull(),
+    meta: jsonb("meta"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_tc_validation_issues_run").on(table.runId),
+    index("idx_tc_validation_issues_type").on(table.issueType),
+  ]
+);
+
 export type TestRun = typeof testRuns.$inferSelect;
 export type NewTestRun = typeof testRuns.$inferInsert;
 export type TestCase = typeof testCases.$inferSelect;
@@ -145,3 +217,9 @@ export type TcRequirement = typeof tcRequirements.$inferSelect;
 export type NewTcRequirement = typeof tcRequirements.$inferInsert;
 export type TcTemplateProfile = typeof tcTemplateProfiles.$inferSelect;
 export type NewTcTemplateProfile = typeof tcTemplateProfiles.$inferInsert;
+export type TcGenerationRun = typeof tcGenerationRuns.$inferSelect;
+export type NewTcGenerationRun = typeof tcGenerationRuns.$inferInsert;
+export type TcGeneratedCase = typeof tcGeneratedCases.$inferSelect;
+export type NewTcGeneratedCase = typeof tcGeneratedCases.$inferInsert;
+export type TcValidationIssue = typeof tcValidationIssues.$inferSelect;
+export type NewTcValidationIssue = typeof tcValidationIssues.$inferInsert;

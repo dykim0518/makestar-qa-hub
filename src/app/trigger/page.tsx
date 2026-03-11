@@ -190,6 +190,9 @@ export default function TriggerPage() {
             <Link href="/trigger" className="rounded-lg bg-indigo-500/10 px-3 py-1.5 text-xs font-semibold text-indigo-400">
               테스트 실행
             </Link>
+            <Link href="/tc" className="rounded-lg px-3 py-1.5 text-xs font-semibold text-[var(--muted)] transition-colors hover:text-white hover:bg-white/5">
+              TC Builder
+            </Link>
           </nav>
         </div>
       </header>

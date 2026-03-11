@@ -54,6 +54,12 @@ export default async function DashboardPage() {
             >
               테스트 실행
             </Link>
+            <Link
+              href="/tc"
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-[var(--muted)] transition-colors hover:text-white hover:bg-white/5"
+            >
+              TC Builder
+            </Link>
           </nav>
         </div>
       </header>
