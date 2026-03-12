@@ -88,8 +88,10 @@ export default function TriggerPage() {
         setPolling(true);
       }
 
-      // running 또는 최근 완료된 run이 있으면 결과 패널 표시
-      setTriggered(true);
+      // running 상태일 때만 자동으로 결과 패널 표시 (완료된 결과는 직접 실행 시에만)
+      if (run.status === "running") {
+        setTriggered(true);
+      }
 
       const casesRes = await fetch(`/api/runs/${run.runId}/tests`);
       if (casesRes.ok) {
@@ -312,7 +314,7 @@ export default function TriggerPage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
-                  {isRunning ? "실시간 테스트 결과" : "최근 테스트 결과"}
+                  {isRunning ? "실시간 테스트 결과" : "테스트 실행 결과"}
                 </h2>
                 {isRunning && (
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-400">
