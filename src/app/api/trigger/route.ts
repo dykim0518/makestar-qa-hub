@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Octokit } from "octokit";
 
 const VALID_SUITES = ["cmr", "albumbuddy", "admin", "all"];
+const VALID_ENVIRONMENTS = ["prod", "stg"];
 const MAX_QUEUED_RUNS = 5;
 
 export async function POST(request: NextRequest) {
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
   if (!pat || !owner || !repo) {
     return NextResponse.json(
       { error: "Server misconfigured: GitHub credentials not set" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -23,20 +24,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { suite, project, spec, grep, retries } = body;
+  const { suite, project, spec, grep, retries, environment } = body;
 
   if (!suite || !VALID_SUITES.includes(suite)) {
     return NextResponse.json(
       { error: `Invalid suite. Must be one of: ${VALID_SUITES.join(", ")}` },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   const retriesNum = parseInt(retries ?? "1", 10);
   if (isNaN(retriesNum) || retriesNum < 0 || retriesNum > 5) {
+    return NextResponse.json({ error: "retries must be 0-5" }, { status: 400 });
+  }
+
+  const envValue = environment || "prod";
+  if (!VALID_ENVIRONMENTS.includes(envValue)) {
     return NextResponse.json(
-      { error: "retries must be 0-5" },
-      { status: 400 }
+      {
+        error: `Invalid environment. Must be one of: ${VALID_ENVIRONMENTS.join(", ")}`,
+      },
+      { status: 400 },
     );
   }
 
@@ -52,7 +60,7 @@ export async function POST(request: NextRequest) {
     });
 
     const activeRuns = data.workflow_runs.filter(
-      (run) => run.status === "queued" || run.status === "in_progress"
+      (run) => run.status === "queued" || run.status === "in_progress",
     );
 
     if (activeRuns.length >= MAX_QUEUED_RUNS) {
@@ -61,7 +69,7 @@ export async function POST(request: NextRequest) {
           ok: false,
           error: `큐가 가득 찼습니다 (${activeRuns.length}/${MAX_QUEUED_RUNS}). 진행 중인 테스트가 완료된 후 다시 시도해주세요.`,
         },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -72,6 +80,7 @@ export async function POST(request: NextRequest) {
       ref: "main",
       inputs: {
         suite,
+        environment: envValue,
         project: project || "",
         spec: spec || "",
         grep: grep || "",
@@ -84,17 +93,17 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      message: queuePosition > 0
-        ? `${suite} 테스트 큐에 추가됨 (대기 ${queuePosition}건)`
-        : `${suite} 테스트 트리거 성공`,
+      message:
+        queuePosition > 0
+          ? `${suite} 테스트 큐에 추가됨 (${envValue.toUpperCase()}, 대기 ${queuePosition}건)`
+          : `${suite} 테스트 트리거 성공 (${envValue.toUpperCase()})`,
       actionsUrl,
     });
   } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Unknown error";
+    const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       { error: `GitHub API 호출 실패: ${message}` },
-      { status: 502 }
+      { status: 502 },
     );
   }
 }
