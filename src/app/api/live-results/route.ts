@@ -21,14 +21,15 @@ export async function POST(request: NextRequest) {
   if (!event || !runId) {
     return NextResponse.json(
       { error: "Missing event or runId" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   try {
     switch (event) {
       case "begin": {
-        const { suite, total, branch, commitSha, triggeredBy } = body;
+        const { suite, total, branch, commitSha, triggeredBy, environment } =
+          body;
         await db
           .insert(testRuns)
           .values({
@@ -42,6 +43,7 @@ export async function POST(request: NextRequest) {
             skipped: 0,
             durationMs: 0,
             triggeredBy: triggeredBy || "workflow_dispatch",
+            environment: environment || "prod",
             commitSha: commitSha || null,
             branch: branch || null,
           })
@@ -63,7 +65,7 @@ export async function POST(request: NextRequest) {
           .update(testRuns)
           .set({ status: "cancelled" })
           .where(
-            sql`${testRuns.status} = 'running' AND ${testRuns.runId} != ${runId}`
+            sql`${testRuns.status} = 'running' AND ${testRuns.runId} != ${runId}`,
           );
 
         // 이전 라이브 결과 정리
@@ -73,7 +75,15 @@ export async function POST(request: NextRequest) {
       }
 
       case "test-end": {
-        const { title, file, project, status, durationMs, errorMessage, errorStack } = body;
+        const {
+          title,
+          file,
+          project,
+          status,
+          durationMs,
+          errorMessage,
+          errorStack,
+        } = body;
 
         // 테스트 케이스 삽입
         const errorMsg = errorMessage || null;
@@ -111,7 +121,14 @@ export async function POST(request: NextRequest) {
       }
 
       case "end": {
-        const { status, suite, total, passed: passedCount, failed: failedCount, flaky: flakyCount } = body;
+        const {
+          status,
+          suite,
+          total,
+          passed: passedCount,
+          failed: failedCount,
+          flaky: flakyCount,
+        } = body;
         const finalStatus = status || "passed";
         await db
           .update(testRuns)
@@ -135,14 +152,14 @@ export async function POST(request: NextRequest) {
       default:
         return NextResponse.json(
           { error: `Unknown event: ${event}` },
-          { status: 400 }
+          { status: 400 },
         );
     }
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       { error: `Live results error: ${message}` },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

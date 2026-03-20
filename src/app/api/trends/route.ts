@@ -9,9 +9,10 @@ const VALID_DAYS = [7, 30, 90];
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const suite = searchParams.get("suite");
+  const environment = searchParams.get("environment");
   const days = Math.min(
     Math.max(parseInt(searchParams.get("days") || "30", 10), 1),
-    90
+    90,
   );
 
   const cutoff = new Date();
@@ -24,6 +25,9 @@ export async function GET(request: NextRequest) {
 
   if (suite && VALID_SUITES.includes(suite)) {
     conditions.push(eq(testRuns.suite, suite));
+  }
+  if (environment) {
+    conditions.push(eq(testRuns.environment, environment));
   }
 
   const where = and(...conditions);

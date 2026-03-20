@@ -5,7 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { TestRun } from "@/db/schema";
 import { StatusBadge } from "./StatusBadge";
-import { formatDuration, formatDate, getPassRate, getPassRateNumber } from "@/lib/format";
+import {
+  formatDuration,
+  formatDate,
+  getPassRate,
+  getPassRateNumber,
+} from "@/lib/format";
 
 export function RunsTable({ runs }: { runs: TestRun[] }) {
   const router = useRouter();
@@ -77,7 +82,7 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                 Run
               </th>
               <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-                Suite
+                Suite / Env
               </th>
               <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
                 상태
@@ -121,22 +126,35 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                       onClick={() => toggleSelect(run.runId)}
                       disabled={!isSelected && selected.size >= 2}
                       className={`group inline-flex h-[18px] w-[18px] items-center justify-center rounded-[5px] border transition-all duration-150
-                        ${isSelected
-                          ? "border-indigo-500 bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.3)]"
-                          : "border-white/15 bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.06]"
+                        ${
+                          isSelected
+                            ? "border-indigo-500 bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.3)]"
+                            : "border-white/15 bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.06]"
                         }
                         disabled:opacity-20 disabled:cursor-not-allowed`}
                     >
                       {isSelected && (
-                        <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none">
-                          <path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                        <svg
+                          className="h-3 w-3 text-white"
+                          viewBox="0 0 12 12"
+                          fill="none"
+                        >
+                          <path
+                            d="M2.5 6L5 8.5L9.5 3.5"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
                         </svg>
                       )}
                     </button>
                   </td>
                   <td className="relative whitespace-nowrap px-5 py-4 text-sm">
                     {indicatorColor && (
-                      <span className={`absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full ${indicatorColor}`} />
+                      <span
+                        className={`absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full ${indicatorColor}`}
+                      />
                     )}
                     <Link
                       href={`/runs/${run.runId}`}
@@ -146,8 +164,19 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                     </Link>
                   </td>
                   <td className="whitespace-nowrap px-5 py-4 text-sm">
-                    <span className="rounded-md border border-[var(--card-border)] bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-300">
-                      {run.suite}
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="rounded-md border border-[var(--card-border)] bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-300">
+                        {run.suite}
+                      </span>
+                      <span
+                        className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
+                          run.environment === "stg"
+                            ? "border border-amber-500/30 bg-amber-500/10 text-amber-400"
+                            : "border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                        }`}
+                      >
+                        {run.environment === "stg" ? "STG" : "PROD"}
+                      </span>
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-5 py-4 text-sm">

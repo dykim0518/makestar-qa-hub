@@ -68,9 +68,7 @@ function CustomTooltip({
 }
 
 function Skeleton() {
-  return (
-    <div className="h-[220px] animate-pulse rounded-lg bg-white/5" />
-  );
+  return <div className="h-[220px] animate-pulse rounded-lg bg-white/5" />;
 }
 
 function ChartCard({
@@ -96,7 +94,13 @@ function ChartCard({
   );
 }
 
-export function TrendCharts({ suite }: { suite: string }) {
+export function TrendCharts({
+  suite,
+  environment,
+}: {
+  suite: string;
+  environment: string;
+}) {
   const [days, setDays] = useState<number>(30);
   const [points, setPoints] = useState<TrendPoint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,6 +110,7 @@ export function TrendCharts({ suite }: { suite: string }) {
     try {
       const params = new URLSearchParams({ days: String(days) });
       if (suite) params.set("suite", suite);
+      if (environment) params.set("environment", environment);
       const res = await fetch(`/api/trends?${params}`);
       if (!res.ok) return;
       const data = await res.json();
@@ -115,7 +120,7 @@ export function TrendCharts({ suite }: { suite: string }) {
     } finally {
       setLoading(false);
     }
-  }, [suite, days]);
+  }, [suite, days, environment]);
 
   useEffect(() => {
     fetchTrends();
@@ -215,11 +220,7 @@ export function TrendCharts({ suite }: { suite: string }) {
                   }}
                 />
                 <Tooltip
-                  content={
-                    <CustomTooltip
-                      formatter={(_n, v) => `${v}%`}
-                    />
-                  }
+                  content={<CustomTooltip formatter={(_n, v) => `${v}%`} />}
                 />
                 <Line
                   type="monotone"
@@ -246,11 +247,7 @@ export function TrendCharts({ suite }: { suite: string }) {
                     x2="0"
                     y2="1"
                   >
-                    <stop
-                      offset="0%"
-                      stopColor="#818cf8"
-                      stopOpacity={0.3}
-                    />
+                    <stop offset="0%" stopColor="#818cf8" stopOpacity={0.3} />
                     <stop
                       offset="100%"
                       stopColor="#818cf8"
@@ -278,11 +275,7 @@ export function TrendCharts({ suite }: { suite: string }) {
                   width={40}
                 />
                 <Tooltip
-                  content={
-                    <CustomTooltip
-                      formatter={(_n, v) => `${v}분`}
-                    />
-                  }
+                  content={<CustomTooltip formatter={(_n, v) => `${v}분`} />}
                 />
                 <Area
                   type="monotone"

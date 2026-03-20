@@ -16,6 +16,12 @@ const SUITES = [
   { value: "admin", label: "Admin" },
 ] as const;
 
+const ENVIRONMENTS = [
+  { value: "", label: "전체" },
+  { value: "prod", label: "Prod" },
+  { value: "stg", label: "STG" },
+] as const;
+
 export function DashboardContent({
   initialRuns,
   initialTotal,
@@ -27,8 +33,12 @@ export function DashboardContent({
   const [total, setTotal] = useState(initialTotal);
   const [page, setPage] = useState(0);
   const [suite, setSuite] = useState("");
-  const [latestRun, setLatestRun] = useState<TestRun | null>(initialRuns[0] || null);
-  const hasRunning = latestRun?.status === "running" || runs.some((r) => r.status === "running");
+  const [environment, setEnvironment] = useState("");
+  const [latestRun, setLatestRun] = useState<TestRun | null>(
+    initialRuns[0] || null,
+  );
+  const hasRunning =
+    latestRun?.status === "running" || runs.some((r) => r.status === "running");
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const fetchRuns = useCallback(
@@ -38,6 +48,7 @@ export function DashboardContent({
         url.searchParams.set("limit", String(PAGE_SIZE));
         url.searchParams.set("offset", String(p * PAGE_SIZE));
         if (suite) url.searchParams.set("suite", suite);
+        if (environment) url.searchParams.set("environment", environment);
         const res = await fetch(url);
         if (!res.ok) return;
         const data = await res.json();
@@ -51,7 +62,7 @@ export function DashboardContent({
         // ignore
       }
     },
-    [suite]
+    [suite, environment],
   );
 
   // 최신 run은 페이지와 무관하게 항상 갱신
@@ -61,6 +72,7 @@ export function DashboardContent({
       url.searchParams.set("limit", "1");
       url.searchParams.set("offset", "0");
       if (suite) url.searchParams.set("suite", suite);
+      if (environment) url.searchParams.set("environment", environment);
       const res = await fetch(url);
       if (!res.ok) return;
       const data = await res.json();
@@ -68,13 +80,13 @@ export function DashboardContent({
     } catch {
       // ignore
     }
-  }, [suite]);
+  }, [suite, environment]);
 
-  // suite 변경 시 page 리셋 및 데이터 재조회
+  // suite/environment 변경 시 page 리셋 및 데이터 재조회
   useEffect(() => {
     setPage(0);
     fetchRuns(0);
-  }, [suite]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [suite, environment]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 페이지 변경 시 데이터 fetch
   useEffect(() => {
@@ -84,10 +96,13 @@ export function DashboardContent({
 
   // running 상태: 5초 빠른 폴링, 아닐 때: 30초 느린 폴링 (새 run 감지)
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchRuns(page);
-      if (page !== 0) fetchLatestRun();
-    }, hasRunning ? 5000 : 30000);
+    const interval = setInterval(
+      () => {
+        fetchRuns(page);
+        if (page !== 0) fetchLatestRun();
+      },
+      hasRunning ? 5000 : 30000,
+    );
     return () => clearInterval(interval);
   }, [hasRunning, page, fetchRuns, fetchLatestRun]);
 
@@ -100,7 +115,8 @@ export function DashboardContent({
       }
     }
     document.addEventListener("visibilitychange", handleVisibility);
-    return () => document.removeEventListener("visibilitychange", handleVisibility);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibility);
   }, [page, fetchRuns, fetchLatestRun]);
 
   function goToPage(p: number) {
@@ -116,14 +132,17 @@ export function DashboardContent({
 
   return (
     <>
-      {/* Suite 필터 */}
-      <div className="mb-6 flex items-center gap-3">
+      {/* Suite + Environment 필터 */}
+      <div className="mb-6 flex items-center gap-3 flex-wrap">
         <span className="text-xs font-medium text-[var(--muted)]">Suite</span>
         <div className="flex rounded-lg border border-[var(--card-border)] overflow-hidden">
           {SUITES.map((s) => (
             <button
               key={s.value}
-              onClick={() => setSuite(s.value)}
+              onClick={() => {
+                setSuite(s.value);
+                if (s.value !== "cmr") setEnvironment("");
+              }}
               className={`px-3 py-1.5 text-xs font-medium transition-colors ${
                 suite === s.value
                   ? "bg-indigo-500/15 text-indigo-400"
@@ -134,6 +153,24 @@ export function DashboardContent({
             </button>
           ))}
         </div>
+
+        <span className="text-xs font-medium text-[var(--muted)]">Env</span>
+        <div className="flex rounded-lg border border-[var(--card-border)] overflow-hidden">
+          {ENVIRONMENTS.map((e) => (
+            <button
+              key={e.value}
+              onClick={() => setEnvironment(e.value)}
+              className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                environment === e.value
+                  ? "bg-violet-500/15 text-violet-400"
+                  : "text-[var(--muted)] hover:text-white hover:bg-white/5"
+              }`}
+            >
+              {e.label}
+            </button>
+          ))}
+        </div>
+
         {hasRunning && (
           <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
             <span className="relative flex h-2 w-2">
@@ -152,18 +189,16 @@ export function DashboardContent({
         <SummaryCards latestRun={latestRun} />
       </section>
 
-      <TrendCharts suite={suite} />
+      <TrendCharts suite={suite} environment={environment} />
 
-      <FlakyRanking suite={suite} />
+      <FlakyRanking suite={suite} environment={environment} />
 
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
             실행 히스토리
           </h2>
-          <span className="text-xs text-[var(--muted)]">
-            총 {total}건
-          </span>
+          <span className="text-xs text-[var(--muted)]">총 {total}건</span>
         </div>
         <RunsTable runs={runs} />
 
@@ -180,9 +215,7 @@ export function DashboardContent({
             {Array.from({ length: totalPages }, (_, i) => i)
               .filter(
                 (i) =>
-                  i === 0 ||
-                  i === totalPages - 1 ||
-                  Math.abs(i - page) <= 1
+                  i === 0 || i === totalPages - 1 || Math.abs(i - page) <= 1,
               )
               .reduce<(number | "...")[]>((acc, i, idx, arr) => {
                 if (idx > 0 && i - (arr[idx - 1] as number) > 1) {
@@ -211,7 +244,7 @@ export function DashboardContent({
                   >
                     {(item as number) + 1}
                   </button>
-                )
+                ),
               )}
 
             <button

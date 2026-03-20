@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   if (!runIdStr) {
     return NextResponse.json(
       { error: "Missing X-GitHub-Run-Id header" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -22,11 +22,12 @@ export async function POST(request: NextRequest) {
   if (isNaN(runId)) {
     return NextResponse.json(
       { error: "Invalid X-GitHub-Run-Id" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   const suite = request.headers.get("x-github-suite") || "cmr";
+  const environment = request.headers.get("x-github-environment") || "prod";
   const commitSha = request.headers.get("x-github-sha") || null;
   const branch = request.headers.get("x-github-branch") || null;
   const triggeredBy = request.headers.get("x-github-triggered-by") || "push";
@@ -35,30 +36,16 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json(
-      { error: "Invalid JSON body" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   const parsed = parsePlaywrightResults(body);
 
-  await db.insert(testRuns).values({
-    runId,
-    suite,
-    status: parsed.status,
-    total: parsed.total,
-    passed: parsed.passed,
-    failed: parsed.failed,
-    flaky: parsed.flaky,
-    skipped: parsed.skipped,
-    durationMs: parsed.durationMs,
-    triggeredBy,
-    commitSha,
-    branch,
-  }).onConflictDoUpdate({
-    target: testRuns.runId,
-    set: {
+  await db
+    .insert(testRuns)
+    .values({
+      runId,
+      suite,
       status: parsed.status,
       total: parsed.total,
       passed: parsed.passed,
@@ -66,15 +53,30 @@ export async function POST(request: NextRequest) {
       flaky: parsed.flaky,
       skipped: parsed.skipped,
       durationMs: parsed.durationMs,
-    },
-  });
+      triggeredBy,
+      environment,
+      commitSha,
+      branch,
+    })
+    .onConflictDoUpdate({
+      target: testRuns.runId,
+      set: {
+        status: parsed.status,
+        total: parsed.total,
+        passed: parsed.passed,
+        failed: parsed.failed,
+        flaky: parsed.flaky,
+        skipped: parsed.skipped,
+        durationMs: parsed.durationMs,
+      },
+    });
 
   // 다른 "running" 상태의 run을 "cancelled"로 정리
   await db
     .update(testRuns)
     .set({ status: "cancelled" })
     .where(
-      sql`${testRuns.status} = 'running' AND ${testRuns.runId} != ${runId}`
+      sql`${testRuns.status} = 'running' AND ${testRuns.runId} != ${runId}`,
     );
 
   // 기존 test_cases 삭제 후 재삽입 (upsert 대응)

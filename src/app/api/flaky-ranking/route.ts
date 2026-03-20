@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const days = parseInt(searchParams.get("days") || "30", 10);
   const suite = searchParams.get("suite") || "";
+  const environment = searchParams.get("environment") || "";
   const limit = parseInt(searchParams.get("limit") || "10", 10);
 
   const sinceDate = new Date();
@@ -17,13 +18,22 @@ export async function GET(request: NextRequest) {
   if (suite) {
     conditions.push(eq(testRuns.suite, suite));
   }
+  if (environment) {
+    conditions.push(eq(testRuns.environment, environment));
+  }
 
   const rankings = await db
     .select({
       title: testCases.title,
-      flakyCount: sql<number>`count(*) filter (where ${testCases.status} = 'flaky')`.as("flaky_count"),
+      flakyCount:
+        sql<number>`count(*) filter (where ${testCases.status} = 'flaky')`.as(
+          "flaky_count",
+        ),
       totalRuns: sql<number>`count(*)`.as("total_runs"),
-      flakyRate: sql<number>`round(count(*) filter (where ${testCases.status} = 'flaky') * 100.0 / count(*), 1)`.as("flaky_rate"),
+      flakyRate:
+        sql<number>`round(count(*) filter (where ${testCases.status} = 'flaky') * 100.0 / count(*), 1)`.as(
+          "flaky_rate",
+        ),
     })
     .from(testCases)
     .innerJoin(testRuns, eq(testCases.runId, testRuns.runId))
@@ -57,7 +67,7 @@ export async function GET(request: NextRequest) {
         ...r,
         last10Results: last10,
       };
-    })
+    }),
   );
 
   return NextResponse.json({ rankings: rankingsWithHistory });

@@ -15,6 +15,7 @@ export const mockRuns: TestRun[] = [
     skipped: 0,
     durationMs: 182000,
     triggeredBy: "workflow_dispatch",
+    environment: "prod",
     commitSha: "a3f7c2e1b8d94e6f0123456789abcdef01234567",
     branch: "main",
     createdAt: hour(1),
@@ -30,6 +31,7 @@ export const mockRuns: TestRun[] = [
     skipped: 0,
     durationMs: 145000,
     triggeredBy: "push",
+    environment: "prod",
     commitSha: "b4e8d3f2a9c05e7f1234567890abcdef12345678",
     branch: "main",
     createdAt: hour(3),
@@ -45,6 +47,7 @@ export const mockRuns: TestRun[] = [
     skipped: 0,
     durationMs: 175000,
     triggeredBy: "workflow_dispatch",
+    environment: "stg",
     commitSha: "c5f9e4a3b0d16f8a2345678901abcdef23456789",
     branch: "main",
     createdAt: hour(6),
@@ -60,6 +63,7 @@ export const mockRuns: TestRun[] = [
     skipped: 0,
     durationMs: 310000,
     triggeredBy: "push",
+    environment: "prod",
     commitSha: "d6a0f5b4c1e27a9b3456789012abcdef34567890",
     branch: "feature/add-search",
     createdAt: hour(12),
@@ -75,6 +79,7 @@ export const mockRuns: TestRun[] = [
     skipped: 0,
     durationMs: 168000,
     triggeredBy: "workflow_dispatch",
+    environment: "prod",
     commitSha: "e7b1a6c5d2f38b0c4567890123abcdef45678901",
     branch: "main",
     createdAt: hour(24),
@@ -97,7 +102,8 @@ export const mockTestCases: TestCase[] = [
   {
     id: 2,
     runId: 12847201,
-    title: "AlbumBuddy 모니터링 > 검색 기능 > AB-SEARCH-01: 상품 검색 결과 표시",
+    title:
+      "AlbumBuddy 모니터링 > 검색 기능 > AB-SEARCH-01: 상품 검색 결과 표시",
     file: "tests/ab_monitoring_pom.spec.ts",
     project: "albumbuddy-monitoring",
     status: "passed",
@@ -114,8 +120,10 @@ export const mockTestCases: TestCase[] = [
     project: "albumbuddy-monitoring",
     status: "failed",
     durationMs: 30000,
-    errorMessage: "Error: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: '장바구니 담기' })",
-    errorStack: "  at AlbumBuddyPage.addToCart (tests/pages/albumbuddy.page.ts:45:18)\n  at tests/ab_monitoring_pom.spec.ts:67:5",
+    errorMessage:
+      "Error: locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: '장바구니 담기' })",
+    errorStack:
+      "  at AlbumBuddyPage.addToCart (tests/pages/albumbuddy.page.ts:45:18)\n  at tests/ab_monitoring_pom.spec.ts:67:5",
     errorCategory: "selector_not_found",
   },
   {
@@ -126,7 +134,8 @@ export const mockTestCases: TestCase[] = [
     project: "albumbuddy-monitoring",
     status: "failed",
     durationMs: 30000,
-    errorMessage: "Error: expect(received).toBeVisible()\n\nExpected: visible\nReceived: hidden\n\nCall log:\n  - expect.toBeVisible with timeout 15000ms\n  - waiting for getByText('주문서 작성')",
+    errorMessage:
+      "Error: expect(received).toBeVisible()\n\nExpected: visible\nReceived: hidden\n\nCall log:\n  - expect.toBeVisible with timeout 15000ms\n  - waiting for getByText('주문서 작성')",
     errorStack: "  at tests/ab_monitoring_pom.spec.ts:89:32",
     errorCategory: "assertion_failure",
   },
@@ -138,8 +147,10 @@ export const mockTestCases: TestCase[] = [
     project: "albumbuddy-monitoring",
     status: "failed",
     durationMs: 30000,
-    errorMessage: "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at https://albumbuddy.makestar.co/payment",
-    errorStack: "  at AlbumBuddyPage.goToPayment (tests/pages/albumbuddy.page.ts:72:10)\n  at tests/ab_monitoring_pom.spec.ts:102:5",
+    errorMessage:
+      "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at https://albumbuddy.makestar.co/payment",
+    errorStack:
+      "  at AlbumBuddyPage.goToPayment (tests/pages/albumbuddy.page.ts:72:10)\n  at tests/ab_monitoring_pom.spec.ts:102:5",
     errorCategory: "network_timeout",
   },
   ...Array.from({ length: 13 }, (_, i) => ({

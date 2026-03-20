@@ -7,12 +7,14 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const suite = searchParams.get("suite");
   const status = searchParams.get("status");
+  const environment = searchParams.get("environment");
   const limit = Math.min(parseInt(searchParams.get("limit") || "10", 10), 100);
   const offset = Math.max(parseInt(searchParams.get("offset") || "0", 10), 0);
 
   const conditions = [];
   if (suite) conditions.push(eq(testRuns.suite, suite));
   if (status) conditions.push(eq(testRuns.status, status));
+  if (environment) conditions.push(eq(testRuns.environment, environment));
 
   const where = conditions.length > 0 ? and(...conditions) : undefined;
 

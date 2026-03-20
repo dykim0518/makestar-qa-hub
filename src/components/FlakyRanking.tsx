@@ -29,7 +29,13 @@ const STATUS_DOTS: Record<string, { color: string; label: string }> = {
   skipped: { color: "bg-slate-500", label: "skipped" },
 };
 
-export function FlakyRanking({ suite }: { suite: string }) {
+export function FlakyRanking({
+  suite,
+  environment,
+}: {
+  suite: string;
+  environment: string;
+}) {
   const [rankings, setRankings] = useState<FlakyRankingItem[]>([]);
   const [days, setDays] = useState(30);
   const [loading, setLoading] = useState(true);
@@ -41,6 +47,7 @@ export function FlakyRanking({ suite }: { suite: string }) {
       params.set("days", String(days));
       params.set("limit", "10");
       if (suite) params.set("suite", suite);
+      if (environment) params.set("environment", environment);
 
       const res = await fetch(`/api/flaky-ranking?${params}`);
       if (res.ok) {
@@ -52,7 +59,7 @@ export function FlakyRanking({ suite }: { suite: string }) {
     } finally {
       setLoading(false);
     }
-  }, [days, suite]);
+  }, [days, suite, environment]);
 
   useEffect(() => {
     fetchRankings();
@@ -87,7 +94,9 @@ export function FlakyRanking({ suite }: { suite: string }) {
         {rankings.length === 0 ? (
           <div className="px-6 py-12 text-center">
             <p className="text-sm text-[var(--muted)]">
-              {loading ? "로딩 중..." : `최근 ${days}일간 flaky 테스트가 없습니다.`}
+              {loading
+                ? "로딩 중..."
+                : `최근 ${days}일간 flaky 테스트가 없습니다.`}
             </p>
           </div>
         ) : (
