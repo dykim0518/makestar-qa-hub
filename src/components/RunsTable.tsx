@@ -97,9 +97,6 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                 소요 시간
               </th>
               <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-                Branch
-              </th>
-              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
                 일시
               </th>
             </tr>
@@ -230,11 +227,6 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                   </td>
                   <td className="whitespace-nowrap px-5 py-4 text-sm font-mono text-[var(--muted)]">
                     {formatDuration(run.durationMs)}
-                  </td>
-                  <td className="whitespace-nowrap px-5 py-4 text-sm">
-                    <span className="font-mono text-sm text-slate-400">
-                      {run.branch || "-"}
-                    </span>
                   </td>
                   <td className="whitespace-nowrap px-5 py-4 text-sm text-[var(--muted)]">
                     {formatDate(run.createdAt)}

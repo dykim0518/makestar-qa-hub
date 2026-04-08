@@ -45,7 +45,7 @@ export function FlakyRanking({
     try {
       const params = new URLSearchParams();
       params.set("days", String(days));
-      params.set("limit", "10");
+      params.set("limit", "5");
       if (suite) params.set("suite", suite);
       if (environment) params.set("environment", environment);
 
