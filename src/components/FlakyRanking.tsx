@@ -2,19 +2,19 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-interface FlakyResult {
+type FlakyResult = {
   status: string;
   runId: number;
   createdAt: string;
-}
+};
 
-interface FlakyRankingItem {
+type FlakyRankingItem = {
   title: string;
   flakyCount: number;
   totalRuns: number;
   flakyRate: number;
   last10Results: FlakyResult[];
-}
+};
 
 const DAYS_OPTIONS = [
   { value: 7, label: "7일" },
@@ -113,7 +113,10 @@ export function FlakyRanking({
 
                 {/* 테스트명 */}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-slate-200">
+                  <p
+                    className="truncate text-sm font-medium text-slate-200"
+                    title={item.title}
+                  >
                     {item.title}
                   </p>
                 </div>
@@ -132,7 +135,7 @@ export function FlakyRanking({
                 </div>
 
                 {/* 최근 10회 결과 도트 */}
-                <div className="flex shrink-0 items-center gap-1">
+                <div className="hidden shrink-0 items-center gap-1 sm:flex">
                   {item.last10Results
                     .slice()
                     .reverse()
@@ -142,7 +145,7 @@ export function FlakyRanking({
                         <span
                           key={i}
                           title={`Run #${r.runId}: ${dot.label}`}
-                          className={`inline-block h-2.5 w-2.5 rounded-full ${dot.color}`}
+                          className={`inline-block h-3 w-3 rounded-full ${dot.color}`}
                         />
                       );
                     })}

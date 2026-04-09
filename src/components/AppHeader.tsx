@@ -1,10 +1,10 @@
 import Link from "next/link";
 
-type ActivePage = "dashboard" | "trigger" | "tc";
+type ActivePage = "dashboard" | "trigger";
 
-interface AppHeaderProps {
+type AppHeaderProps = {
   active?: ActivePage;
-}
+};
 
 export function AppHeader({ active }: AppHeaderProps) {
   const navItemBase =
@@ -38,30 +38,27 @@ export function AppHeader({ active }: AppHeaderProps) {
             Makestar QA Hub
           </Link>
         </div>
-        <nav className="flex items-center gap-2 text-sm">
-          {/* Test Execution 영역 */}
+        <nav
+          className="flex items-center gap-2 text-sm"
+          aria-label="메인 내비게이션"
+        >
           <Link
             href="/dashboard"
-            className={active === "dashboard" ? navActive : navInactive}
+            className={`focus-ring ${active === "dashboard" ? navActive : navInactive}`}
+            {...(active === "dashboard"
+              ? { "aria-current": "page" as const }
+              : {})}
           >
             대시보드
           </Link>
           <Link
             href="/trigger"
-            className={active === "trigger" ? navActive : navInactive}
+            className={`focus-ring ${active === "trigger" ? navActive : navInactive}`}
+            {...(active === "trigger"
+              ? { "aria-current": "page" as const }
+              : {})}
           >
             테스트 실행
-          </Link>
-
-          {/* 구분자 */}
-          <span className="mx-1 h-4 w-px bg-[var(--card-border)]" />
-
-          {/* TC Builder 영역 */}
-          <Link
-            href="/tc"
-            className={active === "tc" ? navActive : navInactive}
-          >
-            TC Builder
           </Link>
         </nav>
       </div>

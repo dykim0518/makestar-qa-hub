@@ -22,7 +22,7 @@ const steps = [
   {
     num: 3,
     title: "테스트 실행",
-    desc: "\"테스트 실행\" 버튼 클릭으로 GitHub Actions 워크플로우 트리거. 이미 실행 중이면 큐에 추가됨 (최대 5개).",
+    desc: '"테스트 실행" 버튼 클릭으로 GitHub Actions 워크플로우 트리거. 이미 실행 중이면 큐에 추가됨 (최대 5개).',
     color: "text-emerald-400",
     border: "border-emerald-500/20",
     bg: "bg-emerald-500/5",
@@ -64,7 +64,7 @@ export function TriggerGuide() {
     <div className="fixed bottom-6 right-6 z-50" ref={panelRef}>
       {/* Panel */}
       {open && (
-        <div className="mb-3 w-[360px] max-h-[70vh] overflow-y-auto rounded-xl border border-[var(--card-border)] bg-[var(--card)] shadow-2xl shadow-black/40">
+        <div className="mb-3 w-[calc(100vw-48px)] max-w-[360px] max-h-[70vh] overflow-y-auto rounded-xl border border-[var(--card-border)] bg-[var(--card)] shadow-2xl shadow-black/40">
           <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--card-border)] bg-[var(--card)] px-4 py-3">
             <span className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
               테스트 실행 가이드
@@ -74,22 +74,44 @@ export function TriggerGuide() {
               onClick={() => setOpen(false)}
               className="text-[var(--muted)] hover:text-white"
             >
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              <svg
+                className="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
             </button>
           </div>
 
           <div className="px-4 pb-4 pt-3">
             {/* Flow diagram */}
             <div className="mb-4 flex flex-wrap items-center justify-center gap-1 text-[10px] font-semibold">
-              <span className="rounded-md bg-indigo-500/15 px-2 py-1 text-indigo-300">Suite</span>
+              <span className="rounded-md bg-indigo-500/15 px-2 py-1 text-indigo-300">
+                Suite
+              </span>
               <span className="text-[var(--muted)]">→</span>
-              <span className="rounded-md bg-blue-500/15 px-2 py-1 text-blue-300">필터</span>
+              <span className="rounded-md bg-blue-500/15 px-2 py-1 text-blue-300">
+                필터
+              </span>
               <span className="text-[var(--muted)]">→</span>
-              <span className="rounded-md bg-emerald-500/15 px-2 py-1 text-emerald-300">실행</span>
+              <span className="rounded-md bg-emerald-500/15 px-2 py-1 text-emerald-300">
+                실행
+              </span>
               <span className="text-[var(--muted)]">→</span>
-              <span className="rounded-md bg-purple-500/15 px-2 py-1 text-purple-300">결과</span>
+              <span className="rounded-md bg-purple-500/15 px-2 py-1 text-purple-300">
+                결과
+              </span>
               <span className="text-[var(--muted)]">→</span>
-              <span className="rounded-md bg-amber-500/15 px-2 py-1 text-amber-300">상세</span>
+              <span className="rounded-md bg-amber-500/15 px-2 py-1 text-amber-300">
+                상세
+              </span>
             </div>
 
             {/* Steps */}
@@ -100,12 +122,18 @@ export function TriggerGuide() {
                   className={`rounded-lg border ${s.border} ${s.bg} px-3 py-2.5`}
                 >
                   <div className="flex items-start gap-2.5">
-                    <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-[10px] font-bold ${s.color}`}>
+                    <span
+                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-[10px] font-bold ${s.color}`}
+                    >
                       {s.num}
                     </span>
                     <div>
-                      <p className={`text-xs font-semibold ${s.color}`}>{s.title}</p>
-                      <p className="mt-0.5 text-[11px] leading-relaxed text-[var(--muted)]">{s.desc}</p>
+                      <p className={`text-xs font-semibold ${s.color}`}>
+                        {s.title}
+                      </p>
+                      <p className="mt-0.5 text-[11px] leading-relaxed text-[var(--muted)]">
+                        {s.desc}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -114,11 +142,22 @@ export function TriggerGuide() {
 
             {/* Tips */}
             <div className="mt-3 rounded-lg border border-[var(--card-border)] bg-white/[0.02] px-3 py-2.5">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)] mb-1.5">팁</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)] mb-1.5">
+                팁
+              </p>
               <ul className="space-y-1 text-[11px] text-[var(--muted)]">
-                <li>• <strong className="text-white/80">Grep 패턴</strong>으로 특정 TC만 실행 (예: CMR-HOME, CMR-SEARCH)</li>
-                <li>• <strong className="text-white/80">Admin</strong> suite는 VPN 연결 필요 (GitHub Runner에서 실패)</li>
-                <li>• 탭 전환 후 복귀하면 <strong className="text-white/80">즉시 최신 결과 갱신</strong></li>
+                <li>
+                  • <strong className="text-white/80">Grep 패턴</strong>으로
+                  특정 TC만 실행 (예: CMR-HOME, CMR-SEARCH)
+                </li>
+                <li>
+                  • <strong className="text-white/80">Admin</strong> suite는 VPN
+                  연결 필요 (GitHub Runner에서 실패)
+                </li>
+                <li>
+                  • 탭 전환 후 복귀하면{" "}
+                  <strong className="text-white/80">즉시 최신 결과 갱신</strong>
+                </li>
               </ul>
             </div>
           </div>
@@ -135,9 +174,18 @@ export function TriggerGuide() {
             : "border-[var(--card-border)] bg-[var(--card)] text-[var(--muted)] hover:border-indigo-500/30 hover:text-indigo-300 shadow-black/30"
         }`}
       >
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+        <svg
+          className="h-5 w-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
           <circle cx="12" cy="12" r="10" />
-          <path strokeLinecap="round" d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+          <path
+            strokeLinecap="round"
+            d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"
+          />
           <circle cx="12" cy="17" r=".5" fill="currentColor" />
         </svg>
       </button>

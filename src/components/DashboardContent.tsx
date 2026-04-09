@@ -133,7 +133,7 @@ export function DashboardContent({
   return (
     <>
       {/* Suite + Environment 필터 */}
-      <div className="mb-6 flex items-center gap-3 flex-wrap">
+      <div className="mb-6 flex items-center gap-3 gap-y-2 flex-wrap">
         <span className="text-xs font-medium text-[var(--muted)]">Suite</span>
         <div className="flex rounded-lg border border-[var(--card-border)] overflow-hidden">
           {SUITES.map((s) => (

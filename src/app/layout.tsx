@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Makestar QA Hub",
-  description: "E2E 테스트 실행·분석 및 TC 자동 생성 플랫폼",
+  description: "E2E 테스트 실행 및 결과 분석 플랫폼",
 };
 
 export default function RootLayout({

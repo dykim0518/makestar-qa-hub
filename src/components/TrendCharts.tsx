@@ -16,7 +16,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-interface TrendPoint {
+type TrendPoint = {
   date: string;
   passRate: number;
   passed: number;
@@ -26,7 +26,7 @@ interface TrendPoint {
   total: number;
   avgDurationMs: number;
   runCount: number;
-}
+};
 
 const PERIODS = [
   { value: 7, label: "7일" },
@@ -68,7 +68,9 @@ function CustomTooltip({
 }
 
 function Skeleton() {
-  return <div className="h-[220px] animate-pulse rounded-lg bg-white/5" />;
+  return (
+    <div className="h-[180px] sm:h-[220px] animate-pulse rounded-lg bg-white/5" />
+  );
 }
 
 function ChartCard({
@@ -89,7 +91,7 @@ function ChartCard({
       <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
         {title}
       </h3>
-      {children}
+      <div className="h-[180px] sm:h-[220px]">{children}</div>
     </div>
   );
 }
@@ -185,7 +187,7 @@ export function TrendCharts({
         <div className="grid gap-4 md:grid-cols-2">
           {/* 성공률 추이 */}
           <ChartCard title="성공률 추이">
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
                 <CartesianGrid
                   strokeDasharray="3 3"
@@ -198,6 +200,7 @@ export function TrendCharts({
                   tick={axisStyle}
                   axisLine={{ stroke: gridStroke }}
                   tickLine={false}
+                  interval="preserveStartEnd"
                 />
                 <YAxis
                   domain={[0, 100]}
@@ -237,7 +240,7 @@ export function TrendCharts({
 
           {/* 실행 시간 추이 */}
           <ChartCard title="실행 시간 추이">
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient
@@ -266,6 +269,7 @@ export function TrendCharts({
                   tick={axisStyle}
                   axisLine={{ stroke: gridStroke }}
                   tickLine={false}
+                  interval="preserveStartEnd"
                 />
                 <YAxis
                   tick={axisStyle}
@@ -293,7 +297,7 @@ export function TrendCharts({
 
           {/* 일별 실패/Flaky 추이 */}
           <ChartCard title="일별 실패 · Flaky 추이" fullWidth>
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
                 <CartesianGrid
                   strokeDasharray="3 3"
@@ -306,6 +310,7 @@ export function TrendCharts({
                   tick={axisStyle}
                   axisLine={{ stroke: gridStroke }}
                   tickLine={false}
+                  interval="preserveStartEnd"
                 />
                 <YAxis
                   tick={axisStyle}

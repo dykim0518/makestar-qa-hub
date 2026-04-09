@@ -12,6 +12,161 @@ import {
   getPassRateNumber,
 } from "@/lib/format";
 
+function PassRateBar({ rate }: { rate: number }) {
+  const color =
+    rate >= 90 ? "bg-emerald-500" : rate >= 70 ? "bg-amber-500" : "bg-rose-500";
+  const textColor =
+    rate >= 90
+      ? "text-emerald-400"
+      : rate >= 70
+        ? "text-amber-400"
+        : "text-rose-400";
+  return (
+    <div className="flex items-center gap-2.5">
+      <div className="h-1.5 w-16 overflow-hidden rounded-full bg-white/5">
+        <div
+          className={`h-full rounded-full transition-all ${color}`}
+          style={{ width: `${rate}%` }}
+        />
+      </div>
+      <span className={`font-mono text-xs font-semibold ${textColor}`}>
+        {rate}%
+      </span>
+    </div>
+  );
+}
+
+function CheckboxButton({
+  checked,
+  disabled,
+  onClick,
+}: {
+  checked: boolean;
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-all duration-150
+        ${
+          checked
+            ? "border-indigo-500 bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.3)]"
+            : "border-white/15 bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.06]"
+        }
+        disabled:opacity-20 disabled:cursor-not-allowed`}
+    >
+      {checked && (
+        <svg className="h-4 w-4 text-white" viewBox="0 0 12 12" fill="none">
+          <path
+            d="M2.5 6L5 8.5L9.5 3.5"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )}
+    </button>
+  );
+}
+
+function RunCardMobile({
+  run,
+  isSelected,
+  canSelect,
+  onToggle,
+}: {
+  run: TestRun;
+  isSelected: boolean;
+  canSelect: boolean;
+  onToggle: () => void;
+}) {
+  const rate = getPassRateNumber(run.passed, run.total);
+  const hasFailure = run.failed > 0;
+  const hasFlaky = run.flaky > 0;
+
+  return (
+    <div
+      className={`rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 transition-colors ${
+        hasFailure ? "border-l-2 border-l-rose-500" : ""
+      } ${isSelected ? "bg-indigo-500/[0.06] border-indigo-500/30" : ""}`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          {/* Run ID + Status */}
+          <div className="mb-2 flex items-center gap-2">
+            <Link
+              href={`/runs/${run.runId}`}
+              className="font-mono text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+            >
+              #{run.runId}
+            </Link>
+            <StatusBadge status={run.status} />
+          </div>
+
+          {/* Suite / Env */}
+          <div className="mb-3 flex items-center gap-1.5">
+            <span className="rounded-md border border-[var(--card-border)] bg-white/5 px-2 py-0.5 font-mono text-xs text-slate-300">
+              {run.suite}
+            </span>
+            <span
+              className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
+                run.environment === "stg"
+                  ? "border border-amber-500/30 bg-amber-500/10 text-amber-400"
+                  : "border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+              }`}
+            >
+              {run.environment === "stg" ? "STG" : "PROD"}
+            </span>
+          </div>
+
+          {/* Results row */}
+          <div className="mb-2 flex items-center gap-3">
+            <span className="font-mono text-sm text-slate-300">
+              <span className="text-emerald-400">{run.passed}</span>
+              <span className="text-[var(--muted)]"> / </span>
+              <span>{run.total}</span>
+            </span>
+            {hasFailure && (
+              <span className="rounded-full border border-rose-500/20 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-400">
+                F:{run.failed}
+              </span>
+            )}
+            {hasFlaky && (
+              <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-400">
+                FL:{run.flaky}
+              </span>
+            )}
+          </div>
+
+          {/* Pass rate + Duration + Date */}
+          <div className="flex items-center gap-4">
+            <PassRateBar rate={rate} />
+            <span className="font-mono text-xs text-[var(--muted)]">
+              {formatDuration(run.durationMs)}
+            </span>
+          </div>
+
+          {/* Date */}
+          <p className="mt-2 text-xs text-[var(--muted)]">
+            {formatDate(run.createdAt)}
+          </p>
+        </div>
+
+        {/* Checkbox */}
+        <CheckboxButton
+          checked={isSelected}
+          disabled={!isSelected && !canSelect}
+          onClick={onToggle}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function RunsTable({ runs }: { runs: TestRun[] }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<number>>(new Set());
@@ -71,11 +226,25 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-[var(--card-border)] bg-[var(--card)]">
+      {/* Mobile card layout */}
+      <div className="flex flex-col gap-3 md:hidden">
+        {runs.map((run) => (
+          <RunCardMobile
+            key={run.runId}
+            run={run}
+            isSelected={selected.has(run.runId)}
+            canSelect={selected.size < 2}
+            onToggle={() => toggleSelect(run.runId)}
+          />
+        ))}
+      </div>
+
+      {/* Desktop table layout */}
+      <div className="hidden md:block overflow-x-auto rounded-xl border border-[var(--card-border)] bg-[var(--card)]">
         <table className="min-w-full">
-          <thead>
+          <thead className="sticky top-0 z-10 bg-[var(--card)]">
             <tr className="border-b border-[var(--card-border)]">
-              <th className="w-10 px-3 py-3.5 text-center">
+              <th className="w-12 px-3 py-3.5 text-center">
                 <span className="sr-only">선택</span>
               </th>
               <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
@@ -118,34 +287,11 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                   className={`transition-colors hover:bg-white/[0.02] ${hasFailure ? "bg-rose-500/[0.03]" : ""} ${isSelected ? "bg-indigo-500/[0.06]" : ""}`}
                 >
                   <td className="px-3 py-4 text-center">
-                    <button
-                      type="button"
-                      onClick={() => toggleSelect(run.runId)}
+                    <CheckboxButton
+                      checked={isSelected}
                       disabled={!isSelected && selected.size >= 2}
-                      className={`group inline-flex h-[18px] w-[18px] items-center justify-center rounded-[5px] border transition-all duration-150
-                        ${
-                          isSelected
-                            ? "border-indigo-500 bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.3)]"
-                            : "border-white/15 bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.06]"
-                        }
-                        disabled:opacity-20 disabled:cursor-not-allowed`}
-                    >
-                      {isSelected && (
-                        <svg
-                          className="h-3 w-3 text-white"
-                          viewBox="0 0 12 12"
-                          fill="none"
-                        >
-                          <path
-                            d="M2.5 6L5 8.5L9.5 3.5"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      )}
-                    </button>
+                      onClick={() => toggleSelect(run.runId)}
+                    />
                   </td>
                   <td className="relative whitespace-nowrap px-5 py-4 text-sm">
                     {indicatorColor && (
@@ -199,31 +345,7 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-5 py-4 text-sm">
-                    <div className="flex items-center gap-2.5">
-                      <div className="h-1.5 w-16 overflow-hidden rounded-full bg-white/5">
-                        <div
-                          className={`h-full rounded-full transition-all ${
-                            rate >= 90
-                              ? "bg-emerald-500"
-                              : rate >= 70
-                                ? "bg-amber-500"
-                                : "bg-rose-500"
-                          }`}
-                          style={{ width: `${rate}%` }}
-                        />
-                      </div>
-                      <span
-                        className={`font-mono font-semibold text-xs ${
-                          rate >= 90
-                            ? "text-emerald-400"
-                            : rate >= 70
-                              ? "text-amber-400"
-                              : "text-rose-400"
-                        }`}
-                      >
-                        {getPassRate(run.passed, run.total)}
-                      </span>
-                    </div>
+                    <PassRateBar rate={rate} />
                   </td>
                   <td className="whitespace-nowrap px-5 py-4 text-sm font-mono text-[var(--muted)]">
                     {formatDuration(run.durationMs)}
