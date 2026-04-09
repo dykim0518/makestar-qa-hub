@@ -40,7 +40,7 @@ export function TestResultsPanel({
     <div>
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
+          <h2 className="text-xl font-bold text-white tracking-tight">
             {isRunning ? "실시간 테스트 결과" : "테스트 실행 결과"}
           </h2>
           {isRunning && (
@@ -106,7 +106,7 @@ export function TestResultsPanel({
           <p className="text-xs text-amber-400">자동 갱신이 중지되었습니다.</p>
           <button
             onClick={onResumePolling}
-            className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-400 transition-colors hover:bg-amber-500/20"
+            className="rounded-md border border-amber-500/40 bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-400 transition-colors hover:bg-amber-500/25"
           >
             다시 시작
           </button>
@@ -114,8 +114,23 @@ export function TestResultsPanel({
       )}
 
       {!triggered ? (
-        <div className="rounded-xl border border-dashed border-[var(--card-border)] bg-[var(--card)] p-10 text-center text-sm text-[var(--muted)]">
-          테스트를 실행하면 결과가 여기에 표시됩니다
+        <div className="rounded-xl border border-dashed border-[var(--card-border)] bg-[var(--card)] p-12 text-center">
+          <svg
+            className="mx-auto mb-4 h-12 w-12 text-[var(--muted)]/30"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1}
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"
+            />
+          </svg>
+          <p className="text-sm text-[var(--muted)]">
+            테스트를 실행하면 결과가 여기에 표시됩니다
+          </p>
         </div>
       ) : waitingForNewRun || (casesLoading && !latestRun) ? (
         <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-10 text-center">
@@ -154,7 +169,7 @@ export function TestResultsPanel({
           {/* Run 요약 헤더 */}
           <Link
             href={`/runs/${latestRun.runId}`}
-            className="mb-3 flex items-center justify-between rounded-xl border border-[var(--card-border)] bg-[var(--card)] px-4 py-3 transition-all hover:border-indigo-500/30"
+            className="mb-3 flex items-center justify-between rounded-xl border border-[var(--card-border)] bg-[var(--card)] px-4 py-3 transition-all hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5"
           >
             <div className="flex items-center gap-3">
               <RunStatusDot status={latestRun.status} />
@@ -200,7 +215,7 @@ export function TestResultsPanel({
                   {Math.round((completedCount / totalCount) * 100)}%
                 </span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
+              <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-500"
                   style={{

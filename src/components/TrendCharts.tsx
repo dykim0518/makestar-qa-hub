@@ -77,18 +77,21 @@ function ChartCard({
   title,
   children,
   fullWidth,
+  dotColor,
 }: {
   title: string;
   children: React.ReactNode;
   fullWidth?: boolean;
+  dotColor?: string;
 }) {
   return (
     <div
-      className={`rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 ${
+      className={`rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 hover:border-[var(--accent)]/20 transition-all ${
         fullWidth ? "md:col-span-2" : ""
       }`}
     >
-      <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
+      <h3 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
+        {dotColor && <span className={`h-2 w-2 rounded-full ${dotColor}`} />}
         {title}
       </h3>
       <div className="h-[180px] sm:h-[220px]">{children}</div>
@@ -186,7 +189,7 @@ export function TrendCharts({
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {/* 성공률 추이 */}
-          <ChartCard title="성공률 추이">
+          <ChartCard title="성공률 추이" dotColor="bg-emerald-400">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
                 <CartesianGrid
@@ -239,7 +242,7 @@ export function TrendCharts({
           </ChartCard>
 
           {/* 실행 시간 추이 */}
-          <ChartCard title="실행 시간 추이">
+          <ChartCard title="실행 시간 추이" dotColor="bg-indigo-400">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
                 <defs>
@@ -296,7 +299,11 @@ export function TrendCharts({
           </ChartCard>
 
           {/* 일별 실패/Flaky 추이 */}
-          <ChartCard title="일별 실패 · Flaky 추이" fullWidth>
+          <ChartCard
+            title="일별 실패 · Flaky 추이"
+            fullWidth
+            dotColor="bg-rose-400"
+          >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
                 <CartesianGrid

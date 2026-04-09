@@ -132,54 +132,60 @@ export function DashboardContent({
 
   return (
     <>
+      <h1 className="mb-6 text-2xl font-bold text-white tracking-tight">
+        대시보드
+      </h1>
+
       {/* Suite + Environment 필터 */}
-      <div className="mb-6 flex items-center gap-3 gap-y-2 flex-wrap">
-        <span className="text-xs font-medium text-[var(--muted)]">Suite</span>
-        <div className="flex rounded-lg border border-[var(--card-border)] overflow-hidden">
-          {SUITES.map((s) => (
-            <button
-              key={s.value}
-              onClick={() => {
-                setSuite(s.value);
-                if (s.value !== "cmr") setEnvironment("");
-              }}
-              className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                suite === s.value
-                  ? "bg-indigo-500/15 text-indigo-400"
-                  : "text-[var(--muted)] hover:text-white hover:bg-white/5"
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
+      <div className="mb-8 rounded-xl border border-[var(--card-border)] bg-[var(--card)] px-5 py-4">
+        <div className="flex items-center gap-3 gap-y-2 flex-wrap">
+          <span className="text-xs font-medium text-[var(--muted)]">Suite</span>
+          <div className="flex rounded-lg border border-[var(--card-border)] overflow-hidden">
+            {SUITES.map((s) => (
+              <button
+                key={s.value}
+                onClick={() => {
+                  setSuite(s.value);
+                  if (s.value !== "cmr") setEnvironment("");
+                }}
+                className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                  suite === s.value
+                    ? "bg-indigo-500/15 text-indigo-400"
+                    : "text-[var(--muted)] hover:text-white hover:bg-white/5"
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
 
-        <span className="text-xs font-medium text-[var(--muted)]">Env</span>
-        <div className="flex rounded-lg border border-[var(--card-border)] overflow-hidden">
-          {ENVIRONMENTS.map((e) => (
-            <button
-              key={e.value}
-              onClick={() => setEnvironment(e.value)}
-              className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                environment === e.value
-                  ? "bg-violet-500/15 text-violet-400"
-                  : "text-[var(--muted)] hover:text-white hover:bg-white/5"
-              }`}
-            >
-              {e.label}
-            </button>
-          ))}
-        </div>
+          <span className="text-xs font-medium text-[var(--muted)]">Env</span>
+          <div className="flex rounded-lg border border-[var(--card-border)] overflow-hidden">
+            {ENVIRONMENTS.map((e) => (
+              <button
+                key={e.value}
+                onClick={() => setEnvironment(e.value)}
+                className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                  environment === e.value
+                    ? "bg-violet-500/15 text-violet-400"
+                    : "text-[var(--muted)] hover:text-white hover:bg-white/5"
+                }`}
+              >
+                {e.label}
+              </button>
+            ))}
+          </div>
 
-        {hasRunning && (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+          {hasRunning && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+              </span>
+              실행 중
             </span>
-            실행 중
-          </span>
-        )}
+          )}
+        </div>
       </div>
 
       <section className="mb-8">
@@ -189,11 +195,15 @@ export function DashboardContent({
         <SummaryCards latestRun={latestRun} />
       </section>
 
-      <TrendCharts suite={suite} environment={environment} />
+      <div className="border-t border-[var(--card-border)] pt-8 mt-2">
+        <TrendCharts suite={suite} environment={environment} />
+      </div>
 
-      <FlakyRanking suite={suite} environment={environment} />
+      <div className="border-t border-[var(--card-border)] pt-8 mt-2">
+        <FlakyRanking suite={suite} environment={environment} />
+      </div>
 
-      <section>
+      <section className="border-t border-[var(--card-border)] pt-8 mt-2">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
             실행 히스토리
@@ -203,7 +213,7 @@ export function DashboardContent({
         <RunsTable runs={runs} />
 
         {totalPages > 1 && (
-          <div className="mt-4 flex items-center justify-center gap-1">
+          <div className="mt-4 flex items-center justify-center gap-1 rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-3 py-2">
             <button
               onClick={() => goToPage(page - 1)}
               disabled={page === 0}

@@ -4,86 +4,136 @@ import type { TestRun } from "@/db/schema";
 import { getPassRate, getPassRateNumber, formatDuration } from "@/lib/format";
 
 export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
-  if (!latestRun) {
-    return (
-      <div className="rounded-xl border border-dashed border-[var(--card-border)] bg-[var(--card)] p-10 text-center text-[var(--muted)]">
-        아직 테스트 결과가 없습니다.
-      </div>
-    );
-  }
+  const isEmpty = !latestRun;
+  const passRate = isEmpty
+    ? 0
+    : getPassRateNumber(latestRun.passed, latestRun.total);
 
-  const passRate = getPassRateNumber(latestRun.passed, latestRun.total);
-
-  const cards = [
-    {
-      label: "총 테스트",
-      value: latestRun.total,
-      icon: "layers",
-      accent: "from-indigo-500 to-indigo-600",
-      iconBg: "bg-indigo-500/10 text-indigo-400",
-    },
-    {
-      label: "통과",
-      value: latestRun.passed,
-      icon: "check",
-      accent: "from-emerald-500 to-emerald-600",
-      iconBg: "bg-emerald-500/10 text-emerald-400",
-    },
-    {
-      label: "실패",
-      value: latestRun.failed,
-      icon: "x",
-      accent: "from-rose-500 to-rose-600",
-      iconBg: "bg-rose-500/10 text-rose-400",
-    },
-    {
-      label: "Flaky",
-      value: latestRun.flaky,
-      icon: "flaky",
-      accent: "from-amber-500 to-amber-600",
-      iconBg: "bg-amber-500/10 text-amber-400",
-    },
-    {
-      label: "성공률",
-      value: getPassRate(latestRun.passed, latestRun.total),
-      icon: "percent",
-      accent:
-        passRate >= 90
-          ? "from-emerald-500 to-emerald-600"
-          : passRate >= 70
-            ? "from-amber-500 to-amber-600"
-            : "from-rose-500 to-rose-600",
-      iconBg:
-        passRate >= 90
-          ? "bg-emerald-500/10 text-emerald-400"
-          : passRate >= 70
-            ? "bg-amber-500/10 text-amber-400"
-            : "bg-rose-500/10 text-rose-400",
-    },
-  ];
+  const cards = isEmpty
+    ? [
+        {
+          label: "총 테스트",
+          value: "--" as string | number,
+          icon: "layers",
+          accent: "from-indigo-500 to-indigo-600",
+          iconBg: "bg-indigo-500/10 text-indigo-400",
+          hoverShadow: "hover:shadow-indigo-500/5",
+        },
+        {
+          label: "통과",
+          value: "--" as string | number,
+          icon: "check",
+          accent: "from-emerald-500 to-emerald-600",
+          iconBg: "bg-emerald-500/10 text-emerald-400",
+          hoverShadow: "hover:shadow-emerald-500/5",
+        },
+        {
+          label: "실패",
+          value: "--" as string | number,
+          icon: "x",
+          accent: "from-rose-500 to-rose-600",
+          iconBg: "bg-rose-500/10 text-rose-400",
+          hoverShadow: "hover:shadow-rose-500/5",
+        },
+        {
+          label: "Flaky",
+          value: "--" as string | number,
+          icon: "flaky",
+          accent: "from-amber-500 to-amber-600",
+          iconBg: "bg-amber-500/10 text-amber-400",
+          hoverShadow: "hover:shadow-amber-500/5",
+        },
+        {
+          label: "성공률",
+          value: "--" as string | number,
+          icon: "percent",
+          accent: "from-emerald-500 to-emerald-600",
+          iconBg: "bg-emerald-500/10 text-emerald-400",
+          hoverShadow: "hover:shadow-emerald-500/5",
+        },
+      ]
+    : [
+        {
+          label: "총 테스트",
+          value: latestRun.total as string | number,
+          icon: "layers",
+          accent: "from-indigo-500 to-indigo-600",
+          iconBg: "bg-indigo-500/10 text-indigo-400",
+          hoverShadow: "hover:shadow-indigo-500/5",
+        },
+        {
+          label: "통과",
+          value: latestRun.passed as string | number,
+          icon: "check",
+          accent: "from-emerald-500 to-emerald-600",
+          iconBg: "bg-emerald-500/10 text-emerald-400",
+          hoverShadow: "hover:shadow-emerald-500/5",
+        },
+        {
+          label: "실패",
+          value: latestRun.failed as string | number,
+          icon: "x",
+          accent: "from-rose-500 to-rose-600",
+          iconBg: "bg-rose-500/10 text-rose-400",
+          hoverShadow: "hover:shadow-rose-500/5",
+        },
+        {
+          label: "Flaky",
+          value: latestRun.flaky as string | number,
+          icon: "flaky",
+          accent: "from-amber-500 to-amber-600",
+          iconBg: "bg-amber-500/10 text-amber-400",
+          hoverShadow: "hover:shadow-amber-500/5",
+        },
+        {
+          label: "성공률",
+          value: getPassRate(latestRun.passed, latestRun.total) as
+            | string
+            | number,
+          icon: "percent",
+          accent:
+            passRate >= 90
+              ? "from-emerald-500 to-emerald-600"
+              : passRate >= 70
+                ? "from-amber-500 to-amber-600"
+                : "from-rose-500 to-rose-600",
+          iconBg:
+            passRate >= 90
+              ? "bg-emerald-500/10 text-emerald-400"
+              : passRate >= 70
+                ? "bg-amber-500/10 text-amber-400"
+                : "bg-rose-500/10 text-rose-400",
+          hoverShadow:
+            passRate >= 90
+              ? "hover:shadow-emerald-500/5"
+              : passRate >= 70
+                ? "hover:shadow-amber-500/5"
+                : "hover:shadow-rose-500/5",
+        },
+      ];
 
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
       {cards.map((card) => (
         <div
           key={card.label}
-          className="group relative overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-5 transition-all hover:border-[var(--accent)]/30"
+          className={`group relative overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-5 transition-all hover:border-[var(--accent)]/30 hover:shadow-lg ${card.hoverShadow} ${isEmpty ? "opacity-50" : ""}`}
         >
           <div
-            className={`absolute top-0 left-0 h-0.5 w-full bg-gradient-to-r ${card.accent}`}
+            className={`absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full bg-gradient-to-b ${card.accent}`}
           />
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
               {card.label}
             </p>
-            <div className={`rounded-lg p-1.5 ${card.iconBg}`}>
+            <div className={`rounded-xl p-2 ${card.iconBg}`}>
               <CardIcon type={card.icon} />
             </div>
           </div>
-          <p className="text-3xl font-bold tracking-tight text-white">
+          <p className="text-4xl font-bold tracking-tight text-white">
             {card.value}
           </p>
-          {card.label === "성공률" && (
+          {card.label === "성공률" && !isEmpty && (
             <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/5">
               <div
                 className={`h-full rounded-full bg-gradient-to-r ${card.accent} transition-all`}
@@ -91,7 +141,7 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
               />
             </div>
           )}
-          {card.label === "총 테스트" && (
+          {card.label === "총 테스트" && !isEmpty && latestRun && (
             <p className="mt-2 text-xs text-[var(--muted)]">
               {formatDuration(latestRun.durationMs)}
             </p>
@@ -107,7 +157,7 @@ function CardIcon({ type }: { type: string }) {
     case "layers":
       return (
         <svg
-          className="h-4 w-4"
+          className="h-5 w-5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -123,7 +173,7 @@ function CardIcon({ type }: { type: string }) {
     case "check":
       return (
         <svg
-          className="h-4 w-4"
+          className="h-5 w-5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -139,7 +189,7 @@ function CardIcon({ type }: { type: string }) {
     case "x":
       return (
         <svg
-          className="h-4 w-4"
+          className="h-5 w-5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -155,7 +205,7 @@ function CardIcon({ type }: { type: string }) {
     case "flaky":
       return (
         <svg
-          className="h-4 w-4"
+          className="h-5 w-5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -171,7 +221,7 @@ function CardIcon({ type }: { type: string }) {
     case "percent":
       return (
         <svg
-          className="h-4 w-4"
+          className="h-5 w-5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

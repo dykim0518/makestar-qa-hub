@@ -11,9 +11,18 @@ export function CaseGroup({
   dotColor: string;
   cases: TestCaseResult[];
 }) {
+  const headerBgMap: Record<string, string> = {
+    "bg-rose-400": "bg-rose-500/5",
+    "bg-amber-400": "bg-amber-500/5",
+    "bg-emerald-400": "bg-emerald-500/5",
+  };
+  const headerBg = headerBgMap[dotColor] || "";
+
   return (
     <div className="mb-2">
-      <div className="flex items-center gap-2 px-1 py-1.5">
+      <div
+        className={`flex items-center gap-2 rounded-lg px-3 py-2 ${headerBg}`}
+      >
         <span className={`h-1.5 w-1.5 rounded-full ${dotColor}`} />
         <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--muted)]">
           {label}
@@ -42,8 +51,8 @@ function CaseRow({ tc }: { tc: TestCaseResult }) {
   const durationSec = (tc.durationMs / 1000).toFixed(1);
 
   return (
-    <div className="flex items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-white/[0.02]">
-      <span className={`h-2 w-2 shrink-0 rounded-full ${config.dot}`} />
+    <div className="flex items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-white/[0.04]">
+      <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${config.dot}`} />
       <div className="min-w-0 flex-1">
         {idMatch ? (
           <p className="text-xs truncate">

@@ -104,10 +104,20 @@ export function FlakyRanking({
             {rankings.map((item, idx) => (
               <div
                 key={item.title}
-                className="flex items-center gap-4 px-4 py-3 hover:bg-white/[0.02] transition-colors"
+                className="flex items-center gap-4 px-4 py-3 hover:bg-white/[0.04] transition-colors"
               >
                 {/* 순위 */}
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-xs font-bold text-amber-400">
+                <span
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                    idx === 0
+                      ? "bg-yellow-500/15 text-yellow-400"
+                      : idx === 1
+                        ? "bg-slate-300/15 text-slate-300"
+                        : idx === 2
+                          ? "bg-amber-700/15 text-amber-600"
+                          : "bg-amber-500/10 text-amber-400"
+                  }`}
+                >
                   {idx + 1}
                 </span>
 
@@ -129,9 +139,17 @@ export function FlakyRanking({
                   <span className="text-xs text-[var(--muted)]">
                     /{item.totalRuns}
                   </span>
-                  <span className="ml-2 text-xs text-[var(--muted)]">
-                    ({item.flakyRate}%)
-                  </span>
+                  <div className="ml-2 flex items-center gap-1.5">
+                    <div className="h-1 w-10 overflow-hidden rounded-full bg-white/5">
+                      <div
+                        className="h-full rounded-full bg-amber-400"
+                        style={{ width: `${item.flakyRate}%` }}
+                      />
+                    </div>
+                    <span className="text-[10px] text-[var(--muted)]">
+                      {item.flakyRate}%
+                    </span>
+                  </div>
                 </div>
 
                 {/* 최근 10회 결과 도트 */}

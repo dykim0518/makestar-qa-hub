@@ -67,8 +67,8 @@ export function TriggerForm({
 
   return (
     <div>
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
-        테스트 실행 트리거
+      <h2 className="mb-5 text-xl font-bold text-white tracking-tight">
+        테스트 실행
       </h2>
       <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-6">
         <fieldset className="mb-6">
@@ -84,23 +84,43 @@ export function TriggerForm({
                   setSuite(s.value);
                   if (s.value !== "cmr") setEnvironment("prod");
                 }}
-                className={`rounded-lg border p-3 text-left transition-all ${
+                className={`relative overflow-hidden rounded-lg border p-3 text-left transition-all ${
                   suite === s.value
                     ? "border-indigo-500/50 bg-indigo-500/10"
                     : "border-[var(--card-border)] bg-white/[0.02] hover:bg-white/5"
                 }`}
               >
+                {suite === s.value && (
+                  <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-indigo-500 rounded-r-full" />
+                )}
                 <div className="flex items-center justify-between">
                   <span
                     className={`text-sm font-semibold ${suite === s.value ? "text-indigo-400" : "text-slate-300"}`}
                   >
                     {s.label}
                   </span>
-                  {s.warn && (
-                    <span className="rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">
-                      VPN
-                    </span>
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    {s.warn && (
+                      <span className="rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">
+                        VPN
+                      </span>
+                    )}
+                    {suite === s.value && (
+                      <svg
+                        className="h-4 w-4 text-indigo-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2.5}
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M4.5 12.75l6 6 9-13.5"
+                        />
+                      </svg>
+                    )}
+                  </div>
                 </div>
                 <p className="mt-1 text-xs text-[var(--muted)]">{s.desc}</p>
               </button>
@@ -119,12 +139,15 @@ export function TriggerForm({
                   key={env}
                   type="button"
                   onClick={() => setEnvironment(env)}
-                  className={`rounded-lg border p-3 text-left transition-all ${
+                  className={`relative overflow-hidden rounded-lg border p-3 text-left transition-all ${
                     environment === env
                       ? "border-indigo-500/50 bg-indigo-500/10"
                       : "border-[var(--card-border)] bg-white/[0.02] hover:bg-white/5"
                   }`}
                 >
+                  {environment === env && (
+                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-indigo-500 rounded-r-full" />
+                  )}
                   <span
                     className={`text-sm font-semibold ${environment === env ? "text-indigo-400" : "text-slate-300"}`}
                   >

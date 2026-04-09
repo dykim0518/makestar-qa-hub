@@ -23,7 +23,7 @@ function PassRateBar({ rate }: { rate: number }) {
         : "text-rose-400";
   return (
     <div className="flex items-center gap-2.5">
-      <div className="h-1.5 w-16 overflow-hidden rounded-full bg-white/5">
+      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-white/5">
         <div
           className={`h-full rounded-full transition-all ${color}`}
           style={{ width: `${rate}%` }}
@@ -90,10 +90,19 @@ function RunCardMobile({
 
   return (
     <div
-      className={`rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 transition-colors ${
+      className={`relative overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 transition-colors ${
         hasFailure ? "border-l-2 border-l-rose-500" : ""
       } ${isSelected ? "bg-indigo-500/[0.06] border-indigo-500/30" : ""}`}
     >
+      <div
+        className={`absolute top-0 left-0 right-0 h-0.5 rounded-t-xl ${
+          hasFailure
+            ? "bg-rose-500"
+            : run.status === "running"
+              ? "bg-indigo-500"
+              : "bg-emerald-500"
+        }`}
+      />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           {/* Run ID + Status */}
@@ -284,7 +293,7 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
               return (
                 <tr
                   key={run.runId}
-                  className={`transition-colors hover:bg-white/[0.02] ${hasFailure ? "bg-rose-500/[0.03]" : ""} ${isSelected ? "bg-indigo-500/[0.06]" : ""}`}
+                  className={`transition-colors hover:bg-white/[0.04] ${hasFailure ? "bg-rose-500/[0.03]" : ""} ${isSelected ? "bg-indigo-500/[0.06]" : ""}`}
                 >
                   <td className="px-3 py-4 text-center">
                     <CheckboxButton

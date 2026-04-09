@@ -1,17 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0f1117;
-  --foreground: #e4e5e9;
-  --card: #1a1d27;
-  --card-border: #2a2d3a;
+  --background: #0a0d14;
+  --foreground: #f1f5f9;
+  --card: #111827;
+  --card-border: #1f2937;
   --card-hover: rgba(255, 255, 255, 0.05);
-  --muted: #6b7280;
+  --card-elevated: #1a2332;
+  --muted: #94a3b8;
   --accent: #6366f1;
   --success: #34d399;
   --warning: #fbbf24;
   --danger: #fb7185;
   --info: #818cf8;
+  --glow-indigo: rgba(99, 102, 241, 0.15);
 }
 
 @theme inline {
@@ -20,12 +22,14 @@
   --color-card: var(--card);
   --color-card-border: var(--card-border);
   --color-card-hover: var(--card-hover);
+  --color-card-elevated: var(--card-elevated);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
   --color-info: var(--info);
+  --color-glow-indigo: var(--glow-indigo);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -51,5 +55,34 @@ body {
 @layer utilities {
   .focus-ring {
     @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Utility classes */
+@layer utilities {
+  .card-glow {
+    @apply transition-all duration-200;
+  }
+  .card-glow:hover {
+    box-shadow: 0 0 20px var(--glow-indigo);
+  }
+  .section-divider {
+    @apply border-t border-[var(--card-border)] pt-8 mt-8;
   }
 }

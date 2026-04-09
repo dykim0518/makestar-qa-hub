@@ -65,6 +65,7 @@ export function TriggerGuide() {
       {/* Panel */}
       {open && (
         <div className="mb-3 w-[calc(100vw-48px)] max-w-[360px] max-h-[70vh] overflow-y-auto rounded-xl border border-[var(--card-border)] bg-[var(--card)] shadow-2xl shadow-black/40">
+          <div className="h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500" />
           <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--card-border)] bg-[var(--card)] px-4 py-3">
             <span className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
               테스트 실행 가이드
@@ -115,7 +116,7 @@ export function TriggerGuide() {
             </div>
 
             {/* Steps */}
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {steps.map((s) => (
                 <div
                   key={s.num}
