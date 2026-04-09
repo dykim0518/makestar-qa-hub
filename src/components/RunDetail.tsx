@@ -6,8 +6,16 @@ import type { TestRun, TestCase } from "@/db/schema";
 import { AppHeader } from "./AppHeader";
 import { StatusBadge } from "./StatusBadge";
 import { TestCasesList } from "./TestCasesList";
-import { formatDuration, formatDate, getPassRate, getPassRateNumber } from "@/lib/format";
-import { ERROR_CATEGORY_DISPLAY, type ErrorCategory } from "@/lib/error-classifier";
+import {
+  formatDuration,
+  formatDate,
+  getPassRate,
+  getPassRateNumber,
+} from "@/lib/format";
+import {
+  ERROR_CATEGORY_DISPLAY,
+  type ErrorCategory,
+} from "@/lib/error-classifier";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
 type StatusFilter = "all" | "failed" | "flaky" | "passed" | "skipped";
@@ -30,7 +38,12 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
   const mountedRef = useRef(false);
 
   const fetchCases = useCallback(
-    async (status: StatusFilter, searchText: string, sortBy: SortOption, cat: CategoryFilter = "") => {
+    async (
+      status: StatusFilter,
+      searchText: string,
+      sortBy: SortOption,
+      cat: CategoryFilter = "",
+    ) => {
       setLoading(true);
       try {
         const params = new URLSearchParams();
@@ -47,7 +60,7 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
         setLoading(false);
       }
     },
-    [run.runId]
+    [run.runId],
   );
 
   // status/sort/category 변경 시 즉시 fetch (초기 마운트 건너뛰기)
@@ -80,12 +93,17 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
   const passRate = getPassRateNumber(run.passed, run.total);
 
   // 실패/flaky 테스트의 카테고리 분포 계산
-  const failedOrFlaky = initialCases.filter((c) => c.status === "failed" || c.status === "flaky");
-  const categoryCounts = failedOrFlaky.reduce<Record<string, number>>((acc, c) => {
-    const cat = c.errorCategory || "unknown";
-    acc[cat] = (acc[cat] || 0) + 1;
-    return acc;
-  }, {});
+  const failedOrFlaky = initialCases.filter(
+    (c) => c.status === "failed" || c.status === "flaky",
+  );
+  const categoryCounts = failedOrFlaky.reduce<Record<string, number>>(
+    (acc, c) => {
+      const cat = c.errorCategory || "unknown";
+      acc[cat] = (acc[cat] || 0) + 1;
+      return acc;
+    },
+    {},
+  );
 
   const PIE_COLORS: Record<string, string> = {
     network_timeout: "#fb923c",
@@ -103,11 +121,11 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
   }));
 
   const statusTabs: { key: StatusFilter; label: string; color: string }[] = [
-    { key: "all", label: "전체", color: "text-white" },
-    { key: "failed", label: "Failed", color: "text-rose-400" },
-    { key: "flaky", label: "Flaky", color: "text-amber-400" },
-    { key: "passed", label: "Passed", color: "text-emerald-400" },
-    { key: "skipped", label: "Skipped", color: "text-slate-400" },
+    { key: "all", label: "전체", color: "text-[var(--foreground)]" },
+    { key: "failed", label: "Failed", color: "text-rose-600" },
+    { key: "flaky", label: "Flaky", color: "text-amber-600" },
+    { key: "passed", label: "Passed", color: "text-emerald-600" },
+    { key: "skipped", label: "Skipped", color: "text-slate-500" },
   ];
 
   const sortOptions: { key: SortOption; label: string }[] = [
@@ -125,10 +143,20 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
         <div className="mb-6">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-1.5 text-sm text-[var(--muted)] hover:text-indigo-400 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-[var(--muted)] hover:text-slate-600 transition-colors"
           >
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            <svg
+              className="h-3.5 w-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+              />
             </svg>
             대시보드로 돌아가기
           </Link>
@@ -138,9 +166,11 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
         <div className="mb-8 overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card)]">
           <div className="border-b border-[var(--card-border)] px-6 py-5">
             <div className="flex items-center gap-4">
-              <h2 className="text-xl font-bold text-white">Run #{run.runId}</h2>
+              <h2 className="text-xl font-bold text-[var(--foreground)]">
+                Run #{run.runId}
+              </h2>
               <StatusBadge status={run.status} />
-              <span className="rounded-md border border-[var(--card-border)] bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-300">
+              <span className="rounded-md border border-[var(--card-border)] bg-slate-50 px-2.5 py-1 font-mono text-xs text-slate-600">
                 {run.suite}
               </span>
             </div>
@@ -150,38 +180,46 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
             <StatCell
               label="성공률"
               value={getPassRate(run.passed, run.total)}
-              color={passRate >= 90 ? "text-emerald-400" : passRate >= 70 ? "text-amber-400" : "text-rose-400"}
+              color={
+                passRate >= 90
+                  ? "text-emerald-600"
+                  : passRate >= 70
+                    ? "text-amber-600"
+                    : "text-rose-600"
+              }
             />
             <StatCell
               label="통과 / 전체"
               value={`${run.passed} / ${run.total}`}
-              color="text-slate-200"
+              color="text-slate-700"
               mono
             />
             <StatCell
               label="소요 시간"
               value={formatDuration(run.durationMs)}
-              color="text-slate-200"
+              color="text-slate-700"
             />
             <StatCell
               label="실행 일시"
               value={formatDate(run.createdAt)}
-              color="text-slate-200"
+              color="text-slate-700"
               small
             />
           </div>
 
           <div className="flex flex-wrap items-center gap-4 border-t border-[var(--card-border)] px-6 py-3.5">
             {run.branch && <MetaTag icon="branch" value={run.branch} />}
-            {run.commitSha && <MetaTag icon="commit" value={run.commitSha.slice(0, 7)} />}
+            {run.commitSha && (
+              <MetaTag icon="commit" value={run.commitSha.slice(0, 7)} />
+            )}
             <MetaTag icon="trigger" value={run.triggeredBy} />
             {run.flaky > 0 && (
-              <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold text-amber-400">
+              <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-600">
                 Flaky: {run.flaky}
               </span>
             )}
             {run.skipped > 0 && (
-              <span className="rounded-full border border-slate-500/20 bg-slate-500/10 px-2.5 py-0.5 text-xs font-semibold text-slate-400">
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs font-semibold text-slate-500">
                 Skipped: {run.skipped}
               </span>
             )}
@@ -198,12 +236,12 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
                 onClick={() => setStatusFilter(tab.key)}
                 className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
                   statusFilter === tab.key
-                    ? `${tab.color} bg-white/10`
-                    : "text-[var(--muted)] hover:text-white hover:bg-white/5"
+                    ? `${tab.color} bg-slate-100`
+                    : "text-[var(--muted)] hover:text-slate-900 hover:bg-slate-100"
                 }`}
               >
                 {tab.label}
-                <span className="ml-1.5 rounded-full bg-white/5 px-1.5 py-0.5 text-[10px] font-bold">
+                <span className="ml-1.5 rounded-full bg-slate-50 px-1.5 py-0.5 text-[10px] font-bold">
                   {statusCounts[tab.key]}
                 </span>
               </button>
@@ -217,33 +255,37 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
                 onClick={() => setCategoryFilter("")}
                 className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
                   categoryFilter === ""
-                    ? "text-white bg-white/10"
-                    : "text-[var(--muted)] hover:text-white hover:bg-white/5"
+                    ? "text-[var(--foreground)] bg-slate-100"
+                    : "text-[var(--muted)] hover:text-slate-900 hover:bg-slate-100"
                 }`}
               >
                 전체 카테고리
               </button>
-              {(Object.keys(ERROR_CATEGORY_DISPLAY) as ErrorCategory[]).map((cat) => {
-                const count = categoryCounts[cat] || 0;
-                if (count === 0) return null;
-                const display = ERROR_CATEGORY_DISPLAY[cat];
-                return (
-                  <button
-                    key={cat}
-                    onClick={() => setCategoryFilter(categoryFilter === cat ? "" : cat)}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                      categoryFilter === cat
-                        ? `${display.color} bg-white/10`
-                        : "text-[var(--muted)] hover:text-white hover:bg-white/5"
-                    }`}
-                  >
-                    {display.label}
-                    <span className="ml-1.5 rounded-full bg-white/5 px-1.5 py-0.5 text-[10px] font-bold">
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
+              {(Object.keys(ERROR_CATEGORY_DISPLAY) as ErrorCategory[]).map(
+                (cat) => {
+                  const count = categoryCounts[cat] || 0;
+                  if (count === 0) return null;
+                  const display = ERROR_CATEGORY_DISPLAY[cat];
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() =>
+                        setCategoryFilter(categoryFilter === cat ? "" : cat)
+                      }
+                      className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                        categoryFilter === cat
+                          ? `${display.color} bg-slate-100`
+                          : "text-[var(--muted)] hover:text-slate-900 hover:bg-slate-100"
+                      }`}
+                    >
+                      {display.label}
+                      <span className="ml-1.5 rounded-full bg-slate-50 px-1.5 py-0.5 text-[10px] font-bold">
+                        {count}
+                      </span>
+                    </button>
+                  );
+                },
+              )}
             </div>
           )}
 
@@ -257,14 +299,18 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
                 stroke="currentColor"
                 strokeWidth={2}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
               </svg>
               <input
                 type="text"
                 placeholder="테스트 이름 검색..."
                 value={search}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="w-full rounded-lg border border-[var(--card-border)] bg-[var(--card)] py-2 pl-9 pr-3 text-sm text-slate-200 placeholder:text-[var(--muted)] focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/50"
+                className="w-full rounded-lg border border-[var(--card-border)] bg-[var(--card)] py-2 pl-9 pr-3 text-sm text-slate-700 placeholder:text-[var(--muted)] focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
               />
             </div>
             <div className="flex gap-1 rounded-lg border border-[var(--card-border)] bg-[var(--card)] p-0.5">
@@ -274,8 +320,8 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
                   onClick={() => setSort(opt.key)}
                   className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
                     sort === opt.key
-                      ? "bg-white/10 text-white"
-                      : "text-[var(--muted)] hover:text-white"
+                      ? "bg-slate-100 text-[var(--foreground)]"
+                      : "text-[var(--muted)] hover:text-slate-900"
                   }`}
                 >
                   {opt.label}
@@ -323,13 +369,18 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
               </div>
               <div className="flex flex-col gap-2">
                 {pieData.map((entry) => (
-                  <div key={entry.key} className="flex items-center gap-2 text-sm">
+                  <div
+                    key={entry.key}
+                    className="flex items-center gap-2 text-sm"
+                  >
                     <span
                       className="inline-block h-3 w-3 rounded-full"
                       style={{ backgroundColor: entry.color }}
                     />
-                    <span className="text-slate-300">{entry.name}</span>
-                    <span className="font-mono text-slate-400">{entry.value}건</span>
+                    <span className="text-slate-600">{entry.name}</span>
+                    <span className="font-mono text-slate-500">
+                      {entry.value}건
+                    </span>
                   </div>
                 ))}
               </div>
@@ -384,18 +435,48 @@ function StatCell({
 function MetaTag({ icon, value }: { icon: string; value: string }) {
   const icons: Record<string, React.ReactNode> = {
     branch: (
-      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.03a4.5 4.5 0 00-6.364-6.364L4.5 8.737" />
+      <svg
+        className="h-3 w-3"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.03a4.5 4.5 0 00-6.364-6.364L4.5 8.737"
+        />
       </svg>
     ),
     commit: (
-      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+      <svg
+        className="h-3 w-3"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
+        />
       </svg>
     ),
     trigger: (
-      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+      <svg
+        className="h-3 w-3"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"
+        />
       </svg>
     ),
   };
@@ -403,7 +484,7 @@ function MetaTag({ icon, value }: { icon: string; value: string }) {
   return (
     <span className="inline-flex items-center gap-1.5 text-xs text-[var(--muted)]">
       {icons[icon]}
-      <code className="font-mono text-slate-400">{value}</code>
+      <code className="font-mono text-slate-500">{value}</code>
     </span>
   );
 }

@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0d14;
-  --foreground: #f1f5f9;
-  --card: #111827;
-  --card-border: #1f2937;
-  --card-hover: rgba(255, 255, 255, 0.05);
-  --card-elevated: #1a2332;
-  --muted: #94a3b8;
-  --accent: #6366f1;
-  --success: #34d399;
-  --warning: #fbbf24;
-  --danger: #fb7185;
-  --info: #818cf8;
-  --glow-indigo: rgba(99, 102, 241, 0.15);
+  --background: #f1f5f9;
+  --foreground: #1e293b;
+  --card: #ffffff;
+  --card-border: #e2e8f0;
+  --card-hover: rgba(0, 0, 0, 0.03);
+  --card-elevated: #f8fafc;
+  --muted: #64748b;
+  --accent: #475569;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #e11d48;
+  --info: #6366f1;
+  --glow-slate: rgba(71, 85, 105, 0.08);
 }
 
 @theme inline {
@@ -29,7 +29,7 @@
   --color-warning: var(--warning);
   --color-danger: var(--danger);
   --color-info: var(--info);
-  --color-glow-indigo: var(--glow-indigo);
+  --color-glow-slate: var(--glow-slate);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -54,7 +54,7 @@ body {
 /* Focus ring utility */
 @layer utilities {
   .focus-ring {
-    @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500;
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400;
   }
 }
 
@@ -80,7 +80,7 @@ body {
     @apply transition-all duration-200;
   }
   .card-glow:hover {
-    box-shadow: 0 0 20px var(--glow-indigo);
+    box-shadow: 0 4px 12px var(--glow-slate);
   }
   .section-divider {
     @apply border-t border-[var(--card-border)] pt-8 mt-8;

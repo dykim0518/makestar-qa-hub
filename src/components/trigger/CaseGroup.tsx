@@ -12,9 +12,9 @@ export function CaseGroup({
   cases: TestCaseResult[];
 }) {
   const headerBgMap: Record<string, string> = {
-    "bg-rose-400": "bg-rose-500/5",
-    "bg-amber-400": "bg-amber-500/5",
-    "bg-emerald-400": "bg-emerald-500/5",
+    "bg-rose-400": "bg-rose-50",
+    "bg-amber-400": "bg-amber-50",
+    "bg-emerald-400": "bg-emerald-50",
   };
   const headerBg = headerBgMap[dotColor] || "";
 
@@ -27,7 +27,7 @@ export function CaseGroup({
         <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--muted)]">
           {label}
         </span>
-        <span className="rounded-full bg-white/5 px-1.5 py-0.5 text-[10px] font-bold text-[var(--muted)]">
+        <span className="rounded-full bg-slate-50 px-1.5 py-0.5 text-[10px] font-bold text-[var(--muted)]">
           {count}
         </span>
       </div>
@@ -40,10 +40,10 @@ export function CaseGroup({
 
 function CaseRow({ tc }: { tc: TestCaseResult }) {
   const statusConfig: Record<string, { dot: string; text: string }> = {
-    passed: { dot: "bg-emerald-400", text: "text-emerald-400" },
-    failed: { dot: "bg-rose-400", text: "text-rose-400" },
-    flaky: { dot: "bg-amber-400", text: "text-amber-400" },
-    skipped: { dot: "bg-slate-400", text: "text-slate-400" },
+    passed: { dot: "bg-emerald-400", text: "text-emerald-600" },
+    failed: { dot: "bg-rose-400", text: "text-rose-600" },
+    flaky: { dot: "bg-amber-400", text: "text-amber-600" },
+    skipped: { dot: "bg-slate-400", text: "text-slate-500" },
   };
   const config = statusConfig[tc.status] || statusConfig.skipped;
 
@@ -51,7 +51,7 @@ function CaseRow({ tc }: { tc: TestCaseResult }) {
   const durationSec = (tc.durationMs / 1000).toFixed(1);
 
   return (
-    <div className="flex items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-white/[0.04]">
+    <div className="flex items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-slate-50">
       <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${config.dot}`} />
       <div className="min-w-0 flex-1">
         {idMatch ? (
@@ -59,10 +59,10 @@ function CaseRow({ tc }: { tc: TestCaseResult }) {
             <span className={`font-mono font-semibold ${config.text}`}>
               {idMatch[1]}
             </span>
-            <span className="text-slate-400 ml-1">{idMatch[2]}</span>
+            <span className="text-slate-500 ml-1">{idMatch[2]}</span>
           </p>
         ) : (
-          <p className="text-xs text-slate-300 truncate">{tc.title}</p>
+          <p className="text-xs text-slate-600 truncate">{tc.title}</p>
         )}
       </div>
       <span className="shrink-0 text-[10px] font-mono text-[var(--muted)]">

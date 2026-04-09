@@ -132,7 +132,7 @@ export function DashboardContent({
 
   return (
     <>
-      <h1 className="mb-6 text-2xl font-bold text-white tracking-tight">
+      <h1 className="mb-6 text-2xl font-bold text-[var(--foreground)] tracking-tight">
         대시보드
       </h1>
 
@@ -150,8 +150,8 @@ export function DashboardContent({
                 }}
                 className={`px-3 py-1.5 text-xs font-medium transition-colors ${
                   suite === s.value
-                    ? "bg-indigo-500/15 text-indigo-400"
-                    : "text-[var(--muted)] hover:text-white hover:bg-white/5"
+                    ? "bg-slate-100 text-slate-800 font-semibold"
+                    : "text-[var(--muted)] hover:text-slate-900 hover:bg-slate-100"
                 }`}
               >
                 {s.label}
@@ -167,8 +167,8 @@ export function DashboardContent({
                 onClick={() => setEnvironment(e.value)}
                 className={`px-3 py-1.5 text-xs font-medium transition-colors ${
                   environment === e.value
-                    ? "bg-violet-500/15 text-violet-400"
-                    : "text-[var(--muted)] hover:text-white hover:bg-white/5"
+                    ? "bg-slate-100 text-slate-800 font-semibold"
+                    : "text-[var(--muted)] hover:text-slate-900 hover:bg-slate-100"
                 }`}
               >
                 {e.label}
@@ -177,10 +177,10 @@ export function DashboardContent({
           </div>
 
           {hasRunning && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
               <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
               실행 중
             </span>
@@ -217,7 +217,7 @@ export function DashboardContent({
             <button
               onClick={() => goToPage(page - 1)}
               disabled={page === 0}
-              className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--muted)] transition-colors hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:pointer-events-none"
+              className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--muted)] transition-colors hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 disabled:pointer-events-none"
             >
               이전
             </button>
@@ -248,8 +248,8 @@ export function DashboardContent({
                     onClick={() => goToPage(item as number)}
                     className={`min-w-[32px] rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
                       page === item
-                        ? "bg-indigo-500/15 text-indigo-400 border border-indigo-500/30"
-                        : "text-[var(--muted)] hover:text-white hover:bg-white/5"
+                        ? "bg-slate-100 text-slate-800 font-semibold border border-slate-300"
+                        : "text-[var(--muted)] hover:text-slate-900 hover:bg-slate-100"
                     }`}
                   >
                     {(item as number) + 1}
@@ -260,7 +260,7 @@ export function DashboardContent({
             <button
               onClick={() => goToPage(page + 1)}
               disabled={page >= totalPages - 1}
-              className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--muted)] transition-colors hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:pointer-events-none"
+              className="rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--muted)] transition-colors hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 disabled:pointer-events-none"
             >
               다음
             </button>

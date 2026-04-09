@@ -67,7 +67,7 @@ export function TriggerForm({
 
   return (
     <div>
-      <h2 className="mb-5 text-xl font-bold text-white tracking-tight">
+      <h2 className="mb-5 text-xl font-bold text-[var(--foreground)] tracking-tight">
         테스트 실행
       </h2>
       <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-6">
@@ -86,28 +86,28 @@ export function TriggerForm({
                 }}
                 className={`relative overflow-hidden rounded-lg border p-3 text-left transition-all ${
                   suite === s.value
-                    ? "border-indigo-500/50 bg-indigo-500/10"
-                    : "border-[var(--card-border)] bg-white/[0.02] hover:bg-white/5"
+                    ? "border-slate-400 bg-slate-50"
+                    : "border-[var(--card-border)] bg-white hover:bg-slate-50"
                 }`}
               >
                 {suite === s.value && (
-                  <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-indigo-500 rounded-r-full" />
+                  <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-slate-500 rounded-r-full" />
                 )}
                 <div className="flex items-center justify-between">
                   <span
-                    className={`text-sm font-semibold ${suite === s.value ? "text-indigo-400" : "text-slate-300"}`}
+                    className={`text-sm font-semibold ${suite === s.value ? "text-slate-700" : "text-slate-600"}`}
                   >
                     {s.label}
                   </span>
                   <div className="flex items-center gap-1.5">
                     {s.warn && (
-                      <span className="rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">
+                      <span className="rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-600">
                         VPN
                       </span>
                     )}
                     {suite === s.value && (
                       <svg
-                        className="h-4 w-4 text-indigo-400"
+                        className="h-4 w-4 text-slate-700"
                         fill="none"
                         viewBox="0 0 24 24"
                         strokeWidth={2.5}
@@ -141,15 +141,15 @@ export function TriggerForm({
                   onClick={() => setEnvironment(env)}
                   className={`relative overflow-hidden rounded-lg border p-3 text-left transition-all ${
                     environment === env
-                      ? "border-indigo-500/50 bg-indigo-500/10"
-                      : "border-[var(--card-border)] bg-white/[0.02] hover:bg-white/5"
+                      ? "border-slate-400 bg-slate-50"
+                      : "border-[var(--card-border)] bg-white hover:bg-slate-50"
                   }`}
                 >
                   {environment === env && (
-                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-indigo-500 rounded-r-full" />
+                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-slate-500 rounded-r-full" />
                   )}
                   <span
-                    className={`text-sm font-semibold ${environment === env ? "text-indigo-400" : "text-slate-300"}`}
+                    className={`text-sm font-semibold ${environment === env ? "text-slate-700" : "text-slate-600"}`}
                   >
                     {env === "prod" ? "Production" : "Staging"}
                   </span>
@@ -165,8 +165,8 @@ export function TriggerForm({
         )}
 
         {selectedSuite?.warn && (
-          <div className="mb-6 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-3">
-            <p className="flex items-center gap-2 text-xs font-semibold text-amber-400">
+          <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+            <p className="flex items-center gap-2 text-xs font-semibold text-amber-600">
               <svg
                 className="h-4 w-4 shrink-0"
                 fill="none"
@@ -218,7 +218,7 @@ export function TriggerForm({
               id="retries"
               value={retries}
               onChange={(e) => setRetries(e.target.value)}
-              className="w-full rounded-lg border border-[var(--card-border)] bg-white/[0.02] px-3 py-2.5 text-sm text-slate-200 outline-none transition-colors focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20"
+              className="w-full rounded-lg border border-[var(--card-border)] bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition-colors focus:border-slate-400 focus:ring-1 focus:ring-slate-300"
             >
               {[0, 1, 2, 3, 4, 5].map((n) => (
                 <option key={n} value={n} className="bg-[var(--card)]">
@@ -230,11 +230,11 @@ export function TriggerForm({
         </div>
 
         {alreadyRunning && !result && (
-          <div className="mb-4 rounded-lg border border-indigo-500/20 bg-indigo-500/5 px-4 py-3">
-            <p className="flex items-center gap-2 text-xs font-semibold text-indigo-400">
+          <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
+            <p className="flex items-center gap-2 text-xs font-semibold text-slate-700">
               <span className="relative flex h-2 w-2 shrink-0">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-indigo-400" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500" />
               </span>
               현재 다른 테스트가 실행 중입니다. 실행 시 큐에 추가되어 순차적으로
               진행됩니다.
@@ -245,7 +245,7 @@ export function TriggerForm({
         <button
           onClick={handleTrigger}
           disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-slate-700 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? (
             <>
@@ -292,11 +292,11 @@ export function TriggerForm({
 
         {result && (
           <div
-            className={`mt-4 rounded-lg border px-4 py-3 ${result.ok ? "border-emerald-500/20 bg-emerald-500/5" : "border-rose-500/20 bg-rose-500/5"}`}
+            className={`mt-4 rounded-lg border px-4 py-3 ${result.ok ? "border-emerald-200 bg-emerald-50" : "border-rose-200 bg-rose-50"}`}
           >
             {result.ok ? (
               <div>
-                <p className="text-sm font-semibold text-emerald-400">
+                <p className="text-sm font-semibold text-emerald-600">
                   {result.message}
                 </p>
                 <p className="mt-1 text-xs text-[var(--muted)]">
@@ -307,7 +307,7 @@ export function TriggerForm({
                     href={result.actionsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-2 inline-flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                    className="mt-2 inline-flex items-center gap-1.5 text-xs text-slate-700 hover:text-slate-900 transition-colors"
                   >
                     GitHub Actions에서 실시간 확인
                     <svg
@@ -327,7 +327,7 @@ export function TriggerForm({
                 )}
               </div>
             ) : (
-              <p className="text-sm font-semibold text-rose-400">
+              <p className="text-sm font-semibold text-rose-600">
                 {result.error}
               </p>
             )}

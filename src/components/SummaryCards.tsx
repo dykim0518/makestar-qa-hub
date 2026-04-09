@@ -16,7 +16,7 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
           value: "--" as string | number,
           icon: "layers",
           accent: "from-indigo-500 to-indigo-600",
-          iconBg: "bg-indigo-500/10 text-indigo-400",
+          iconBg: "bg-slate-100 text-slate-600",
           hoverShadow: "hover:shadow-indigo-500/5",
         },
         {
@@ -24,7 +24,7 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
           value: "--" as string | number,
           icon: "check",
           accent: "from-emerald-500 to-emerald-600",
-          iconBg: "bg-emerald-500/10 text-emerald-400",
+          iconBg: "bg-emerald-50 text-emerald-600",
           hoverShadow: "hover:shadow-emerald-500/5",
         },
         {
@@ -32,7 +32,7 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
           value: "--" as string | number,
           icon: "x",
           accent: "from-rose-500 to-rose-600",
-          iconBg: "bg-rose-500/10 text-rose-400",
+          iconBg: "bg-rose-50 text-rose-600",
           hoverShadow: "hover:shadow-rose-500/5",
         },
         {
@@ -40,7 +40,7 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
           value: "--" as string | number,
           icon: "flaky",
           accent: "from-amber-500 to-amber-600",
-          iconBg: "bg-amber-500/10 text-amber-400",
+          iconBg: "bg-amber-50 text-amber-600",
           hoverShadow: "hover:shadow-amber-500/5",
         },
         {
@@ -48,7 +48,7 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
           value: "--" as string | number,
           icon: "percent",
           accent: "from-emerald-500 to-emerald-600",
-          iconBg: "bg-emerald-500/10 text-emerald-400",
+          iconBg: "bg-emerald-50 text-emerald-600",
           hoverShadow: "hover:shadow-emerald-500/5",
         },
       ]
@@ -58,7 +58,7 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
           value: latestRun.total as string | number,
           icon: "layers",
           accent: "from-indigo-500 to-indigo-600",
-          iconBg: "bg-indigo-500/10 text-indigo-400",
+          iconBg: "bg-slate-100 text-slate-600",
           hoverShadow: "hover:shadow-indigo-500/5",
         },
         {
@@ -66,7 +66,7 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
           value: latestRun.passed as string | number,
           icon: "check",
           accent: "from-emerald-500 to-emerald-600",
-          iconBg: "bg-emerald-500/10 text-emerald-400",
+          iconBg: "bg-emerald-50 text-emerald-600",
           hoverShadow: "hover:shadow-emerald-500/5",
         },
         {
@@ -74,7 +74,7 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
           value: latestRun.failed as string | number,
           icon: "x",
           accent: "from-rose-500 to-rose-600",
-          iconBg: "bg-rose-500/10 text-rose-400",
+          iconBg: "bg-rose-50 text-rose-600",
           hoverShadow: "hover:shadow-rose-500/5",
         },
         {
@@ -82,7 +82,7 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
           value: latestRun.flaky as string | number,
           icon: "flaky",
           accent: "from-amber-500 to-amber-600",
-          iconBg: "bg-amber-500/10 text-amber-400",
+          iconBg: "bg-amber-50 text-amber-600",
           hoverShadow: "hover:shadow-amber-500/5",
         },
         {
@@ -99,10 +99,10 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
                 : "from-rose-500 to-rose-600",
           iconBg:
             passRate >= 90
-              ? "bg-emerald-500/10 text-emerald-400"
+              ? "bg-emerald-50 text-emerald-600"
               : passRate >= 70
-                ? "bg-amber-500/10 text-amber-400"
-                : "bg-rose-500/10 text-rose-400",
+                ? "bg-amber-50 text-amber-600"
+                : "bg-rose-50 text-rose-600",
           hoverShadow:
             passRate >= 90
               ? "hover:shadow-emerald-500/5"
@@ -130,11 +130,11 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
               <CardIcon type={card.icon} />
             </div>
           </div>
-          <p className="text-4xl font-bold tracking-tight text-white">
+          <p className="text-4xl font-bold tracking-tight text-[var(--foreground)]">
             {card.value}
           </p>
           {card.label === "성공률" && !isEmpty && (
-            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
               <div
                 className={`h-full rounded-full bg-gradient-to-r ${card.accent} transition-all`}
                 style={{ width: `${passRate}%` }}

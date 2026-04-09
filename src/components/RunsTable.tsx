@@ -17,13 +17,13 @@ function PassRateBar({ rate }: { rate: number }) {
     rate >= 90 ? "bg-emerald-500" : rate >= 70 ? "bg-amber-500" : "bg-rose-500";
   const textColor =
     rate >= 90
-      ? "text-emerald-400"
+      ? "text-emerald-600"
       : rate >= 70
-        ? "text-amber-400"
-        : "text-rose-400";
+        ? "text-amber-600"
+        : "text-rose-600";
   return (
     <div className="flex items-center gap-2.5">
-      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-white/5">
+      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-100">
         <div
           className={`h-full rounded-full transition-all ${color}`}
           style={{ width: `${rate}%` }}
@@ -53,8 +53,8 @@ function CheckboxButton({
       className={`inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-all duration-150
         ${
           checked
-            ? "border-indigo-500 bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.3)]"
-            : "border-white/15 bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.06]"
+            ? "border-slate-500 bg-slate-500 shadow-sm"
+            : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
         }
         disabled:opacity-20 disabled:cursor-not-allowed`}
     >
@@ -92,7 +92,7 @@ function RunCardMobile({
     <div
       className={`relative overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 transition-colors ${
         hasFailure ? "border-l-2 border-l-rose-500" : ""
-      } ${isSelected ? "bg-indigo-500/[0.06] border-indigo-500/30" : ""}`}
+      } ${isSelected ? "bg-slate-50 border-slate-300" : ""}`}
     >
       <div
         className={`absolute top-0 left-0 right-0 h-0.5 rounded-t-xl ${
@@ -109,7 +109,7 @@ function RunCardMobile({
           <div className="mb-2 flex items-center gap-2">
             <Link
               href={`/runs/${run.runId}`}
-              className="font-mono text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+              className="font-mono text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
             >
               #{run.runId}
             </Link>
@@ -118,14 +118,14 @@ function RunCardMobile({
 
           {/* Suite / Env */}
           <div className="mb-3 flex items-center gap-1.5">
-            <span className="rounded-md border border-[var(--card-border)] bg-white/5 px-2 py-0.5 font-mono text-xs text-slate-300">
+            <span className="rounded-md border border-[var(--card-border)] bg-slate-50 px-2 py-0.5 font-mono text-xs text-slate-600">
               {run.suite}
             </span>
             <span
               className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
                 run.environment === "stg"
-                  ? "border border-amber-500/30 bg-amber-500/10 text-amber-400"
-                  : "border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                  ? "border border-amber-500/30 bg-amber-500/10 text-amber-600"
+                  : "border border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
               }`}
             >
               {run.environment === "stg" ? "STG" : "PROD"}
@@ -134,18 +134,18 @@ function RunCardMobile({
 
           {/* Results row */}
           <div className="mb-2 flex items-center gap-3">
-            <span className="font-mono text-sm text-slate-300">
-              <span className="text-emerald-400">{run.passed}</span>
+            <span className="font-mono text-sm text-slate-600">
+              <span className="text-emerald-600">{run.passed}</span>
               <span className="text-[var(--muted)]"> / </span>
               <span>{run.total}</span>
             </span>
             {hasFailure && (
-              <span className="rounded-full border border-rose-500/20 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-400">
+              <span className="rounded-full border border-rose-500/20 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-600">
                 F:{run.failed}
               </span>
             )}
             {hasFlaky && (
-              <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-400">
+              <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-600">
                 FL:{run.flaky}
               </span>
             )}
@@ -215,7 +215,7 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
         <div className="sticky top-4 z-10 mb-3 flex justify-center">
           <button
             onClick={handleCompare}
-            className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/15 px-5 py-2 text-sm font-semibold text-indigo-400 shadow-lg shadow-indigo-500/10 backdrop-blur transition-all hover:bg-indigo-500/25 hover:border-indigo-500/50"
+            className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-700 shadow-lg shadow-slate-200/60 backdrop-blur transition-all hover:bg-slate-50 hover:border-slate-400"
           >
             <svg
               className="h-4 w-4"
@@ -293,7 +293,7 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
               return (
                 <tr
                   key={run.runId}
-                  className={`transition-colors hover:bg-white/[0.04] ${hasFailure ? "bg-rose-500/[0.03]" : ""} ${isSelected ? "bg-indigo-500/[0.06]" : ""}`}
+                  className={`transition-colors hover:bg-slate-50 ${hasFailure ? "bg-rose-50/50" : ""} ${isSelected ? "bg-slate-50" : ""}`}
                 >
                   <td className="px-3 py-4 text-center">
                     <CheckboxButton
@@ -310,21 +310,21 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                     )}
                     <Link
                       href={`/runs/${run.runId}`}
-                      className="font-mono font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+                      className="font-mono font-medium text-slate-600 hover:text-slate-900 transition-colors"
                     >
                       #{run.runId}
                     </Link>
                   </td>
                   <td className="whitespace-nowrap px-5 py-4 text-sm">
                     <span className="inline-flex items-center gap-1.5">
-                      <span className="rounded-md border border-[var(--card-border)] bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-300">
+                      <span className="rounded-md border border-[var(--card-border)] bg-slate-50 px-2.5 py-1 font-mono text-xs text-slate-600">
                         {run.suite}
                       </span>
                       <span
                         className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
                           run.environment === "stg"
-                            ? "border border-amber-500/30 bg-amber-500/10 text-amber-400"
-                            : "border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                            ? "border border-amber-500/30 bg-amber-500/10 text-amber-600"
+                            : "border border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
                         }`}
                       >
                         {run.environment === "stg" ? "STG" : "PROD"}
@@ -335,19 +335,19 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                     <StatusBadge status={run.status} />
                   </td>
                   <td className="whitespace-nowrap px-5 py-4 text-sm">
-                    <span className="inline-flex items-center gap-2 font-mono text-slate-300">
+                    <span className="inline-flex items-center gap-2 font-mono text-slate-600">
                       <span>
-                        <span className="text-emerald-400">{run.passed}</span>
+                        <span className="text-emerald-600">{run.passed}</span>
                         <span className="text-[var(--muted)]"> / </span>
-                        <span className="text-slate-300">{run.total}</span>
+                        <span className="text-slate-600">{run.total}</span>
                       </span>
                       {hasFailure && (
-                        <span className="rounded-full border border-rose-500/20 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-400">
+                        <span className="rounded-full border border-rose-500/20 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-600">
                           F:{run.failed}
                         </span>
                       )}
                       {hasFlaky && (
-                        <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-400">
+                        <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-600">
                           FL:{run.flaky}
                         </span>
                       )}

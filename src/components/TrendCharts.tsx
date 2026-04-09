@@ -69,7 +69,7 @@ function CustomTooltip({
 
 function Skeleton() {
   return (
-    <div className="h-[180px] sm:h-[220px] animate-pulse rounded-lg bg-white/5" />
+    <div className="h-[180px] sm:h-[220px] animate-pulse rounded-lg bg-slate-100" />
   );
 }
 
@@ -161,8 +161,8 @@ export function TrendCharts({
                 onClick={() => setDays(p.value)}
                 className={`px-2.5 py-1 text-xs font-medium transition-colors ${
                   days === p.value
-                    ? "bg-indigo-500/15 text-indigo-400"
-                    : "text-[var(--muted)] hover:text-white hover:bg-white/5"
+                    ? "bg-slate-100 text-slate-800 font-semibold"
+                    : "text-[var(--muted)] hover:text-slate-900 hover:bg-slate-100"
                 }`}
               >
                 {p.label}
@@ -189,7 +189,7 @@ export function TrendCharts({
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {/* 성공률 추이 */}
-          <ChartCard title="성공률 추이" dotColor="bg-emerald-400">
+          <ChartCard title="성공률 추이" dotColor="bg-emerald-500">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
                 <CartesianGrid
@@ -215,13 +215,13 @@ export function TrendCharts({
                 />
                 <ReferenceLine
                   y={90}
-                  stroke="#f59e0b"
+                  stroke="#d97706"
                   strokeDasharray="4 4"
                   strokeOpacity={0.5}
                   label={{
                     value: "90%",
                     position: "right",
-                    fill: "#f59e0b",
+                    fill: "#d97706",
                     fontSize: 10,
                   }}
                 />
@@ -232,9 +232,9 @@ export function TrendCharts({
                   type="monotone"
                   dataKey="passRate"
                   name="성공률"
-                  stroke="#34d399"
+                  stroke="#059669"
                   strokeWidth={2}
-                  dot={{ r: 3, fill: "#34d399" }}
+                  dot={{ r: 3, fill: "#059669" }}
                   activeDot={{ r: 5 }}
                 />
               </LineChart>
@@ -242,7 +242,7 @@ export function TrendCharts({
           </ChartCard>
 
           {/* 실행 시간 추이 */}
-          <ChartCard title="실행 시간 추이" dotColor="bg-indigo-400">
+          <ChartCard title="실행 시간 추이" dotColor="bg-slate-500">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
                 <defs>
@@ -253,10 +253,10 @@ export function TrendCharts({
                     x2="0"
                     y2="1"
                   >
-                    <stop offset="0%" stopColor="#818cf8" stopOpacity={0.3} />
+                    <stop offset="0%" stopColor="#475569" stopOpacity={0.3} />
                     <stop
                       offset="100%"
-                      stopColor="#818cf8"
+                      stopColor="#475569"
                       stopOpacity={0.02}
                     />
                   </linearGradient>
@@ -288,10 +288,10 @@ export function TrendCharts({
                   type="monotone"
                   dataKey="avgDurationMin"
                   name="평균 실행 시간"
-                  stroke="#818cf8"
+                  stroke="#475569"
                   strokeWidth={2}
                   fill="url(#durationGradient)"
-                  dot={{ r: 3, fill: "#818cf8" }}
+                  dot={{ r: 3, fill: "#475569" }}
                   activeDot={{ r: 5 }}
                 />
               </AreaChart>
@@ -302,7 +302,7 @@ export function TrendCharts({
           <ChartCard
             title="일별 실패 · Flaky 추이"
             fullWidth
-            dotColor="bg-rose-400"
+            dotColor="bg-rose-500"
           >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
@@ -331,14 +331,14 @@ export function TrendCharts({
                   dataKey="failed"
                   name="Failed"
                   stackId="issues"
-                  fill="#fb7185"
+                  fill="#e11d48"
                   radius={[0, 0, 0, 0]}
                 />
                 <Bar
                   dataKey="flaky"
                   name="Flaky"
                   stackId="issues"
-                  fill="#fbbf24"
+                  fill="#d97706"
                   radius={[2, 2, 0, 0]}
                 />
               </BarChart>

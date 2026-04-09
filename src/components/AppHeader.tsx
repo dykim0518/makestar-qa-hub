@@ -9,16 +9,16 @@ type AppHeaderProps = {
 export function AppHeader({ active }: AppHeaderProps) {
   const navItemBase =
     "rounded-lg px-3.5 py-2 text-xs font-semibold transition-all relative";
-  const navActive = `${navItemBase} bg-indigo-500/10 text-indigo-400 after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:w-5 after:rounded-full after:bg-indigo-400`;
-  const navInactive = `${navItemBase} text-[var(--muted)] hover:text-white hover:bg-white/5`;
+  const navActive = `${navItemBase} bg-slate-100 text-slate-900 after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:w-5 after:rounded-full after:bg-slate-600`;
+  const navInactive = `${navItemBase} text-[var(--muted)] hover:text-slate-900 hover:bg-slate-100`;
 
   return (
-    <header className="bg-[var(--card)]/80 backdrop-blur-xl border-b border-white/[0.06]">
+    <header className="bg-[var(--card)]/80 backdrop-blur-xl border-b border-[var(--card-border)]">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/10 shadow-lg shadow-indigo-500/10">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 shadow-sm">
             <svg
-              className="h-5 w-5 text-indigo-400"
+              className="h-5 w-5 text-slate-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -33,7 +33,7 @@ export function AppHeader({ active }: AppHeaderProps) {
           </div>
           <Link
             href="/dashboard"
-            className="text-xl font-bold text-white hover:text-indigo-400 transition-colors"
+            className="text-xl font-bold text-slate-900 hover:text-slate-600 transition-colors"
           >
             Makestar QA Hub
           </Link>

@@ -65,7 +65,9 @@ const RULES: CategoryRule[] = [
   },
 ];
 
-export function classifyError(errorMessage: string | null): ErrorCategory | null {
+export function classifyError(
+  errorMessage: string | null,
+): ErrorCategory | null {
   if (!errorMessage) return null;
   for (const rule of RULES) {
     if (rule.patterns.some((p) => p.test(errorMessage))) {
@@ -75,30 +77,33 @@ export function classifyError(errorMessage: string | null): ErrorCategory | null
   return "unknown";
 }
 
-export const ERROR_CATEGORY_DISPLAY: Record<ErrorCategory, { label: string; color: string; bgColor: string }> = {
+export const ERROR_CATEGORY_DISPLAY: Record<
+  ErrorCategory,
+  { label: string; color: string; bgColor: string }
+> = {
   network_timeout: {
     label: "네트워크/타임아웃",
-    color: "text-orange-400",
-    bgColor: "bg-orange-500/10 border-orange-500/20",
+    color: "text-orange-600",
+    bgColor: "bg-orange-50 border-orange-200",
   },
   selector_not_found: {
     label: "셀렉터 못 찾음",
-    color: "text-purple-400",
-    bgColor: "bg-purple-500/10 border-purple-500/20",
+    color: "text-purple-600",
+    bgColor: "bg-purple-50 border-purple-200",
   },
   assertion_failure: {
     label: "검증 실패",
-    color: "text-blue-400",
-    bgColor: "bg-blue-500/10 border-blue-500/20",
+    color: "text-blue-600",
+    bgColor: "bg-blue-50 border-blue-200",
   },
   environment_issue: {
     label: "환경 이슈",
-    color: "text-red-400",
-    bgColor: "bg-red-500/10 border-red-500/20",
+    color: "text-red-600",
+    bgColor: "bg-red-50 border-red-200",
   },
   unknown: {
     label: "기타",
-    color: "text-slate-400",
-    bgColor: "bg-slate-500/10 border-slate-500/20",
+    color: "text-slate-500",
+    bgColor: "bg-slate-50 border-slate-200",
   },
 };

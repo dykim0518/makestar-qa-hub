@@ -78,8 +78,8 @@ export function FlakyRanking({
               onClick={() => setDays(opt.value)}
               className={`px-3 py-1.5 text-xs font-medium transition-colors ${
                 days === opt.value
-                  ? "bg-amber-500/15 text-amber-400"
-                  : "text-[var(--muted)] hover:text-white hover:bg-white/5"
+                  ? "bg-amber-50 text-amber-700 font-semibold"
+                  : "text-[var(--muted)] hover:text-slate-900 hover:bg-slate-100"
               }`}
             >
               {opt.label}
@@ -104,18 +104,18 @@ export function FlakyRanking({
             {rankings.map((item, idx) => (
               <div
                 key={item.title}
-                className="flex items-center gap-4 px-4 py-3 hover:bg-white/[0.04] transition-colors"
+                className="flex items-center gap-4 px-4 py-3 hover:bg-slate-50 transition-colors"
               >
                 {/* 순위 */}
                 <span
                   className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                     idx === 0
-                      ? "bg-yellow-500/15 text-yellow-400"
+                      ? "bg-yellow-100 text-yellow-700"
                       : idx === 1
-                        ? "bg-slate-300/15 text-slate-300"
+                        ? "bg-slate-100 text-slate-500"
                         : idx === 2
-                          ? "bg-amber-700/15 text-amber-600"
-                          : "bg-amber-500/10 text-amber-400"
+                          ? "bg-amber-100 text-amber-700"
+                          : "bg-amber-50 text-amber-600"
                   }`}
                 >
                   {idx + 1}
@@ -124,7 +124,7 @@ export function FlakyRanking({
                 {/* 테스트명 */}
                 <div className="min-w-0 flex-1">
                   <p
-                    className="truncate text-sm font-medium text-slate-200"
+                    className="truncate text-sm font-medium text-slate-700"
                     title={item.title}
                   >
                     {item.title}
@@ -133,16 +133,16 @@ export function FlakyRanking({
 
                 {/* Flaky 횟수/비율 */}
                 <div className="shrink-0 text-right">
-                  <span className="text-sm font-mono font-semibold text-amber-400">
+                  <span className="text-sm font-mono font-semibold text-amber-600">
                     {item.flakyCount}
                   </span>
                   <span className="text-xs text-[var(--muted)]">
                     /{item.totalRuns}
                   </span>
                   <div className="ml-2 flex items-center gap-1.5">
-                    <div className="h-1 w-10 overflow-hidden rounded-full bg-white/5">
+                    <div className="h-1 w-10 overflow-hidden rounded-full bg-slate-100">
                       <div
-                        className="h-full rounded-full bg-amber-400"
+                        className="h-full rounded-full bg-amber-500"
                         style={{ width: `${item.flakyRate}%` }}
                       />
                     </div>
