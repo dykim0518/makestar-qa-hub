@@ -141,6 +141,10 @@ export function useTriggerPolling(): UseTriggerPollingReturn {
       const timer = setTimeout(() => {
         fetchLatestResults();
         setPolling(false);
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
       }, 3000);
       return () => clearTimeout(timer);
     }

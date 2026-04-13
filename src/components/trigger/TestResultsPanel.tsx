@@ -100,8 +100,8 @@ export function TestResultsPanel({
         )}
       </div>
 
-      {/* 폴링 중지 알림 */}
-      {pollingStopped && (
+      {/* 폴링 중지 알림 (실행 중인 경우에만) */}
+      {pollingStopped && isRunning && (
         <div className="mb-3 flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5">
           <p className="text-xs text-amber-600">자동 갱신이 중지되었습니다.</p>
           <button
