@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-type ActivePage = "dashboard" | "trigger";
+type ActivePage = "dashboard" | "trigger" | "coverage";
 
 type AppHeaderProps = {
   active?: ActivePage;
@@ -59,6 +59,15 @@ export function AppHeader({ active }: AppHeaderProps) {
               : {})}
           >
             테스트 실행
+          </Link>
+          <Link
+            href="/coverage"
+            className={`focus-ring ${active === "coverage" ? navActive : navInactive}`}
+            {...(active === "coverage"
+              ? { "aria-current": "page" as const }
+              : {})}
+          >
+            커버리지
           </Link>
         </nav>
       </div>

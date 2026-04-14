@@ -5,6 +5,7 @@ import { eq, sql } from "drizzle-orm";
 import { validateApiSecret } from "@/lib/auth";
 import { parsePlaywrightResults } from "@/lib/results-parser";
 import { sendSlackNotification } from "@/lib/slack-notifier";
+import { linkCoverageForRun } from "@/lib/coverage-linker";
 
 export async function POST(request: NextRequest) {
   const authError = validateApiSecret(request);
@@ -89,6 +90,20 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // 기능 커버리지 링크 갱신 (@feature: 태그 기반)
+  const coverageResult = await linkCoverageForRun(
+    runId,
+    suite,
+    parsed.testCases.map((tc) => ({
+      title: tc.title,
+      file: tc.file ?? null,
+      status: tc.status,
+    })),
+  ).catch((err) => {
+    console.error("coverage link failed:", err);
+    return { linked: 0, updatedFeatures: 0 };
+  });
+
   // Slack 알림 (fire-and-forget)
   sendSlackNotification({
     runId,
@@ -106,5 +121,6 @@ export async function POST(request: NextRequest) {
     total: parsed.total,
     passed: parsed.passed,
     failed: parsed.failed,
+    coverage: coverageResult,
   });
 }

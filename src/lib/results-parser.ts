@@ -53,7 +53,7 @@ export interface ParsedResults {
 const failedStates = new Set(["failed", "timedOut", "interrupted"]);
 
 function determineTestStatus(
-  results: PlaywrightResult[]
+  results: PlaywrightResult[],
 ): "passed" | "failed" | "flaky" | "skipped" {
   if (results.length === 0) return "skipped";
 
@@ -66,32 +66,41 @@ function determineTestStatus(
   return "passed";
 }
 
-export function parsePlaywrightResults(report: PlaywrightReport): ParsedResults {
+export function parsePlaywrightResults(
+  report: PlaywrightReport,
+): ParsedResults {
   const stats = report.stats || {};
   const testCases: Omit<NewTestCase, "runId">[] = [];
 
-  function walkSuite(suite: PlaywrightSuite) {
+  function walkSuite(suite: PlaywrightSuite, parentPath: string[] = []) {
+    // 파일명(.spec.ts)은 path에서 제외, describe 제목만 누적
+    const isFileSuite = (suite.title ?? "").endsWith(".spec.ts");
+    const currentPath =
+      isFileSuite || !suite.title ? parentPath : [...parentPath, suite.title];
+
     for (const spec of suite.specs || []) {
       for (const test of spec.tests || []) {
         const results = test.results || [];
         const status = determineTestStatus(results);
 
         const titleParts = [
+          ...currentPath,
           ...(spec.titlePath || []),
           ...(test.titlePath || []),
+          spec.title,
         ].filter(Boolean);
         const title =
           titleParts.length > 0
-            ? titleParts.join(" > ")
+            ? Array.from(new Set(titleParts)).join(" > ")
             : test.title || spec.title || "Unknown test";
 
         const totalDuration = results.reduce(
           (sum, r) => sum + (r.duration || 0),
-          0
+          0,
         );
 
         const firstError = results.find(
-          (r) => failedStates.has(r.status) && r.errors?.length
+          (r) => failedStates.has(r.status) && r.errors?.length,
         );
         const errorInfo = firstError?.errors?.[0];
 
@@ -109,7 +118,7 @@ export function parsePlaywrightResults(report: PlaywrightReport): ParsedResults 
       }
     }
     for (const child of suite.suites || []) {
-      walkSuite(child);
+      walkSuite(child, currentPath);
     }
   }
 

@@ -484,3 +484,68 @@ export type QaExecutionArtifact = typeof qaExecutionArtifacts.$inferSelect;
 export type NewQaExecutionArtifact = typeof qaExecutionArtifacts.$inferInsert;
 export type QaIssueDraft = typeof qaIssueDrafts.$inferSelect;
 export type NewQaIssueDraft = typeof qaIssueDrafts.$inferInsert;
+
+export const qaCoverageFeatures = pgTable(
+  "qa_coverage_features",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    product: text("product").notNull(), // cmr | albumbuddy | admin
+    category: text("category"),
+    pagePath: text("page_path").notNull(),
+    pageTitle: text("page_title"),
+    featureName: text("feature_name").notNull(),
+    description: text("description"),
+    priority: text("priority").notNull().default("medium"), // critical | high | medium | low
+    coverageStatus: text("coverage_status").notNull().default("none"), // covered | partial | none | manual_only
+    source: text("source").notNull().default("manual"), // auto_crawl | manual | hybrid
+    tag: text("tag"),
+    notes: text("notes"),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("uq_qa_coverage_features_product_path_feature").on(
+      table.product,
+      table.pagePath,
+      table.featureName,
+    ),
+    index("idx_qa_coverage_features_product").on(table.product),
+    index("idx_qa_coverage_features_status").on(table.coverageStatus),
+    index("idx_qa_coverage_features_tag").on(table.tag),
+  ],
+);
+
+export const qaCoverageTestLinks = pgTable(
+  "qa_coverage_test_links",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    featureId: uuid("feature_id")
+      .notNull()
+      .references(() => qaCoverageFeatures.id, { onDelete: "cascade" }),
+    testTitle: text("test_title").notNull(),
+    testFile: text("test_file"),
+    suite: text("suite").notNull(), // cmr | albumbuddy | admin
+    lastRunId: bigint("last_run_id", { mode: "number" }).references(
+      () => testRuns.runId,
+      { onDelete: "set null" },
+    ),
+    lastStatus: text("last_status"), // passed | failed | flaky | skipped
+    lastRunAt: timestamp("last_run_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("uq_qa_coverage_test_links_feature_title_file").on(
+      table.featureId,
+      table.testTitle,
+      table.testFile,
+    ),
+    index("idx_qa_coverage_test_links_feature").on(table.featureId),
+    index("idx_qa_coverage_test_links_suite").on(table.suite),
+  ],
+);
+
+export type QaCoverageFeature = typeof qaCoverageFeatures.$inferSelect;
+export type NewQaCoverageFeature = typeof qaCoverageFeatures.$inferInsert;
+export type QaCoverageTestLink = typeof qaCoverageTestLinks.$inferSelect;
+export type NewQaCoverageTestLink = typeof qaCoverageTestLinks.$inferInsert;
