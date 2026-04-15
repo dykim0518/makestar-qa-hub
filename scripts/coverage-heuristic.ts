@@ -172,7 +172,7 @@ async function applyProposals(proposals: Proposal[]) {
         links.push({
           featureId: m.featureId,
           testTitle: title,
-          testFile: `tests/${p.file}`,
+          testFile: p.file,
           suite: p.suite,
           lastStatus: "heuristic",
           lastRunAt: new Date(),

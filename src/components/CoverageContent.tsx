@@ -32,12 +32,16 @@ function productRank(product: string): number {
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
   covered: {
-    label: "자동화됨",
+    label: "자동화(검증)",
     cls: "bg-emerald-100 text-emerald-800 border-emerald-200",
   },
   partial: {
     label: "부분",
     cls: "bg-amber-100 text-amber-800 border-amber-200",
+  },
+  heuristic_only: {
+    label: "추정",
+    cls: "bg-indigo-100 text-indigo-800 border-indigo-200",
   },
   manual_only: {
     label: "수동만",
@@ -422,18 +426,29 @@ export function CoverageContent({ rows }: Props) {
   const summary = useMemo(() => {
     const byProduct = new Map<
       string,
-      { total: number; covered: number; partial: number; none: number }
+      {
+        total: number;
+        covered: number;
+        partial: number;
+        heuristic: number;
+        manual: number;
+        none: number;
+      }
     >();
     for (const r of rows) {
       const s = byProduct.get(r.product) ?? {
         total: 0,
         covered: 0,
         partial: 0,
+        heuristic: 0,
+        manual: 0,
         none: 0,
       };
       s.total += 1;
       if (r.coverageStatus === "covered") s.covered += 1;
       else if (r.coverageStatus === "partial") s.partial += 1;
+      else if (r.coverageStatus === "heuristic_only") s.heuristic += 1;
+      else if (r.coverageStatus === "manual_only") s.manual += 1;
       else s.none += 1;
       byProduct.set(r.product, s);
     }
@@ -502,11 +517,15 @@ export function CoverageContent({ rows }: Props) {
         return (
           <div>
             <h1 className="text-2xl font-bold text-slate-900">
-              자동화 커버리지
+              자동화 매핑 현황
             </h1>
             <p className="mt-2 text-sm text-[var(--muted)]">
-              {total}개 기능 중 {covered}개 자동화 ({overallPct}%) ·{" "}
+              {total}개 기능 중 {covered}개 검증 자동화 ({overallPct}%) ·{" "}
               {productSummary}
+            </p>
+            <p className="mt-0.5 text-[11px] text-[var(--muted)]">
+              검증 자동화 = 실제 테스트 실행으로 passed 확인된 기능.
+              추정(휴리스틱)은 별도 집계.
             </p>
             <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
               <div
@@ -558,10 +577,18 @@ export function CoverageContent({ rows }: Props) {
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <div className="mt-3 flex gap-3 text-xs text-[var(--muted)]">
+                <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[var(--muted)]">
                   <span>총 {s.total}</span>
-                  <span className="text-emerald-700">자동화 {s.covered}</span>
-                  <span className="text-amber-700">부분 {s.partial}</span>
+                  <span className="text-emerald-700">검증 {s.covered}</span>
+                  {s.partial > 0 && (
+                    <span className="text-amber-700">부분 {s.partial}</span>
+                  )}
+                  {s.heuristic > 0 && (
+                    <span className="text-indigo-700">추정 {s.heuristic}</span>
+                  )}
+                  {s.manual > 0 && (
+                    <span className="text-sky-700">수동만 {s.manual}</span>
+                  )}
                   <span>미커버 {s.none}</span>
                 </div>
               </button>
@@ -589,8 +616,9 @@ export function CoverageContent({ rows }: Props) {
           onChange={(e) => setFilterStatus(e.target.value)}
         >
           <option value="all">전체 상태</option>
-          <option value="covered">자동화됨</option>
+          <option value="covered">자동화(검증)</option>
           <option value="partial">부분</option>
+          <option value="heuristic_only">추정</option>
           <option value="manual_only">수동만</option>
           <option value="none">미커버</option>
         </select>

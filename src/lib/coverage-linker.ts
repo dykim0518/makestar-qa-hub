@@ -60,19 +60,24 @@ export async function linkCoverageForRun(
   const featureByTag = new Map(features.map((f) => [f.tag!, f.id]));
 
   const links: NewQaCoverageTestLink[] = [];
+  const affectedFiles = new Set<string>();
   for (const [tag, cases] of tagToCases) {
     const featureId = featureByTag.get(tag);
-    if (!featureId) continue; // 아직 등록 안 된 feature — 무시(수동 등록 시 자동 연결됨)
+    if (!featureId) continue;
     for (const tc of cases) {
+      // testFile 정규화: tests/ 접두사 제거
+      const normalizedFile = tc.file ? tc.file.replace(/^tests\//, "") : null;
       links.push({
         featureId,
         testTitle: tc.title,
-        testFile: tc.file,
+        testFile: normalizedFile,
         suite,
         lastRunId: runId,
         lastStatus: tc.status,
+        linkSource: "real",
         lastRunAt: runAt,
       });
+      if (normalizedFile) affectedFiles.add(normalizedFile);
     }
   }
 
@@ -92,35 +97,73 @@ export async function linkCoverageForRun(
           suite: sql`excluded.suite`,
           lastRunId: sql`excluded.last_run_id`,
           lastStatus: sql`excluded.last_status`,
+          linkSource: sql`excluded.link_source`,
           lastRunAt: sql`excluded.last_run_at`,
         },
       });
   }
 
-  // coverage_status 재계산: 연결된 feature의 최근 상태 기반
+  // heuristic 중복 제거: 이번 run의 real link 중 heuristic이 이미 매핑한 것은 제거
+  for (const real of links) {
+    if (!real.testFile) continue;
+    const heuristics = await db
+      .select({
+        id: qaCoverageTestLinks.id,
+        testTitle: qaCoverageTestLinks.testTitle,
+      })
+      .from(qaCoverageTestLinks)
+      .where(
+        sql`${qaCoverageTestLinks.featureId} = ${real.featureId}
+          AND ${qaCoverageTestLinks.testFile} = ${real.testFile}
+          AND ${qaCoverageTestLinks.linkSource} = 'heuristic'`,
+      );
+    for (const h of heuristics) {
+      if (
+        real.testTitle === h.testTitle ||
+        real.testTitle.endsWith(` > ${h.testTitle}`)
+      ) {
+        await db
+          .delete(qaCoverageTestLinks)
+          .where(eq(qaCoverageTestLinks.id, h.id));
+      }
+    }
+  }
+
+  // coverage_status 재계산 (새 규칙: heuristic/manual 분리, skipped-only → none)
   const touchedFeatureIds = Array.from(
     new Set(links.map((l) => l.featureId as string)),
   );
   for (const featureId of touchedFeatureIds) {
-    const linkStatuses = await db
-      .select({ lastStatus: qaCoverageTestLinks.lastStatus })
+    const all = await db
+      .select({
+        status: qaCoverageTestLinks.lastStatus,
+        src: qaCoverageTestLinks.linkSource,
+      })
       .from(qaCoverageTestLinks)
       .where(eq(qaCoverageTestLinks.featureId, featureId));
 
-    const statuses = linkStatuses
-      .map((l) => l.lastStatus)
-      .filter((s): s is string => Boolean(s));
-    const hasPassed = statuses.includes("passed");
-    const hasFailed = statuses.includes("failed") || statuses.includes("flaky");
-    const nextStatus = hasPassed
-      ? hasFailed
-        ? "partial"
-        : "covered"
-      : "partial";
+    const real = all.filter((l) => l.src === "real");
+    const heuristic = all.filter((l) => l.src === "heuristic");
+    const manual = all.filter((l) => l.src === "manual");
+    const realPassed = real.some((l) => l.status === "passed");
+    const realFailed = real.some(
+      (l) => l.status === "failed" || l.status === "flaky",
+    );
+    const realSkippedOnly =
+      real.length > 0 && real.every((l) => l.status === "skipped");
+
+    let next: string;
+    if (realPassed && realFailed) next = "partial";
+    else if (realPassed) next = "covered";
+    else if (realFailed) next = "partial";
+    else if (realSkippedOnly) next = "none";
+    else if (heuristic.length > 0) next = "heuristic_only";
+    else if (manual.length > 0) next = "manual_only";
+    else next = "none";
 
     await db
       .update(qaCoverageFeatures)
-      .set({ coverageStatus: nextStatus, updatedAt: new Date() })
+      .set({ coverageStatus: next, updatedAt: new Date() })
       .where(eq(qaCoverageFeatures.id, featureId));
   }
 

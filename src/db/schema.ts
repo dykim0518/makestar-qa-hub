@@ -532,7 +532,8 @@ export const qaCoverageTestLinks = pgTable(
       () => testRuns.runId,
       { onDelete: "set null" },
     ),
-    lastStatus: text("last_status"), // passed | failed | flaky | skipped
+    lastStatus: text("last_status"), // passed | failed | flaky | skipped | heuristic
+    linkSource: text("link_source").notNull().default("real"), // real | heuristic | manual
     lastRunAt: timestamp("last_run_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
@@ -544,6 +545,7 @@ export const qaCoverageTestLinks = pgTable(
     ),
     index("idx_qa_coverage_test_links_feature").on(table.featureId),
     index("idx_qa_coverage_test_links_suite").on(table.suite),
+    index("idx_qa_coverage_test_links_source").on(table.linkSource),
   ],
 );
 
