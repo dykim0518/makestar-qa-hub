@@ -29,6 +29,9 @@ async function main() {
     process.exit(1);
   }
   const suite = process.argv[3] || "admin";
+  // --reconcile: 이번 run에 없는 real 링크는 stale로 판정하여 삭제.
+  // 전체 spec 실행 시에만 사용. --grep 같은 부분 실행에선 절대 쓰지 말 것.
+  const reconcile = process.argv.includes("--reconcile");
   const abs = path.resolve(inputArg);
   if (!fs.existsSync(abs)) {
     console.error(`file not found: ${abs}`);
@@ -72,9 +75,13 @@ async function main() {
       file: tc.file ?? null,
       status: tc.status,
     })),
+    new Date(),
+    { reconcile },
   );
+  if (reconcile)
+    console.log("  (reconcile 모드: 이번 run에 없는 real 링크 정리)");
   console.log(
-    `\n커버리지 업데이트: ${coverage.linked} links, ${coverage.updatedFeatures} features`,
+    `\n커버리지 업데이트: ${coverage.linked} links, ${coverage.updatedFeatures} features (stale 제거: ${coverage.staleRemoved})`,
   );
 
   if (parsed.failed > 0) {

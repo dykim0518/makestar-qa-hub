@@ -99,9 +99,11 @@ export async function POST(request: NextRequest) {
       file: tc.file ?? null,
       status: tc.status,
     })),
+    new Date(),
+    { reconcile: true }, // CI: 항상 full suite 실행 전제
   ).catch((err) => {
     console.error("coverage link failed:", err);
-    return { linked: 0, updatedFeatures: 0 };
+    return { linked: 0, updatedFeatures: 0, staleRemoved: 0 };
   });
 
   // Slack 알림 (fire-and-forget)

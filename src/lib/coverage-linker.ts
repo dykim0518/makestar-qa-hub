@@ -16,7 +16,7 @@ import {
   qaCoverageTestLinks,
   type NewQaCoverageTestLink,
 } from "@/db/schema";
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { extractFeatureTags } from "./coverage-tag";
 import { computeCoverageStatus } from "./coverage-status";
 
@@ -37,7 +37,8 @@ export async function linkCoverageForRun(
   suite: string,
   testCases: TestCaseForLink[],
   runAt: Date = new Date(),
-): Promise<{ linked: number; updatedFeatures: number }> {
+  options: { reconcile?: boolean } = {},
+): Promise<{ linked: number; updatedFeatures: number; staleRemoved: number }> {
   const tagToCases = new Map<string, TestCaseForLink[]>();
   for (const tc of testCases) {
     for (const tag of extractFeatureTags(tc.title)) {
@@ -45,7 +46,8 @@ export async function linkCoverageForRun(
       tagToCases.get(tag)!.push(tc);
     }
   }
-  if (tagToCases.size === 0) return { linked: 0, updatedFeatures: 0 };
+  if (tagToCases.size === 0)
+    return { linked: 0, updatedFeatures: 0, staleRemoved: 0 };
 
   // 현재 등록된 feature 중 해당 태그를 가진 것만 매핑
   const tags = Array.from(tagToCases.keys());
@@ -55,6 +57,18 @@ export async function linkCoverageForRun(
     .where(inArray(qaCoverageFeatures.tag, tags));
 
   const featureByTag = new Map(features.map((f) => [f.tag!, f.id]));
+
+  // 이번 run에 등장한 모든 testFile + (testFile, testTitle) 조합 수집.
+  // reconciliation에서 "이번 run에 없는 old real link"를 stale로 판정할 때 사용.
+  const runFiles = new Set<string>();
+  const runTestKeys = new Set<string>();
+  for (const tc of testCases) {
+    const file = tc.file ? tc.file.replace(/^tests\//, "") : null;
+    if (file) {
+      runFiles.add(file);
+      runTestKeys.add(`${file}::${tc.title}`);
+    }
+  }
 
   const links: NewQaCoverageTestLink[] = [];
   const affectedFiles = new Set<string>();
@@ -78,7 +92,8 @@ export async function linkCoverageForRun(
     }
   }
 
-  if (links.length === 0) return { linked: 0, updatedFeatures: 0 };
+  if (links.length === 0)
+    return { linked: 0, updatedFeatures: 0, staleRemoved: 0 };
 
   for (let i = 0; i < links.length; i += 100) {
     await db
@@ -126,9 +141,39 @@ export async function linkCoverageForRun(
     }
   }
 
+  // Reconciliation: 이번 run에 등장한 파일들의 old real link 중
+  // 이번 run에 없는 (testFile, testTitle) 조합은 stale로 판정하고 삭제.
+  // — 태그 제거/테스트 삭제/rename 시 자동 정리.
+  const staleFeatureIds = new Set<string>();
+  if (options.reconcile && runFiles.size > 0) {
+    const oldRealLinks = await db
+      .select({
+        id: qaCoverageTestLinks.id,
+        featureId: qaCoverageTestLinks.featureId,
+        testTitle: qaCoverageTestLinks.testTitle,
+        testFile: qaCoverageTestLinks.testFile,
+      })
+      .from(qaCoverageTestLinks)
+      .where(
+        and(
+          eq(qaCoverageTestLinks.linkSource, "real"),
+          inArray(qaCoverageTestLinks.testFile, Array.from(runFiles)),
+        ),
+      );
+    for (const old of oldRealLinks) {
+      const key = `${old.testFile}::${old.testTitle}`;
+      if (!runTestKeys.has(key)) {
+        await db
+          .delete(qaCoverageTestLinks)
+          .where(eq(qaCoverageTestLinks.id, old.id));
+        staleFeatureIds.add(old.featureId);
+      }
+    }
+  }
+
   // coverage_status 재계산 (새 규칙: heuristic/manual 분리, skipped-only → none)
   const touchedFeatureIds = Array.from(
-    new Set(links.map((l) => l.featureId as string)),
+    new Set([...links.map((l) => l.featureId as string), ...staleFeatureIds]),
   );
   for (const featureId of touchedFeatureIds) {
     const all = await db
@@ -152,5 +197,9 @@ export async function linkCoverageForRun(
       .where(eq(qaCoverageFeatures.id, featureId));
   }
 
-  return { linked: links.length, updatedFeatures: touchedFeatureIds.length };
+  return {
+    linked: links.length,
+    updatedFeatures: touchedFeatureIds.length,
+    staleRemoved: staleFeatureIds.size,
+  };
 }
