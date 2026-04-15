@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Pre-push hook: 단위 테스트 + 타입체크 실행.
+# 실패 시 push 중단. 긴급 우회: git push --no-verify
+
+set -e
+
+echo "▶ [pre-push] 단위 테스트..."
+npm test --silent
+
+echo "▶ [pre-push] 타입체크..."
+npx tsc --noEmit
+
+echo "✅ [pre-push] 통과"
