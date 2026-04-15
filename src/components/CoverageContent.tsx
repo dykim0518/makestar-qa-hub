@@ -264,6 +264,87 @@ function TestLinksList({ links }: { links: CoverageLink[] }) {
   );
 }
 
+function OperationalSignals({
+  rows,
+  filterProduct,
+}: {
+  rows: CoverageFeatureRow[];
+  filterProduct: string;
+}) {
+  const scoped = rows.filter((r) => r.product === filterProduct);
+  const now = Date.now();
+  const STALE_MS = 14 * 24 * 60 * 60 * 1000;
+
+  const failed: CoverageFeatureRow[] = [];
+  const flaky: CoverageFeatureRow[] = [];
+  const stale: CoverageFeatureRow[] = [];
+  const heuristicOnly: CoverageFeatureRow[] = [];
+
+  for (const r of scoped) {
+    if (r.links.length === 0) continue;
+    const statuses = r.links.map((l) => l.lastStatus);
+    const hasFailed = statuses.includes("failed");
+    const hasFlaky = statuses.includes("flaky");
+    const hasReal =
+      statuses.includes("passed") ||
+      statuses.includes("failed") ||
+      statuses.includes("flaky");
+    const lastRealRun = r.links
+      .filter(
+        (l) =>
+          l.lastStatus === "passed" ||
+          l.lastStatus === "failed" ||
+          l.lastStatus === "flaky",
+      )
+      .map((l) => l.lastRunAt?.getTime() ?? 0)
+      .reduce((a, b) => Math.max(a, b), 0);
+
+    if (hasFailed) failed.push(r);
+    if (hasFlaky) flaky.push(r);
+    if (!hasReal) heuristicOnly.push(r);
+    else if (now - lastRealRun > STALE_MS) stale.push(r);
+  }
+
+  const tiles = [
+    {
+      label: "실패",
+      n: failed.length,
+      cls: "bg-rose-50 border-rose-200 text-rose-800",
+      hint: "실패 테스트 포함",
+    },
+    {
+      label: "Flaky",
+      n: flaky.length,
+      cls: "bg-amber-50 border-amber-200 text-amber-800",
+      hint: "불안정 테스트",
+    },
+    {
+      label: "미실행(14일+)",
+      n: stale.length,
+      cls: "bg-slate-50 border-slate-200 text-slate-700",
+      hint: "오래된 실행 결과",
+    },
+    {
+      label: "추정만",
+      n: heuristicOnly.length,
+      cls: "bg-indigo-50 border-indigo-200 text-indigo-800",
+      hint: "실측 없이 휴리스틱만",
+    },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      {tiles.map((t) => (
+        <div key={t.label} className={`rounded-lg border px-4 py-3 ${t.cls}`}>
+          <div className="text-xs font-medium opacity-80">{t.label}</div>
+          <div className="mt-1 text-2xl font-bold">{t.n}</div>
+          <div className="mt-0.5 text-[10px] opacity-70">{t.hint}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 type CategoryGroup = {
   key: string;
   product: string;
@@ -487,6 +568,8 @@ export function CoverageContent({ rows }: Props) {
             );
           })}
       </div>
+
+      <OperationalSignals rows={rows} filterProduct={filterProduct} />
 
       <div className="flex flex-wrap gap-3">
         <select
