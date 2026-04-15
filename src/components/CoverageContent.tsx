@@ -60,6 +60,73 @@ function Badge({ status }: { status: string }) {
   );
 }
 
+const PRIORITY_META: Record<string, { label: string; cls: string }> = {
+  critical: {
+    label: "Critical",
+    cls: "bg-rose-100 text-rose-800 border-rose-200",
+  },
+  high: {
+    label: "High",
+    cls: "bg-orange-100 text-orange-800 border-orange-200",
+  },
+  medium: {
+    label: "Medium",
+    cls: "bg-slate-100 text-slate-700 border-slate-200",
+  },
+  low: { label: "Low", cls: "bg-slate-50 text-slate-500 border-slate-200" },
+};
+
+function PriorityBadge({ priority }: { priority: string }) {
+  const meta = PRIORITY_META[priority] ?? PRIORITY_META.medium;
+  return (
+    <span
+      className={`inline-flex items-center rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase ${meta.cls}`}
+    >
+      {meta.label}
+    </span>
+  );
+}
+
+function TestRatioBar({ links }: { links: { lastStatus: string | null }[] }) {
+  if (links.length === 0) return <span className="text-[var(--muted)]">—</span>;
+  const passed = links.filter((l) => l.lastStatus === "passed").length;
+  const failed = links.filter(
+    (l) => l.lastStatus === "failed" || l.lastStatus === "flaky",
+  ).length;
+  const heuristic = links.filter((l) => l.lastStatus === "heuristic").length;
+  const total = links.length;
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center gap-2 text-xs">
+        <span className="font-medium text-slate-700">
+          {passed}/{total}
+        </span>
+        {failed > 0 && <span className="text-rose-600">✗{failed}</span>}
+      </div>
+      <div className="flex h-1 w-20 overflow-hidden rounded-full bg-slate-100">
+        {passed > 0 && (
+          <div
+            className="bg-emerald-500"
+            style={{ width: `${(passed / total) * 100}%` }}
+          />
+        )}
+        {failed > 0 && (
+          <div
+            className="bg-rose-500"
+            style={{ width: `${(failed / total) * 100}%` }}
+          />
+        )}
+        {heuristic > 0 && (
+          <div
+            className="bg-indigo-300"
+            style={{ width: `${(heuristic / total) * 100}%` }}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
 function LinkStatusDot({ status }: { status: string | null }) {
   const color =
     status === "passed"
@@ -80,6 +147,51 @@ function LinkStatusDot({ status }: { status: string | null }) {
   );
 }
 
+const STATUS_GROUP_ORDER = [
+  "failed",
+  "flaky",
+  "passed",
+  "heuristic",
+  "skipped",
+  "other",
+] as const;
+
+const STATUS_GROUP_META: Record<
+  string,
+  { label: string; cls: string; dotCls: string }
+> = {
+  failed: {
+    label: "실패",
+    cls: "text-rose-700 bg-rose-50",
+    dotCls: "bg-rose-500",
+  },
+  flaky: {
+    label: "Flaky",
+    cls: "text-amber-700 bg-amber-50",
+    dotCls: "bg-amber-500",
+  },
+  passed: {
+    label: "통과",
+    cls: "text-emerald-700 bg-emerald-50",
+    dotCls: "bg-emerald-500",
+  },
+  heuristic: {
+    label: "휴리스틱(추정)",
+    cls: "text-indigo-700 bg-indigo-50",
+    dotCls: "bg-indigo-400",
+  },
+  skipped: {
+    label: "스킵",
+    cls: "text-slate-600 bg-slate-100",
+    dotCls: "bg-slate-400",
+  },
+  other: {
+    label: "기타",
+    cls: "text-slate-500 bg-slate-50",
+    dotCls: "bg-slate-300",
+  },
+};
+
 function TestLinksList({ links }: { links: CoverageLink[] }) {
   if (links.length === 0) {
     return (
@@ -88,26 +200,66 @@ function TestLinksList({ links }: { links: CoverageLink[] }) {
       </div>
     );
   }
+  const grouped = new Map<string, CoverageLink[]>();
+  for (const l of links) {
+    const k =
+      l.lastStatus && STATUS_GROUP_META[l.lastStatus] ? l.lastStatus : "other";
+    if (!grouped.has(k)) grouped.set(k, []);
+    grouped.get(k)!.push(l);
+  }
+  const orderedGroups = STATUS_GROUP_ORDER.filter((g) => grouped.has(g));
   return (
-    <div className="divide-y divide-[var(--card-border)] bg-slate-50/50">
-      {links.map((l) => (
-        <div
-          key={l.id}
-          className="flex items-center justify-between gap-4 px-6 py-2"
-        >
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-xs text-slate-800">{l.testTitle}</div>
-            {l.testFile && (
-              <div className="font-mono text-[10px] text-[var(--muted)]">
-                {l.testFile}
-              </div>
-            )}
+    <div className="bg-slate-50/50">
+      <div className="flex flex-wrap gap-1.5 border-b border-[var(--card-border)] px-6 py-2.5">
+        {orderedGroups.map((g) => {
+          const meta = STATUS_GROUP_META[g];
+          return (
+            <span
+              key={g}
+              className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium ${meta.cls}`}
+            >
+              <span
+                className={`inline-block h-1.5 w-1.5 rounded-full ${meta.dotCls}`}
+              />
+              {meta.label} {grouped.get(g)!.length}
+            </span>
+          );
+        })}
+      </div>
+      {orderedGroups.map((g) => {
+        const meta = STATUS_GROUP_META[g];
+        const items = grouped.get(g)!;
+        return (
+          <div key={g}>
+            <div className="flex items-center gap-2 bg-white/60 px-6 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+              <span
+                className={`inline-block h-1.5 w-1.5 rounded-full ${meta.dotCls}`}
+              />
+              {meta.label}
+              <span className="text-slate-400">({items.length})</span>
+            </div>
+            <div className="divide-y divide-[var(--card-border)]">
+              {items.map((l) => (
+                <div
+                  key={l.id}
+                  className="flex items-center justify-between gap-4 px-6 py-2"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-xs text-slate-800">
+                      {l.testTitle}
+                    </div>
+                    {l.testFile && (
+                      <div className="font-mono text-[10px] text-[var(--muted)]">
+                        {l.testFile}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="shrink-0">
-            <LinkStatusDot status={l.lastStatus} />
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -121,6 +273,7 @@ type CategoryGroup = {
   covered: number;
   partial: number;
   pct: number;
+  minOrder: number;
 };
 
 export function CoverageContent({ rows }: Props) {
@@ -162,6 +315,7 @@ export function CoverageContent({ rows }: Props) {
           covered: 0,
           partial: 0,
           pct: 0,
+          minOrder: Number.MAX_SAFE_INTEGER,
         });
       }
       const g = map.get(key)!;
@@ -169,16 +323,18 @@ export function CoverageContent({ rows }: Props) {
       g.total += 1;
       if (r.coverageStatus === "covered") g.covered += 1;
       else if (r.coverageStatus === "partial") g.partial += 1;
+      if (r.displayOrder < g.minOrder) g.minOrder = r.displayOrder;
     }
     for (const g of map.values()) {
       g.pct = g.total
         ? Math.round(((g.covered + g.partial * 0.5) / g.total) * 100)
         : 0;
+      g.rows.sort((a, b) => a.displayOrder - b.displayOrder);
     }
     return Array.from(map.values()).sort((a, b) => {
       const pr = productRank(a.product) - productRank(b.product);
       if (pr !== 0) return pr;
-      return a.category.localeCompare(b.category);
+      return a.minOrder - b.minOrder;
     });
   }, [filtered]);
 
@@ -288,20 +444,34 @@ export function CoverageContent({ rows }: Props) {
             const pct = s.total
               ? Math.round(((s.covered + s.partial * 0.5) / s.total) * 100)
               : 0;
+            const isActive = product === filterProduct;
             return (
-              <div
+              <button
+                type="button"
                 key={product}
-                className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-5"
+                onClick={() => setFilterProduct(product)}
+                aria-pressed={isActive}
+                className={`rounded-xl border p-5 text-left transition-all ${
+                  isActive
+                    ? "border-emerald-500 bg-emerald-50/40 ring-2 ring-emerald-500/40 shadow-sm"
+                    : "border-[var(--card-border)] bg-[var(--card)] hover:border-slate-300 hover:bg-slate-50"
+                }`}
               >
                 <div className="flex items-baseline justify-between">
-                  <div className="text-sm font-semibold text-slate-600">
+                  <div
+                    className={`text-sm font-semibold ${isActive ? "text-emerald-800" : "text-slate-600"}`}
+                  >
                     {PRODUCT_LABEL[product] ?? product}
                   </div>
-                  <div className="text-2xl font-bold text-slate-900">
+                  <div
+                    className={`text-2xl font-bold ${isActive ? "text-emerald-900" : "text-slate-900"}`}
+                  >
                     {pct}%
                   </div>
                 </div>
-                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className={`mt-3 h-2 w-full overflow-hidden rounded-full ${isActive ? "bg-emerald-100" : "bg-slate-100"}`}
+                >
                   <div
                     className="h-full bg-emerald-500"
                     style={{ width: `${pct}%` }}
@@ -313,7 +483,7 @@ export function CoverageContent({ rows }: Props) {
                   <span className="text-amber-700">부분 {s.partial}</span>
                   <span>미커버 {s.none}</span>
                 </div>
-              </div>
+              </button>
             );
           })}
       </div>
@@ -439,14 +609,14 @@ export function CoverageContent({ rows }: Props) {
                             <td className="px-4 py-2 text-sm text-slate-900">
                               {r.featureName}
                             </td>
-                            <td className="px-4 py-2 text-xs uppercase text-slate-500">
-                              {r.priority}
+                            <td className="px-4 py-2">
+                              <PriorityBadge priority={r.priority} />
                             </td>
                             <td className="px-4 py-2">
                               <Badge status={r.coverageStatus} />
                             </td>
-                            <td className="px-4 py-2 text-xs text-slate-600">
-                              {r.linkCount > 0 ? `${r.linkCount}건` : "—"}
+                            <td className="px-4 py-2">
+                              <TestRatioBar links={r.links} />
                             </td>
                             <td className="px-4 py-2 text-xs text-[var(--muted)]">
                               {r.lastRunAt

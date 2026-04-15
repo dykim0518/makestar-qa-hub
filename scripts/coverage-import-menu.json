@@ -9,7 +9,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /product/new/[id]"
+    "notes": "연결: → /product/new/[id]",
+    "displayOrder": 1
   },
   {
     "product": "admin_makestar",
@@ -21,7 +22,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /product/new/list"
+    "notes": "연결: ← /product/new/list",
+    "displayOrder": 2
   },
   {
     "product": "admin_makestar",
@@ -33,7 +35,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /product/new/list"
+    "notes": "연결: → /product/new/list",
+    "displayOrder": 3
   },
   {
     "product": "admin_makestar",
@@ -45,7 +48,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /sku/[id]"
+    "notes": "연결: → /sku/[id]",
+    "displayOrder": 4
   },
   {
     "product": "admin_makestar",
@@ -57,7 +61,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /sku/list"
+    "notes": "연결: ← /sku/list",
+    "displayOrder": 5
   },
   {
     "product": "admin_makestar",
@@ -69,7 +74,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /sku/list"
+    "notes": "연결: → /sku/list",
+    "displayOrder": 6
   },
   {
     "product": "admin_makestar",
@@ -81,7 +87,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /photocard-sku/work-request/[skuCode], /photocard-sku/inspection/*, /photocard-sku/work/*"
+    "notes": "연결: → /photocard-sku/work-request/[skuCode], /photocard-sku/inspection/*, /photocard-sku/work/*",
+    "displayOrder": 7
   },
   {
     "product": "admin_makestar",
@@ -93,7 +100,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /photocard-sku/work-request/list"
+    "notes": "연결: ← /photocard-sku/work-request/list",
+    "displayOrder": 8
   },
   {
     "product": "admin_makestar",
@@ -105,7 +113,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /photocard-sku/inspection/[skuCode]"
+    "notes": "연결: → /photocard-sku/inspection/[skuCode]",
+    "displayOrder": 9
   },
   {
     "product": "admin_makestar",
@@ -117,7 +126,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /photocard-sku/inspection/[skuCode]"
+    "notes": "연결: → /photocard-sku/inspection/[skuCode]",
+    "displayOrder": 10
   },
   {
     "product": "admin_makestar",
@@ -129,7 +139,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /photocard-sku/inspection/[skuCode]"
+    "notes": "연결: → /photocard-sku/inspection/[skuCode]",
+    "displayOrder": 11
   },
   {
     "product": "admin_makestar",
@@ -141,7 +152,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /photocard-sku/inspection/*"
+    "notes": "연결: ← /photocard-sku/inspection/*",
+    "displayOrder": 12
   },
   {
     "product": "admin_makestar",
@@ -153,7 +165,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 13
   },
   {
     "product": "admin_makestar",
@@ -165,7 +178,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 14
   },
   {
     "product": "admin_makestar",
@@ -177,7 +191,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 15
   },
   {
     "product": "admin_makestar",
@@ -189,7 +204,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /event/update/[id]"
+    "notes": "연결: → /event/update/[id]",
+    "displayOrder": 16
   },
   {
     "product": "admin_makestar",
@@ -201,7 +217,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /event/list"
+    "notes": "연결: ← /event/list",
+    "displayOrder": 17
   },
   {
     "product": "admin_makestar",
@@ -213,7 +230,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /event/list"
+    "notes": "연결: → /event/list",
+    "displayOrder": 18
   },
   {
     "product": "admin_makestar",
@@ -225,7 +243,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /display-category/[id]"
+    "notes": "연결: → /display-category/[id]",
+    "displayOrder": 19
   },
   {
     "product": "admin_makestar",
@@ -237,7 +256,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /display-category"
+    "notes": "연결: ← /display-category",
+    "displayOrder": 20
   },
   {
     "product": "admin_makestar",
@@ -249,7 +269,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /order/event/[id]"
+    "notes": "연결: → /order/event/[id]",
+    "displayOrder": 21
   },
   {
     "product": "admin_makestar",
@@ -261,7 +282,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /order/list"
+    "notes": "연결: ← /order/list",
+    "displayOrder": 22
   },
   {
     "product": "admin_makestar",
@@ -273,7 +295,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /purchase/[id]"
+    "notes": "연결: → /purchase/[id]",
+    "displayOrder": 23
   },
   {
     "product": "admin_makestar",
@@ -285,7 +308,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /purchase"
+    "notes": "연결: ← /purchase",
+    "displayOrder": 24
   },
   {
     "product": "admin_makestar",
@@ -297,7 +321,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 25
   },
   {
     "product": "admin_makestar",
@@ -309,7 +334,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 26
   },
   {
     "product": "admin_makestar",
@@ -321,7 +347,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /event-winner/[id]"
+    "notes": "연결: → /event-winner/[id]",
+    "displayOrder": 27
   },
   {
     "product": "admin_makestar",
@@ -333,7 +360,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /event-winner/list"
+    "notes": "연결: ← /event-winner/list",
+    "displayOrder": 28
   },
   {
     "product": "admin_makestar",
@@ -345,7 +373,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /event-winning-manage/[id]"
+    "notes": "연결: → /event-winning-manage/[id]",
+    "displayOrder": 29
   },
   {
     "product": "admin_makestar",
@@ -357,7 +386,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /event-winning-manage"
+    "notes": "연결: ← /event-winning-manage",
+    "displayOrder": 30
   },
   {
     "product": "admin_makestar",
@@ -369,7 +399,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /notification/notice/create, /notification/notice/update/[id], /notification/popup/create, /notification/popup/update/[id]"
+    "notes": "연결: → /notification/notice/create, /notification/notice/update/[id], /notification/popup/create, /notification/popup/update/[id]",
+    "displayOrder": 31
   },
   {
     "product": "admin_makestar",
@@ -381,7 +412,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /notification/list"
+    "notes": "연결: → /notification/list",
+    "displayOrder": 32
   },
   {
     "product": "admin_makestar",
@@ -393,7 +425,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /notification/list"
+    "notes": "연결: ← /notification/list",
+    "displayOrder": 33
   },
   {
     "product": "admin_makestar",
@@ -405,7 +438,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /notification/list"
+    "notes": "연결: → /notification/list",
+    "displayOrder": 34
   },
   {
     "product": "admin_makestar",
@@ -417,7 +451,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /notification/list"
+    "notes": "연결: ← /notification/list",
+    "displayOrder": 35
   },
   {
     "product": "admin_makestar",
@@ -429,7 +464,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /contents/event"
+    "notes": "연결: → /contents/event",
+    "displayOrder": 36
   },
   {
     "product": "admin_makestar",
@@ -441,7 +477,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /contents/banner/list"
+    "notes": "연결: ← /contents/banner/list",
+    "displayOrder": 37
   },
   {
     "product": "admin_makestar",
@@ -453,7 +490,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /user/[id], /user-group/[id]"
+    "notes": "연결: → /user/[id], /user-group/[id]",
+    "displayOrder": 38
   },
   {
     "product": "admin_makestar",
@@ -465,7 +503,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /user/list"
+    "notes": "연결: ← /user/list",
+    "displayOrder": 39
   },
   {
     "product": "admin_makestar",
@@ -477,7 +516,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /user/list"
+    "notes": "연결: ← /user/list",
+    "displayOrder": 40
   },
   {
     "product": "admin_makestar",
@@ -489,7 +529,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 41
   },
   {
     "product": "admin_makestar",
@@ -501,7 +542,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /artist/[id], /artist/create"
+    "notes": "연결: → /artist/[id], /artist/create",
+    "displayOrder": 42
   },
   {
     "product": "admin_makestar",
@@ -513,7 +555,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /artist/list"
+    "notes": "연결: ← /artist/list",
+    "displayOrder": 43
   },
   {
     "product": "admin_makestar",
@@ -525,7 +568,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /artist/list"
+    "notes": "연결: → /artist/list",
+    "displayOrder": 44
   },
   {
     "product": "admin_makestar",
@@ -537,7 +581,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 45
   },
   {
     "product": "admin_makestar",
@@ -549,7 +594,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 46
   },
   {
     "product": "admin_makestar",
@@ -561,7 +607,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 47
   },
   {
     "product": "admin_albumbuddy",
@@ -573,7 +620,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /albumbuddy/artist/create"
+    "notes": "연결: → /albumbuddy/artist/create",
+    "displayOrder": 1
   },
   {
     "product": "admin_albumbuddy",
@@ -585,7 +633,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /albumbuddy/artist/list"
+    "notes": "연결: → /albumbuddy/artist/list",
+    "displayOrder": 2
   },
   {
     "product": "admin_albumbuddy",
@@ -597,7 +646,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 3
   },
   {
     "product": "admin_albumbuddy",
@@ -609,7 +659,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /albumbuddy/goods/[id], /albumbuddy/goods/create"
+    "notes": "연결: → /albumbuddy/goods/[id], /albumbuddy/goods/create",
+    "displayOrder": 4
   },
   {
     "product": "admin_albumbuddy",
@@ -621,7 +672,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /albumbuddy/goods/list"
+    "notes": "연결: ← /albumbuddy/goods/list",
+    "displayOrder": 5
   },
   {
     "product": "admin_albumbuddy",
@@ -633,7 +685,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /albumbuddy/goods/list"
+    "notes": "연결: → /albumbuddy/goods/list",
+    "displayOrder": 6
   },
   {
     "product": "admin_albumbuddy",
@@ -645,7 +698,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /albumbuddy/goods/create"
+    "notes": "연결: → /albumbuddy/goods/create",
+    "displayOrder": 7
   },
   {
     "product": "admin_albumbuddy",
@@ -657,7 +711,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 8
   },
   {
     "product": "admin_albumbuddy",
@@ -669,7 +724,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /albumbuddy/purchase/process"
+    "notes": "연결: → /albumbuddy/purchase/process",
+    "displayOrder": 9
   },
   {
     "product": "admin_albumbuddy",
@@ -681,7 +737,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /albumbuddy/purchase/list"
+    "notes": "연결: ← /albumbuddy/purchase/list",
+    "displayOrder": 10
   },
   {
     "product": "admin_albumbuddy",
@@ -693,7 +750,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 11
   },
   {
     "product": "admin_albumbuddy",
@@ -705,7 +763,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /albumbuddy/stock/[id], /albumbuddy/stock/create"
+    "notes": "연결: → /albumbuddy/stock/[id], /albumbuddy/stock/create",
+    "displayOrder": 12
   },
   {
     "product": "admin_albumbuddy",
@@ -717,7 +776,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /albumbuddy/stock/list"
+    "notes": "연결: ← /albumbuddy/stock/list",
+    "displayOrder": 13
   },
   {
     "product": "admin_albumbuddy",
@@ -729,7 +789,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /albumbuddy/stock/list"
+    "notes": "연결: → /albumbuddy/stock/list",
+    "displayOrder": 14
   },
   {
     "product": "admin_albumbuddy",
@@ -741,7 +802,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /albumbuddy/warehouse/[id]"
+    "notes": "연결: → /albumbuddy/warehouse/[id]",
+    "displayOrder": 15
   },
   {
     "product": "admin_albumbuddy",
@@ -753,7 +815,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /albumbuddy/warehouse/list"
+    "notes": "연결: ← /albumbuddy/warehouse/list",
+    "displayOrder": 16
   },
   {
     "product": "admin_albumbuddy",
@@ -765,7 +828,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /albumbuddy/packaging/[id]"
+    "notes": "연결: → /albumbuddy/packaging/[id]",
+    "displayOrder": 17
   },
   {
     "product": "admin_albumbuddy",
@@ -777,7 +841,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /albumbuddy/packaging/list"
+    "notes": "연결: ← /albumbuddy/packaging/list",
+    "displayOrder": 18
   },
   {
     "product": "admin_albumbuddy",
@@ -789,7 +854,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 19
   },
   {
     "product": "admin_albumbuddy",
@@ -801,7 +867,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /albumbuddy/shipping/[id]"
+    "notes": "연결: → /albumbuddy/shipping/[id]",
+    "displayOrder": 20
   },
   {
     "product": "admin_albumbuddy",
@@ -813,7 +880,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /albumbuddy/shipping/list"
+    "notes": "연결: ← /albumbuddy/shipping/list",
+    "displayOrder": 21
   },
   {
     "product": "admin_albumbuddy",
@@ -825,7 +893,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 22
   },
   {
     "product": "admin_albumbuddy",
@@ -837,7 +906,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 23
   },
   {
     "product": "admin_albumbuddy",
@@ -849,7 +919,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 24
   },
   {
     "product": "admin_pocaalbum",
@@ -861,7 +932,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/album/[id], /pocaalbum/album/create"
+    "notes": "연결: → /pocaalbum/album/[id], /pocaalbum/album/create",
+    "displayOrder": 1
   },
   {
     "product": "admin_pocaalbum",
@@ -873,7 +945,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /pocaalbum/album/list"
+    "notes": "연결: ← /pocaalbum/album/list",
+    "displayOrder": 2
   },
   {
     "product": "admin_pocaalbum",
@@ -885,7 +958,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/album/list"
+    "notes": "연결: → /pocaalbum/album/list",
+    "displayOrder": 3
   },
   {
     "product": "admin_pocaalbum",
@@ -897,7 +971,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/album/publish/create"
+    "notes": "연결: → /pocaalbum/album/publish/create",
+    "displayOrder": 4
   },
   {
     "product": "admin_pocaalbum",
@@ -909,7 +984,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/album/publish/list"
+    "notes": "연결: → /pocaalbum/album/publish/list",
+    "displayOrder": 5
   },
   {
     "product": "admin_pocaalbum",
@@ -921,7 +997,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/album/photo/[id], /pocaalbum/album/photo/create"
+    "notes": "연결: → /pocaalbum/album/photo/[id], /pocaalbum/album/photo/create",
+    "displayOrder": 6
   },
   {
     "product": "admin_pocaalbum",
@@ -933,7 +1010,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /pocaalbum/album/photo/list"
+    "notes": "연결: ← /pocaalbum/album/photo/list",
+    "displayOrder": 7
   },
   {
     "product": "admin_pocaalbum",
@@ -945,7 +1023,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/album/photo/list"
+    "notes": "연결: → /pocaalbum/album/photo/list",
+    "displayOrder": 8
   },
   {
     "product": "admin_pocaalbum",
@@ -957,7 +1036,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/album/music/[id], /pocaalbum/album/music/create"
+    "notes": "연결: → /pocaalbum/album/music/[id], /pocaalbum/album/music/create",
+    "displayOrder": 9
   },
   {
     "product": "admin_pocaalbum",
@@ -969,7 +1049,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /pocaalbum/album/music/list"
+    "notes": "연결: ← /pocaalbum/album/music/list",
+    "displayOrder": 10
   },
   {
     "product": "admin_pocaalbum",
@@ -981,7 +1062,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/album/music/list"
+    "notes": "연결: → /pocaalbum/album/music/list",
+    "displayOrder": 11
   },
   {
     "product": "admin_pocaalbum",
@@ -993,7 +1075,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/album/video/[id], /pocaalbum/album/video/create"
+    "notes": "연결: → /pocaalbum/album/video/[id], /pocaalbum/album/video/create",
+    "displayOrder": 12
   },
   {
     "product": "admin_pocaalbum",
@@ -1005,7 +1088,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /pocaalbum/album/video/list"
+    "notes": "연결: ← /pocaalbum/album/video/list",
+    "displayOrder": 13
   },
   {
     "product": "admin_pocaalbum",
@@ -1017,7 +1101,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/album/video/list"
+    "notes": "연결: → /pocaalbum/album/video/list",
+    "displayOrder": 14
   },
   {
     "product": "admin_pocaalbum",
@@ -1029,7 +1114,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/album/youtube/[id], /pocaalbum/album/youtube/create"
+    "notes": "연결: → /pocaalbum/album/youtube/[id], /pocaalbum/album/youtube/create",
+    "displayOrder": 15
   },
   {
     "product": "admin_pocaalbum",
@@ -1041,7 +1127,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /pocaalbum/album/youtube/list"
+    "notes": "연결: ← /pocaalbum/album/youtube/list",
+    "displayOrder": 16
   },
   {
     "product": "admin_pocaalbum",
@@ -1053,7 +1140,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/album/youtube/list"
+    "notes": "연결: → /pocaalbum/album/youtube/list",
+    "displayOrder": 17
   },
   {
     "product": "admin_pocaalbum",
@@ -1065,7 +1153,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/fave/pack/[id], /pocaalbum/fave/pack/create, /pocaalbum/fave/pack/publish/create"
+    "notes": "연결: → /pocaalbum/fave/pack/[id], /pocaalbum/fave/pack/create, /pocaalbum/fave/pack/publish/create",
+    "displayOrder": 18
   },
   {
     "product": "admin_pocaalbum",
@@ -1077,7 +1166,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /pocaalbum/fave/pack/list"
+    "notes": "연결: ← /pocaalbum/fave/pack/list",
+    "displayOrder": 19
   },
   {
     "product": "admin_pocaalbum",
@@ -1089,7 +1179,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/fave/pack/list"
+    "notes": "연결: → /pocaalbum/fave/pack/list",
+    "displayOrder": 20
   },
   {
     "product": "admin_pocaalbum",
@@ -1101,7 +1192,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/fave/pack/list"
+    "notes": "연결: → /pocaalbum/fave/pack/list",
+    "displayOrder": 21
   },
   {
     "product": "admin_pocaalbum",
@@ -1113,7 +1205,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/fave/event/[id], /pocaalbum/fave/event/create"
+    "notes": "연결: → /pocaalbum/fave/event/[id], /pocaalbum/fave/event/create",
+    "displayOrder": 22
   },
   {
     "product": "admin_pocaalbum",
@@ -1125,7 +1218,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /pocaalbum/fave/event/list"
+    "notes": "연결: ← /pocaalbum/fave/event/list",
+    "displayOrder": 23
   },
   {
     "product": "admin_pocaalbum",
@@ -1137,7 +1231,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/fave/event/list"
+    "notes": "연결: → /pocaalbum/fave/event/list",
+    "displayOrder": 24
   },
   {
     "product": "admin_pocaalbum",
@@ -1149,7 +1244,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/benefit/event/[id], /pocaalbum/benefit/event/create"
+    "notes": "연결: → /pocaalbum/benefit/event/[id], /pocaalbum/benefit/event/create",
+    "displayOrder": 25
   },
   {
     "product": "admin_pocaalbum",
@@ -1161,7 +1257,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /pocaalbum/benefit/event/list"
+    "notes": "연결: ← /pocaalbum/benefit/event/list",
+    "displayOrder": 26
   },
   {
     "product": "admin_pocaalbum",
@@ -1173,7 +1270,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/benefit/event/list"
+    "notes": "연결: → /pocaalbum/benefit/event/list",
+    "displayOrder": 27
   },
   {
     "product": "admin_pocaalbum",
@@ -1185,7 +1283,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 28
   },
   {
     "product": "admin_pocaalbum",
@@ -1197,7 +1296,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/shop/product/[id], /pocaalbum/shop/product/create"
+    "notes": "연결: → /pocaalbum/shop/product/[id], /pocaalbum/shop/product/create",
+    "displayOrder": 29
   },
   {
     "product": "admin_pocaalbum",
@@ -1209,7 +1309,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /pocaalbum/shop/product/list"
+    "notes": "연결: ← /pocaalbum/shop/product/list",
+    "displayOrder": 30
   },
   {
     "product": "admin_pocaalbum",
@@ -1221,7 +1322,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/shop/product/list"
+    "notes": "연결: → /pocaalbum/shop/product/list",
+    "displayOrder": 31
   },
   {
     "product": "admin_pocaalbum",
@@ -1233,7 +1335,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 32
   },
   {
     "product": "admin_pocaalbum",
@@ -1245,7 +1348,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 33
   },
   {
     "product": "admin_pocaalbum",
@@ -1257,7 +1361,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 34
   },
   {
     "product": "admin_pocaalbum",
@@ -1269,7 +1374,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/notice/[id], /pocaalbum/notice/create"
+    "notes": "연결: → /pocaalbum/notice/[id], /pocaalbum/notice/create",
+    "displayOrder": 35
   },
   {
     "product": "admin_pocaalbum",
@@ -1281,7 +1387,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /pocaalbum/notice/list"
+    "notes": "연결: ← /pocaalbum/notice/list",
+    "displayOrder": 36
   },
   {
     "product": "admin_pocaalbum",
@@ -1293,7 +1400,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/notice/list"
+    "notes": "연결: → /pocaalbum/notice/list",
+    "displayOrder": 37
   },
   {
     "product": "admin_pocaalbum",
@@ -1305,7 +1413,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/notice/notification/create"
+    "notes": "연결: → /pocaalbum/notice/notification/create",
+    "displayOrder": 38
   },
   {
     "product": "admin_pocaalbum",
@@ -1317,7 +1426,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/notice/notification/list"
+    "notes": "연결: → /pocaalbum/notice/notification/list",
+    "displayOrder": 39
   },
   {
     "product": "admin_pocaalbum",
@@ -1329,7 +1439,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 40
   },
   {
     "product": "admin_pocaalbum",
@@ -1341,7 +1452,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: → /pocaalbum/user/[id]"
+    "notes": "연결: → /pocaalbum/user/[id]",
+    "displayOrder": 41
   },
   {
     "product": "admin_pocaalbum",
@@ -1353,7 +1465,8 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": "연결: ← /pocaalbum/user/list"
+    "notes": "연결: ← /pocaalbum/user/list",
+    "displayOrder": 42
   },
   {
     "product": "admin_pocaalbum",
@@ -1365,6 +1478,7 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": null,
-    "notes": null
+    "notes": null,
+    "displayOrder": 43
   }
 ]

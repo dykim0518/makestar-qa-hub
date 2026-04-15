@@ -26,6 +26,7 @@ type Row = {
   source?: string;
   tag?: string | null;
   notes?: string | null;
+  displayOrder?: number;
 };
 
 async function main() {
@@ -53,6 +54,7 @@ async function main() {
       source: r.source ?? "manual",
       tag: r.tag ?? null,
       notes: r.notes ?? null,
+      displayOrder: r.displayOrder ?? 0,
     }));
     const result = await db
       .insert(qaCoverageFeatures)
@@ -70,6 +72,7 @@ async function main() {
           source: sql`excluded.source`,
           tag: sql`excluded.tag`,
           notes: sql`excluded.notes`,
+          displayOrder: sql`excluded.display_order`,
           updatedAt: new Date(),
         },
       })

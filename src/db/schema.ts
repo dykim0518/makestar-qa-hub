@@ -501,6 +501,7 @@ export const qaCoverageFeatures = pgTable(
     tag: text("tag"),
     notes: text("notes"),
     isActive: boolean("is_active").notNull().default(true),
+    displayOrder: integer("display_order").notNull().default(0),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -513,6 +514,7 @@ export const qaCoverageFeatures = pgTable(
     index("idx_qa_coverage_features_product").on(table.product),
     index("idx_qa_coverage_features_status").on(table.coverageStatus),
     index("idx_qa_coverage_features_tag").on(table.tag),
+    index("idx_qa_coverage_features_display_order").on(table.displayOrder),
   ],
 );
 

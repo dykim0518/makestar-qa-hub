@@ -27,6 +27,7 @@ type CoverageFeatureRow = {
   coverageStatus: string;
   source: string;
   tag: string | null;
+  displayOrder: number;
   linkCount: number;
   lastRunAt: Date | null;
   lastStatus: string | null;
@@ -39,7 +40,11 @@ async function getCoverage(): Promise<CoverageFeatureRow[]> {
       .select()
       .from(qaCoverageFeatures)
       .where(eq(qaCoverageFeatures.isActive, true))
-      .orderBy(qaCoverageFeatures.product, qaCoverageFeatures.pagePath),
+      .orderBy(
+        qaCoverageFeatures.product,
+        qaCoverageFeatures.displayOrder,
+        qaCoverageFeatures.pagePath,
+      ),
     db.select().from(qaCoverageTestLinks),
   ]);
 
@@ -73,6 +78,7 @@ async function getCoverage(): Promise<CoverageFeatureRow[]> {
       coverageStatus: f.coverageStatus,
       source: f.source,
       tag: f.tag,
+      displayOrder: f.displayOrder,
       linkCount: links.length,
       lastRunAt: links[0]?.lastRunAt ?? null,
       lastStatus: links[0]?.lastStatus ?? null,
