@@ -28,6 +28,7 @@ type CoverageFeatureRow = {
   coverageStatus: string;
   source: string;
   tag: string | null;
+  notes: string | null;
   displayOrder: number;
   linkCount: number;
   lastRunAt: Date | null;
@@ -80,6 +81,7 @@ async function getCoverage(): Promise<CoverageFeatureRow[]> {
       coverageStatus: f.coverageStatus,
       source: f.source,
       tag: f.tag,
+      notes: f.notes,
       displayOrder: f.displayOrder,
       linkCount: links.length,
       lastRunAt: links[0]?.lastRunAt ?? null,
