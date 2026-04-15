@@ -243,23 +243,54 @@ function TestLinksList({ links }: { links: CoverageLink[] }) {
               <span className="text-slate-400">({items.length})</span>
             </div>
             <div className="divide-y divide-[var(--card-border)]">
-              {items.map((l) => (
-                <div
-                  key={l.id}
-                  className="flex items-center justify-between gap-4 px-6 py-2"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-xs text-slate-800">
-                      {l.testTitle}
+              {items.map((l) => {
+                const srcBadge =
+                  l.linkSource === "heuristic"
+                    ? {
+                        text: "추정",
+                        cls: "bg-indigo-100 text-indigo-700 border-indigo-200",
+                      }
+                    : l.linkSource === "manual"
+                      ? {
+                          text: "수동",
+                          cls: "bg-sky-100 text-sky-700 border-sky-200",
+                        }
+                      : {
+                          text: "실측",
+                          cls: "bg-emerald-100 text-emerald-700 border-emerald-200",
+                        };
+                return (
+                  <div
+                    key={l.id}
+                    className="flex items-center justify-between gap-4 px-6 py-2"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start gap-2">
+                        <span
+                          className={`mt-0.5 shrink-0 inline-flex items-center rounded border px-1.5 py-0.5 text-[10px] font-semibold ${srcBadge.cls}`}
+                        >
+                          {srcBadge.text}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-xs text-slate-800">
+                            {l.testTitle}
+                          </div>
+                          {l.testFile && (
+                            <div className="font-mono text-[10px] text-[var(--muted)]">
+                              {l.testFile}
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    {l.testFile && (
-                      <div className="font-mono text-[10px] text-[var(--muted)]">
-                        {l.testFile}
+                    {l.lastRunAt && l.linkSource === "real" && (
+                      <div className="shrink-0 text-[10px] text-[var(--muted)]">
+                        {new Date(l.lastRunAt).toLocaleDateString("ko-KR")}
                       </div>
                     )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         );

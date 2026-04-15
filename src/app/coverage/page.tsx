@@ -13,6 +13,7 @@ type CoverageLink = {
   testFile: string | null;
   suite: string;
   lastStatus: string | null;
+  linkSource: string;
   lastRunAt: Date | null;
 };
 
@@ -58,6 +59,7 @@ async function getCoverage(): Promise<CoverageFeatureRow[]> {
       testFile: l.testFile,
       suite: l.suite,
       lastStatus: l.lastStatus,
+      linkSource: l.linkSource,
       lastRunAt: l.lastRunAt,
     });
     linksByFeature.set(l.featureId, arr);
