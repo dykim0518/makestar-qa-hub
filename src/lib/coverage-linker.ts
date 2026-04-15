@@ -17,13 +17,10 @@ import {
   type NewQaCoverageTestLink,
 } from "@/db/schema";
 import { eq, inArray, sql } from "drizzle-orm";
+import { extractFeatureTags } from "./coverage-tag";
+import { computeCoverageStatus } from "./coverage-status";
 
-const FEATURE_TAG_RE = /@feature:([a-zA-Z0-9._-]+)/g;
-
-export function extractFeatureTags(title: string): string[] {
-  const matches = title.matchAll(FEATURE_TAG_RE);
-  return Array.from(new Set(Array.from(matches, (m) => m[1])));
-}
+export { extractFeatureTags };
 
 type TestCaseForLink = {
   title: string;
@@ -142,24 +139,12 @@ export async function linkCoverageForRun(
       .from(qaCoverageTestLinks)
       .where(eq(qaCoverageTestLinks.featureId, featureId));
 
-    const real = all.filter((l) => l.src === "real");
-    const heuristic = all.filter((l) => l.src === "heuristic");
-    const manual = all.filter((l) => l.src === "manual");
-    const realPassed = real.some((l) => l.status === "passed");
-    const realFailed = real.some(
-      (l) => l.status === "failed" || l.status === "flaky",
+    const next = computeCoverageStatus(
+      all.map((l) => ({
+        status: l.status,
+        source: (l.src as "real" | "heuristic" | "manual") ?? "real",
+      })),
     );
-    const realSkippedOnly =
-      real.length > 0 && real.every((l) => l.status === "skipped");
-
-    let next: string;
-    if (realPassed && realFailed) next = "partial";
-    else if (realPassed) next = "covered";
-    else if (realFailed) next = "partial";
-    else if (realSkippedOnly) next = "none";
-    else if (heuristic.length > 0) next = "heuristic_only";
-    else if (manual.length > 0) next = "manual_only";
-    else next = "none";
 
     await db
       .update(qaCoverageFeatures)
