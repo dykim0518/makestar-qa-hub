@@ -2,7 +2,6 @@
 
 import { Fragment, useMemo, useState } from "react";
 import type { CoverageFeatureRow, CoverageLink } from "@/app/coverage/page";
-import { FeatureEditor } from "./FeatureEditor";
 
 type Props = {
   rows: CoverageFeatureRow[];
@@ -776,7 +775,6 @@ export function CoverageContent({ rows }: Props) {
                                 className="border-t border-dashed border-[var(--card-border)] p-0"
                               >
                                 <TestLinksList links={r.links} />
-                                <FeatureEditor feature={r} />
                               </td>
                             </tr>
                           )}
