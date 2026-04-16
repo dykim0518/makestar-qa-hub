@@ -45,16 +45,21 @@
   --font-mono: var(--font-geist-mono);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family:
-    "Pretendard Variable",
-    var(--font-sans),
-    -apple-system,
-    BlinkMacSystemFont,
-    system-ui,
-    sans-serif;
+@layer base {
+  html,
+  body {
+    font-family:
+      "Pretendard Variable",
+      var(--font-geist-sans),
+      -apple-system,
+      BlinkMacSystemFont,
+      system-ui,
+      sans-serif;
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+  }
 }
 
 /* Reduced motion */
