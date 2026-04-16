@@ -68,7 +68,7 @@ const CATEGORY_CONFIG: Record<
 };
 
 const STATUS_ARROW_COLOR: Record<string, string> = {
-  passed: "text-emerald-600",
+  passed: "text-emerald-700",
   failed: "text-rose-600",
   flaky: "text-amber-600",
   skipped: "text-slate-500",
@@ -97,13 +97,13 @@ function RunCard({ run, label }: { run: TestRun; label: string }) {
       </div>
       <div className="flex items-center gap-4 text-sm">
         <span className="font-mono">
-          <span className="text-emerald-600">{run.passed}</span>
+          <span className="text-emerald-700">{run.passed}</span>
           <span className="text-[var(--muted)]"> / </span>
           <span className="text-slate-700">{run.total}</span>
           <span
             className={`ml-1 font-semibold ${
               rate >= 90
-                ? "text-emerald-600"
+                ? "text-emerald-700"
                 : rate >= 70
                   ? "text-amber-600"
                   : "text-rose-600"

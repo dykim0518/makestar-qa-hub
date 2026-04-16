@@ -124,7 +124,7 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
     { key: "all", label: "전체", color: "text-[var(--foreground)]" },
     { key: "failed", label: "Failed", color: "text-rose-600" },
     { key: "flaky", label: "Flaky", color: "text-amber-600" },
-    { key: "passed", label: "Passed", color: "text-emerald-600" },
+    { key: "passed", label: "Passed", color: "text-emerald-700" },
     { key: "skipped", label: "Skipped", color: "text-slate-500" },
   ];
 
@@ -182,7 +182,7 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
               value={getPassRate(run.passed, run.total)}
               color={
                 passRate >= 90
-                  ? "text-emerald-600"
+                  ? "text-emerald-700"
                   : passRate >= 70
                     ? "text-amber-600"
                     : "text-rose-600"

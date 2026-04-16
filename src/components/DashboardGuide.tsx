@@ -15,7 +15,7 @@ const steps = [
     num: 2,
     title: "최근 실행 요약",
     desc: "최신 Run의 총 테스트 수, 통과, 실패, 통과율을 카드로 한눈에 확인. 통과율은 프로그레스 바로 시각화.",
-    color: "text-emerald-600",
+    color: "text-emerald-700",
     border: "border-emerald-500/20",
     bg: "bg-emerald-500/5",
   },
@@ -73,6 +73,7 @@ export function DashboardGuide() {
             <button
               type="button"
               onClick={() => setOpen(false)}
+              aria-label="가이드 닫기"
               className="text-[var(--muted)] hover:text-slate-900"
             >
               <svg
@@ -98,7 +99,7 @@ export function DashboardGuide() {
                 필터
               </span>
               <span className="text-[var(--muted)]">→</span>
-              <span className="rounded-md bg-emerald-50 px-2 py-1 text-emerald-600">
+              <span className="rounded-md bg-emerald-50 px-2 py-1 text-emerald-700">
                 요약
               </span>
               <span className="text-[var(--muted)]">→</span>
@@ -171,6 +172,8 @@ export function DashboardGuide() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
+        aria-label={open ? "가이드 닫기" : "대시보드 가이드 열기"}
+        aria-expanded={open}
         className={`flex h-11 w-11 items-center justify-center rounded-full border shadow-lg transition-all ${
           open
             ? "border-slate-300 bg-slate-100 text-slate-700 shadow-slate-200/60"

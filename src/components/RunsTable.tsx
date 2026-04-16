@@ -18,7 +18,7 @@ function PassRateBar({ rate }: { rate: number }) {
     rate >= 90 ? "bg-emerald-500" : rate >= 70 ? "bg-amber-500" : "bg-rose-500";
   const textColor =
     rate >= 90
-      ? "text-emerald-600"
+      ? "text-emerald-700"
       : rate >= 70
         ? "text-amber-600"
         : "text-rose-600";
@@ -130,7 +130,7 @@ function RunCardMobile({
               className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
                 run.environment === "stg"
                   ? "border border-amber-500/30 bg-amber-500/10 text-amber-600"
-                  : "border border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
+                  : "border border-emerald-500/30 bg-emerald-500/10 text-emerald-700"
               }`}
             >
               {run.environment === "stg" ? "STG" : "PROD"}
@@ -140,7 +140,7 @@ function RunCardMobile({
           {/* L2: Results + Pass rate bar */}
           <div className="mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
             <span className="font-mono text-sm text-slate-600">
-              <span className="text-emerald-600">{run.passed}</span>
+              <span className="text-emerald-700">{run.passed}</span>
               <span className="text-[var(--muted)]"> / </span>
               <span>{run.total}</span>
             </span>
@@ -401,7 +401,7 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                         className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
                           run.environment === "stg"
                             ? "border border-amber-500/30 bg-amber-500/10 text-amber-600"
-                            : "border border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
+                            : "border border-emerald-500/30 bg-emerald-500/10 text-emerald-700"
                         }`}
                       >
                         {run.environment === "stg" ? "STG" : "PROD"}
@@ -414,7 +414,7 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                   <td className="whitespace-nowrap px-5 py-4 text-sm">
                     <span className="inline-flex items-center gap-2 text-slate-600">
                       <span className="font-mono">
-                        <span className="text-emerald-600">{run.passed}</span>
+                        <span className="text-emerald-700">{run.passed}</span>
                         <span className="text-[var(--muted)]"> / </span>
                         <span className="text-slate-600">{run.total}</span>
                       </span>

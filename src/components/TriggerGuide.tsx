@@ -23,7 +23,7 @@ const steps = [
     num: 3,
     title: "테스트 실행",
     desc: '"테스트 실행" 버튼 클릭으로 GitHub Actions 워크플로우 트리거. 이미 실행 중이면 큐에 추가됨 (최대 5개).',
-    color: "text-emerald-600",
+    color: "text-emerald-700",
     border: "border-emerald-500/20",
     bg: "bg-emerald-500/5",
   },
@@ -73,6 +73,7 @@ export function TriggerGuide() {
             <button
               type="button"
               onClick={() => setOpen(false)}
+              aria-label="가이드 닫기"
               className="text-[var(--muted)] hover:text-slate-900"
             >
               <svg
@@ -102,7 +103,7 @@ export function TriggerGuide() {
                 필터
               </span>
               <span className="text-[var(--muted)]">→</span>
-              <span className="rounded-md bg-emerald-50 px-2 py-1 text-emerald-600">
+              <span className="rounded-md bg-emerald-50 px-2 py-1 text-emerald-700">
                 실행
               </span>
               <span className="text-[var(--muted)]">→</span>
@@ -171,6 +172,8 @@ export function TriggerGuide() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
+        aria-label={open ? "가이드 닫기" : "테스트 실행 가이드 열기"}
+        aria-expanded={open}
         className={`flex h-11 w-11 items-center justify-center rounded-full border shadow-lg transition-all ${
           open
             ? "border-slate-300 bg-slate-100 text-slate-700 shadow-slate-200/60"

@@ -296,7 +296,7 @@ export function TriggerForm({
           >
             {result.ok ? (
               <div>
-                <p className="text-sm font-semibold text-emerald-600">
+                <p className="text-sm font-semibold text-emerald-700">
                   {result.message}
                 </p>
                 <p className="mt-1 text-xs text-[var(--muted)]">

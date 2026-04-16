@@ -40,7 +40,7 @@ export function CaseGroup({
 
 function CaseRow({ tc }: { tc: TestCaseResult }) {
   const statusConfig: Record<string, { dot: string; text: string }> = {
-    passed: { dot: "bg-emerald-400", text: "text-emerald-600" },
+    passed: { dot: "bg-emerald-400", text: "text-emerald-700" },
     failed: { dot: "bg-rose-400", text: "text-rose-600" },
     flaky: { dot: "bg-amber-400", text: "text-amber-600" },
     skipped: { dot: "bg-slate-400", text: "text-slate-500" },

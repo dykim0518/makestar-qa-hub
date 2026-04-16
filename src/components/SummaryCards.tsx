@@ -24,7 +24,7 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
           value: "--" as string | number,
           icon: "check",
           accent: "from-emerald-500 to-emerald-600",
-          iconBg: "bg-emerald-50 text-emerald-600",
+          iconBg: "bg-emerald-50 text-emerald-700",
           hoverShadow: "hover:shadow-emerald-500/5",
         },
         {
@@ -48,7 +48,7 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
           value: "--" as string | number,
           icon: "percent",
           accent: "from-emerald-500 to-emerald-600",
-          iconBg: "bg-emerald-50 text-emerald-600",
+          iconBg: "bg-emerald-50 text-emerald-700",
           hoverShadow: "hover:shadow-emerald-500/5",
         },
       ]
@@ -66,7 +66,7 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
           value: latestRun.passed as string | number,
           icon: "check",
           accent: "from-emerald-500 to-emerald-600",
-          iconBg: "bg-emerald-50 text-emerald-600",
+          iconBg: "bg-emerald-50 text-emerald-700",
           hoverShadow: "hover:shadow-emerald-500/5",
         },
         {
@@ -99,7 +99,7 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
                 : "from-rose-500 to-rose-600",
           iconBg:
             passRate >= 90
-              ? "bg-emerald-50 text-emerald-600"
+              ? "bg-emerald-50 text-emerald-700"
               : passRate >= 70
                 ? "bg-amber-50 text-amber-600"
                 : "bg-rose-50 text-rose-600",
