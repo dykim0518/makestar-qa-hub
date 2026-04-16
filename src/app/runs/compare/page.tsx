@@ -45,8 +45,22 @@ export default async function ComparePage({
 
   if (!a || !b) {
     return (
-      <div className="mx-auto max-w-5xl px-6 py-10">
+      <main id="main-content" className="mx-auto max-w-5xl px-6 py-10">
         <div className="rounded-xl border border-dashed border-[var(--card-border)] bg-[var(--card)] p-10 text-center">
+          <svg
+            aria-hidden="true"
+            className="mx-auto mb-3 h-10 w-10 text-slate-300"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
+            />
+          </svg>
           <p className="text-[var(--muted)]">
             비교할 두 Run ID를 선택해주세요.
           </p>
@@ -57,7 +71,7 @@ export default async function ComparePage({
             ← 대시보드로 돌아가기
           </Link>
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -73,8 +87,22 @@ export default async function ComparePage({
 
   if (runsA.length === 0 || runsB.length === 0) {
     return (
-      <div className="mx-auto max-w-5xl px-6 py-10">
+      <main id="main-content" className="mx-auto max-w-5xl px-6 py-10">
         <div className="rounded-xl border border-dashed border-rose-200 bg-rose-50 p-10 text-center">
+          <svg
+            aria-hidden="true"
+            className="mx-auto mb-3 h-10 w-10 text-rose-300"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+            />
+          </svg>
           <p className="text-rose-700">
             Run을 찾을 수 없습니다. (A: #{a}, B: #{b})
           </p>
@@ -85,7 +113,7 @@ export default async function ComparePage({
             ← 대시보드로 돌아가기
           </Link>
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -127,7 +155,7 @@ export default async function ComparePage({
   );
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10">
+    <main id="main-content" className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-6 flex items-center gap-3">
         <Link
           href="/dashboard"
@@ -139,6 +167,6 @@ export default async function ComparePage({
         <h1 className="text-lg font-semibold text-slate-900">Run 비교</h1>
       </div>
       <RunCompare data={{ runA: runsA[0], runB: runsB[0], summary, tests }} />
-    </div>
+    </main>
   );
 }

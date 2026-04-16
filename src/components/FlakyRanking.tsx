@@ -88,15 +88,42 @@ export function FlakyRanking({
         </div>
       </div>
 
-      <div
-        className={`overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card)] transition-opacity ${loading ? "opacity-50" : ""}`}
-      >
-        {rankings.length === 0 ? (
+      <div className="overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card)]">
+        {loading && rankings.length === 0 ? (
+          <div
+            className="divide-y divide-[var(--card-border)]"
+            aria-busy="true"
+            aria-label="랭킹 로딩 중"
+          >
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 px-3.5 py-3 sm:gap-4 sm:px-4"
+              >
+                <div className="h-6 w-6 shrink-0 animate-pulse rounded-full bg-slate-100" />
+                <div className="h-4 flex-1 animate-pulse rounded bg-slate-100" />
+                <div className="h-4 w-20 shrink-0 animate-pulse rounded bg-slate-100" />
+              </div>
+            ))}
+          </div>
+        ) : rankings.length === 0 ? (
           <div className="px-6 py-12 text-center">
+            <svg
+              aria-hidden="true"
+              className="mx-auto mb-3 h-10 w-10 text-slate-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              />
+            </svg>
             <p className="text-sm text-[var(--muted)]">
-              {loading
-                ? "로딩 중..."
-                : `최근 ${days}일간 flaky 테스트가 없습니다.`}
+              최근 {days}일간 flaky 테스트가 없습니다.
             </p>
           </div>
         ) : (

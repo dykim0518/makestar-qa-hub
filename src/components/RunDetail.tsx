@@ -139,7 +139,7 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
     <div className="min-h-screen bg-[var(--background)]">
       <AppHeader />
 
-      <main className="mx-auto max-w-7xl px-6 py-8">
+      <main id="main-content" className="mx-auto max-w-7xl px-6 py-8">
         <div className="mb-6">
           <Link
             href="/dashboard"

@@ -197,8 +197,24 @@ export function RunCompare({ data }: { data: CompareData }) {
         </div>
 
         {filteredTests.length === 0 ? (
-          <div className="p-10 text-center text-[var(--muted)] text-sm">
-            선택된 카테고리에 해당하는 테스트가 없습니다.
+          <div className="p-10 text-center">
+            <svg
+              aria-hidden="true"
+              className="mx-auto mb-3 h-10 w-10 text-slate-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m15 15-2 5L9 9l11 4-5 2Zm0 0 5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656-2.12 2.122"
+              />
+            </svg>
+            <p className="text-sm text-[var(--muted)]">
+              선택된 카테고리에 해당하는 테스트가 없습니다.
+            </p>
           </div>
         ) : (
           <div className="divide-y divide-[var(--card-border)]">

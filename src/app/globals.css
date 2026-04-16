@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/*
+ * Design Tokens
+ *
+ * 사용 지침:
+ * - 일반 텍스트/배경은 CSS 변수 우선: text-[var(--muted)], bg-[var(--card)]
+ * - 의미 색상(상태): Tailwind semantic 팔레트 직접 사용 (emerald=성공, rose=실패, amber=flaky, indigo=link/accent)
+ * - muted 텍스트는 slate-600 이상 (대비 4.5:1 이상). --muted는 slate-600(#475569, 7.2:1)
+ * - 다크모드 전환 시 이 :root 블록만 오버라이드하면 전역 적용됨
+ */
 :root {
   --background: #f1f5f9;
   --foreground: #1e293b;

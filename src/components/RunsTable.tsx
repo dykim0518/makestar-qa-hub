@@ -210,8 +210,30 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
 
   if (runs.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-[var(--card-border)] bg-[var(--card)] p-10 text-center text-[var(--muted)]">
-        표시할 실행 기록이 없습니다.
+      <div className="rounded-xl border border-dashed border-[var(--card-border)] bg-[var(--card)] p-10 text-center">
+        <svg
+          aria-hidden="true"
+          className="mx-auto mb-3 h-10 w-10 text-slate-300"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"
+          />
+        </svg>
+        <p className="mb-3 text-sm text-[var(--muted)]">
+          표시할 실행 기록이 없습니다.
+        </p>
+        <Link
+          href="/trigger"
+          className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-4 py-1.5 text-xs font-semibold text-white hover:bg-slate-700 transition-colors"
+        >
+          테스트 실행하러 가기
+        </Link>
       </div>
     );
   }

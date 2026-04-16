@@ -11,11 +11,7 @@ async function getRuns(): Promise<{ runs: TestRun[]; total: number }> {
     const { testRuns } = await import("@/db/schema");
     const { desc, sql } = await import("drizzle-orm");
     const [runs, countResult] = await Promise.all([
-      db
-        .select()
-        .from(testRuns)
-        .orderBy(desc(testRuns.createdAt))
-        .limit(10),
+      db.select().from(testRuns).orderBy(desc(testRuns.createdAt)).limit(10),
       db.select({ count: sql<number>`count(*)` }).from(testRuns),
     ]);
     return { runs, total: Number(countResult[0].count) };
@@ -32,7 +28,7 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-[var(--background)]">
       <AppHeader active="dashboard" />
 
-      <main className="mx-auto max-w-7xl px-6 py-8">
+      <main id="main-content" className="mx-auto max-w-7xl px-6 py-8">
         <DashboardContent initialRuns={runs} initialTotal={total} />
       </main>
 

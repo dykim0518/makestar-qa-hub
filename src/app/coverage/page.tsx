@@ -98,7 +98,7 @@ export default async function CoveragePage() {
   return (
     <div className="min-h-screen bg-[var(--background)]">
       <AppHeader active="coverage" />
-      <main className="mx-auto max-w-7xl px-6 py-8">
+      <main id="main-content" className="mx-auto max-w-7xl px-6 py-8">
         <CoverageContent rows={rows} />
       </main>
     </div>
