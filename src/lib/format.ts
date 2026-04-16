@@ -17,6 +17,27 @@ export function formatDate(date: string | Date): string {
   });
 }
 
+export function formatRelativeTime(date: string | Date): string {
+  const now = Date.now();
+  const target = new Date(date).getTime();
+  const diffMs = now - target;
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "방금";
+  if (diffMin < 60) return `${diffMin}분 전`;
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour}시간 전`;
+  const diffDay = Math.floor(diffHour / 24);
+  if (diffDay < 7) return `${diffDay}일 전`;
+  const d = new Date(date);
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
+export function shortRunId(runId: number | string, length = 6): string {
+  const s = String(runId);
+  if (s.length <= length) return `#${s}`;
+  return `#…${s.slice(-length)}`;
+}
+
 export function getPassRate(passed: number, total: number): string {
   if (total === 0) return "0%";
   return `${Math.round((passed / total) * 100)}%`;

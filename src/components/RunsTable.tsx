@@ -8,8 +8,10 @@ import { StatusBadge } from "./StatusBadge";
 import {
   formatDuration,
   formatDate,
+  formatRelativeTime,
   getPassRate,
   getPassRateNumber,
+  shortRunId,
 } from "@/lib/format";
 
 function PassRateBar({ rate }: { rate: number }) {
@@ -77,11 +79,13 @@ function RunCardMobile({
   run,
   isSelected,
   canSelect,
+  compareMode,
   onToggle,
 }: {
   run: TestRun;
   isSelected: boolean;
   canSelect: boolean;
+  compareMode: boolean;
   onToggle: () => void;
 }) {
   const rate = getPassRateNumber(run.passed, run.total);
@@ -90,7 +94,7 @@ function RunCardMobile({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 transition-colors ${
+      className={`relative overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-3.5 transition-colors ${
         hasFailure ? "border-l-2 border-l-rose-500" : ""
       } ${isSelected ? "bg-slate-50 border-slate-300" : ""}`}
     >
@@ -103,22 +107,19 @@ function RunCardMobile({
               : "bg-emerald-500"
         }`}
       />
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          {/* Run ID + Status */}
-          <div className="mb-2 flex items-center gap-2">
+          {/* L1: Run ID · Status · Suite · Env */}
+          <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
             <Link
               href={`/runs/${run.runId}`}
               className="font-mono text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              title={`#${run.runId}`}
             >
-              #{run.runId}
+              {shortRunId(run.runId)}
             </Link>
             <StatusBadge status={run.status} />
-          </div>
-
-          {/* Suite / Env */}
-          <div className="mb-3 flex items-center gap-1.5">
-            <span className="rounded-md border border-[var(--card-border)] bg-slate-50 px-2 py-0.5 font-mono text-xs text-slate-600">
+            <span className="rounded-md border border-[var(--card-border)] bg-slate-50 px-1.5 py-0.5 font-mono text-[10px] text-slate-600">
               {run.suite}
             </span>
             <span
@@ -132,45 +133,47 @@ function RunCardMobile({
             </span>
           </div>
 
-          {/* Results row */}
-          <div className="mb-2 flex items-center gap-3">
+          {/* L2: Results + Pass rate bar */}
+          <div className="mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
             <span className="font-mono text-sm text-slate-600">
               <span className="text-emerald-600">{run.passed}</span>
               <span className="text-[var(--muted)]"> / </span>
               <span>{run.total}</span>
             </span>
             {hasFailure && (
-              <span className="rounded-full border border-rose-500/20 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-600">
-                F:{run.failed}
+              <span className="text-xs font-medium text-rose-600">
+                · {run.failed} failed
               </span>
             )}
             {hasFlaky && (
-              <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-600">
-                FL:{run.flaky}
+              <span className="text-xs font-medium text-amber-600">
+                · {run.flaky} flaky
               </span>
             )}
-          </div>
-
-          {/* Pass rate + Duration + Date */}
-          <div className="flex items-center gap-4">
-            <PassRateBar rate={rate} />
-            <span className="font-mono text-xs text-[var(--muted)]">
-              {formatDuration(run.durationMs)}
+            <span className="ml-auto">
+              <PassRateBar rate={rate} />
             </span>
           </div>
 
-          {/* Date */}
-          <p className="mt-2 text-xs text-[var(--muted)]">
-            {formatDate(run.createdAt)}
-          </p>
+          {/* L3: Duration · Relative time */}
+          <div
+            className="flex items-center gap-1.5 text-xs text-[var(--muted)]"
+            title={formatDate(run.createdAt)}
+          >
+            <span className="font-mono">{formatDuration(run.durationMs)}</span>
+            <span>·</span>
+            <span>{formatRelativeTime(run.createdAt)}</span>
+          </div>
         </div>
 
-        {/* Checkbox */}
-        <CheckboxButton
-          checked={isSelected}
-          disabled={!isSelected && !canSelect}
-          onClick={onToggle}
-        />
+        {/* Checkbox (compare mode only on mobile) */}
+        {compareMode && (
+          <CheckboxButton
+            checked={isSelected}
+            disabled={!isSelected && !canSelect}
+            onClick={onToggle}
+          />
+        )}
       </div>
     </div>
   );
@@ -179,6 +182,12 @@ function RunCardMobile({
 export function RunsTable({ runs }: { runs: TestRun[] }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [compareMode, setCompareMode] = useState(false);
+
+  function toggleCompareMode() {
+    if (compareMode) setSelected(new Set());
+    setCompareMode((prev) => !prev);
+  }
 
   function toggleSelect(runId: number) {
     setSelected((prev) => {
@@ -210,6 +219,45 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
 
   return (
     <div className="relative">
+      {/* Mobile compare mode toggle */}
+      <div className="mb-3 flex items-center justify-end gap-2 md:hidden">
+        {compareMode && (
+          <span className="text-xs text-[var(--muted)]">
+            {selected.size}/2 선택
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={toggleCompareMode}
+          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+            compareMode
+              ? "border-slate-400 bg-slate-100 text-slate-700"
+              : "border-slate-300 bg-white text-slate-600 hover:bg-slate-50"
+          }`}
+        >
+          {compareMode ? (
+            "취소"
+          ) : (
+            <>
+              <svg
+                className="h-3.5 w-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
+                />
+              </svg>
+              Run 비교
+            </>
+          )}
+        </button>
+      </div>
+
       {/* Floating compare button */}
       {selected.size === 2 && (
         <div className="sticky top-4 z-10 mb-3 flex justify-center">
@@ -243,6 +291,7 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
             run={run}
             isSelected={selected.has(run.runId)}
             canSelect={selected.size < 2}
+            compareMode={compareMode}
             onToggle={() => toggleSelect(run.runId)}
           />
         ))}
@@ -335,20 +384,20 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                     <StatusBadge status={run.status} />
                   </td>
                   <td className="whitespace-nowrap px-5 py-4 text-sm">
-                    <span className="inline-flex items-center gap-2 font-mono text-slate-600">
-                      <span>
+                    <span className="inline-flex items-center gap-2 text-slate-600">
+                      <span className="font-mono">
                         <span className="text-emerald-600">{run.passed}</span>
                         <span className="text-[var(--muted)]"> / </span>
                         <span className="text-slate-600">{run.total}</span>
                       </span>
                       {hasFailure && (
-                        <span className="rounded-full border border-rose-500/20 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-600">
-                          F:{run.failed}
+                        <span className="text-xs font-medium text-rose-600">
+                          · {run.failed} failed
                         </span>
                       )}
                       {hasFlaky && (
-                        <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-600">
-                          FL:{run.flaky}
+                        <span className="text-xs font-medium text-amber-600">
+                          · {run.flaky} flaky
                         </span>
                       )}
                     </span>

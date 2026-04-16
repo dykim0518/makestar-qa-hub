@@ -113,11 +113,11 @@ export function SummaryCards({ latestRun }: { latestRun: TestRun | null }) {
       ];
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-5">
       {cards.map((card) => (
         <div
           key={card.label}
-          className={`group relative overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-5 transition-all hover:border-[var(--accent)]/30 hover:shadow-lg ${card.hoverShadow} ${isEmpty ? "opacity-50" : ""}`}
+          className={`group relative overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 transition-all hover:border-[var(--accent)]/30 hover:shadow-lg sm:p-5 ${card.hoverShadow} ${card.label === "성공률" ? "col-span-2 sm:col-span-1" : ""} ${isEmpty ? "opacity-50" : ""}`}
         >
           <div
             className={`absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full bg-gradient-to-b ${card.accent}`}

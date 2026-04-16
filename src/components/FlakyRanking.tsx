@@ -104,7 +104,7 @@ export function FlakyRanking({
             {rankings.map((item, idx) => (
               <div
                 key={item.title}
-                className="flex items-center gap-4 px-4 py-3 hover:bg-slate-50 transition-colors"
+                className="flex items-center gap-3 px-3.5 py-3 hover:bg-slate-50 transition-colors sm:gap-4 sm:px-4"
               >
                 {/* 순위 */}
                 <span
@@ -124,32 +124,29 @@ export function FlakyRanking({
                 {/* 테스트명 */}
                 <div className="min-w-0 flex-1">
                   <p
-                    className="truncate text-sm font-medium text-slate-700"
+                    className="text-sm font-medium text-slate-700 line-clamp-2 sm:truncate"
                     title={item.title}
                   >
                     {item.title}
                   </p>
                 </div>
 
-                {/* Flaky 횟수/비율 */}
+                {/* Flaky 비율 + 횟수 */}
                 <div className="shrink-0 text-right">
-                  <span className="text-sm font-mono font-semibold text-amber-600">
-                    {item.flakyCount}
-                  </span>
-                  <span className="text-xs text-[var(--muted)]">
-                    /{item.totalRuns}
-                  </span>
-                  <div className="ml-2 flex items-center gap-1.5">
+                  <div className="flex items-center justify-end gap-1.5">
                     <div className="h-1 w-10 overflow-hidden rounded-full bg-slate-100">
                       <div
                         className="h-full rounded-full bg-amber-500"
                         style={{ width: `${item.flakyRate}%` }}
                       />
                     </div>
-                    <span className="text-[10px] text-[var(--muted)]">
+                    <span className="font-mono text-xs font-semibold text-amber-600">
                       {item.flakyRate}%
                     </span>
                   </div>
+                  <p className="mt-0.5 font-mono text-[10px] text-[var(--muted)]">
+                    {item.flakyCount}/{item.totalRuns}
+                  </p>
                 </div>
 
                 {/* 최근 10회 결과 도트 */}
