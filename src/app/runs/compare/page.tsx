@@ -2,7 +2,6 @@ import Link from "next/link";
 import { db } from "@/db";
 import { testRuns, testCases } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { AppHeader } from "@/components/AppHeader";
 import { RunCompare } from "@/components/RunCompare";
 import type { DiffCategory, CompareTest } from "@/app/api/runs/compare/route";
 
@@ -10,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 function classifyTest(
   statusA: string | undefined,
-  statusB: string | undefined
+  statusB: string | undefined,
 ): DiffCategory {
   if (!statusA && statusB) return "new";
   if (statusA && !statusB) return "removed";
@@ -124,7 +123,7 @@ export default async function ComparePage({
 
   tests.sort(
     (x, y) =>
-      CATEGORY_ORDER.indexOf(x.category) - CATEGORY_ORDER.indexOf(y.category)
+      CATEGORY_ORDER.indexOf(x.category) - CATEGORY_ORDER.indexOf(y.category),
   );
 
   return (

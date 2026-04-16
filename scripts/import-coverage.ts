@@ -40,7 +40,6 @@ async function main() {
   console.log(`importing ${raw.length} rows from ${abs}`);
 
   let inserted = 0;
-  let updated = 0;
   for (let i = 0; i < raw.length; i += 50) {
     const batch = raw.slice(i, i + 50);
     const values = batch.map((r) => ({

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { testRuns, testCases } from "@/db/schema";
-import { eq, ne, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { validateApiSecret } from "@/lib/auth";
 import { classifyError } from "@/lib/error-classifier";
 import { sendSlackNotification } from "@/lib/slack-notifier";

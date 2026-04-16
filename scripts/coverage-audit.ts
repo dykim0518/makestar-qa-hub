@@ -12,7 +12,7 @@
  */
 import { db } from "../src/db";
 import { qaCoverageFeatures, qaCoverageTestLinks } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 type LinkRow = {
   linkId: string;

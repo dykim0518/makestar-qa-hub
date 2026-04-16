@@ -9,7 +9,6 @@ import {
   formatDuration,
   formatDate,
   formatRelativeTime,
-  getPassRate,
   getPassRateNumber,
   shortRunId,
 } from "@/lib/format";

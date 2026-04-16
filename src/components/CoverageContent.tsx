@@ -131,26 +131,6 @@ function TestRatioBar({ links }: { links: { lastStatus: string | null }[] }) {
   );
 }
 
-function LinkStatusDot({ status }: { status: string | null }) {
-  const color =
-    status === "passed"
-      ? "bg-emerald-500"
-      : status === "failed"
-        ? "bg-rose-500"
-        : status === "flaky"
-          ? "bg-amber-500"
-          : status === "heuristic"
-            ? "bg-indigo-400"
-            : "bg-slate-300";
-  const label = status === "heuristic" ? "휴리스틱" : (status ?? "-");
-  return (
-    <span className="inline-flex items-center gap-1.5 text-xs text-slate-600">
-      <span className={`inline-block h-1.5 w-1.5 rounded-full ${color}`} />
-      {label}
-    </span>
-  );
-}
-
 const STATUS_GROUP_ORDER = [
   "failed",
   "flaky",
@@ -307,7 +287,7 @@ function OperationalSignals({
   filterProduct: string;
 }) {
   const scoped = rows.filter((r) => r.product === filterProduct);
-  const now = Date.now();
+  const [now] = useState(() => Date.now());
   const STALE_MS = 14 * 24 * 60 * 60 * 1000;
 
   const failed: CoverageFeatureRow[] = [];

@@ -84,6 +84,7 @@ export function DashboardContent({
 
   // suite/environment 변경 시 page 리셋 및 데이터 재조회
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 필터 변경으로 인한 page 리셋과 fetch를 effect에서 일괄 처리
     setPage(0);
     fetchRuns(0);
   }, [suite, environment]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -91,6 +92,7 @@ export function DashboardContent({
   // 페이지 변경 시 데이터 fetch
   useEffect(() => {
     if (page === 0) return; // 첫 페이지는 suite 변경 effect에서 처리
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 외부 API와의 동기화 (data fetching 패턴)
     fetchRuns(page);
   }, [page, fetchRuns]);
 
