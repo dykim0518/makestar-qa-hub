@@ -14,6 +14,7 @@ import {
   Tooltip,
   ReferenceLine,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 
 type TrendPoint = {
@@ -327,9 +328,20 @@ export function TrendCharts({
                   width={40}
                 />
                 <Tooltip content={<CustomTooltip />} />
+                <Legend
+                  verticalAlign="top"
+                  align="right"
+                  iconType="circle"
+                  iconSize={8}
+                  wrapperStyle={{
+                    paddingBottom: 8,
+                    fontSize: 12,
+                    color: "#475569",
+                  }}
+                />
                 <Bar
                   dataKey="failed"
-                  name="Failed"
+                  name="실패"
                   stackId="issues"
                   fill="#e11d48"
                   radius={[0, 0, 0, 0]}

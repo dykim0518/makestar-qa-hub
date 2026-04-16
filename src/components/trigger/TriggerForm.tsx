@@ -190,21 +190,21 @@ export function TriggerForm({
           <InputField
             id="project"
             label="Project (선택)"
-            placeholder="예: cmr-monitoring"
+            placeholder="cmr-monitoring"
             value={project}
             onChange={setProject}
           />
           <InputField
             id="spec"
             label="Spec 파일 (선택)"
-            placeholder="예: tests/cmr_monitoring_pom.spec.ts"
+            placeholder="tests/cmr_monitoring_pom.spec.ts"
             value={spec}
             onChange={setSpec}
           />
           <InputField
             id="grep"
             label="Grep 패턴 (선택)"
-            placeholder="예: CMR-HOME, CMR-SEARCH"
+            placeholder="CMR-HOME, CMR-SEARCH"
             value={grep}
             onChange={setGrep}
           />
