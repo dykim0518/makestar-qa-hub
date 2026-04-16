@@ -145,12 +145,12 @@ function RunCardMobile({
               <span>{run.total}</span>
             </span>
             {hasFailure && (
-              <span className="text-xs font-medium text-rose-600">
+              <span className="text-xs font-medium text-rose-700">
                 · {run.failed} failed
               </span>
             )}
             {hasFlaky && (
-              <span className="text-xs font-medium text-amber-600">
+              <span className="text-xs font-medium text-amber-700">
                 · {run.flaky} flaky
               </span>
             )}
@@ -419,12 +419,12 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                         <span className="text-slate-600">{run.total}</span>
                       </span>
                       {hasFailure && (
-                        <span className="text-xs font-medium text-rose-600">
+                        <span className="text-xs font-medium text-rose-700">
                           · {run.failed} failed
                         </span>
                       )}
                       {hasFlaky && (
-                        <span className="text-xs font-medium text-amber-600">
+                        <span className="text-xs font-medium text-amber-700">
                           · {run.flaky} flaky
                         </span>
                       )}
