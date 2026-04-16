@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { InputField } from "./InputField";
+import { StyledSelect } from "@/components/ui/StyledSelect";
 import type { TriggerResult } from "@/lib/types/trigger";
 
 const SUITES = [
@@ -214,18 +215,17 @@ export function TriggerForm({
             >
               Retries
             </label>
-            <select
+            <StyledSelect
               id="retries"
               value={retries}
               onChange={(e) => setRetries(e.target.value)}
-              className="w-full rounded-lg border border-[var(--card-border)] bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition-colors focus:border-slate-400 focus:ring-1 focus:ring-slate-300"
             >
               {[0, 1, 2, 3, 4, 5].map((n) => (
-                <option key={n} value={n} className="bg-[var(--card)]">
+                <option key={n} value={n}>
                   {n}
                 </option>
               ))}
-            </select>
+            </StyledSelect>
           </div>
         </div>
 

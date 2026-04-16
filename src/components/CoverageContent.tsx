@@ -2,6 +2,7 @@
 
 import { Fragment, useMemo, useState } from "react";
 import type { CoverageFeatureRow, CoverageLink } from "@/app/coverage/page";
+import { StyledSelect } from "@/components/ui/StyledSelect";
 
 type Props = {
   rows: CoverageFeatureRow[];
@@ -220,7 +221,7 @@ function TestLinksList({ links }: { links: CoverageLink[] }) {
                 className={`inline-block h-1.5 w-1.5 rounded-full ${meta.dotCls}`}
               />
               {meta.label}
-              <span className="text-slate-400">({items.length})</span>
+              <span className="text-slate-500">({items.length})</span>
             </div>
             <div className="divide-y divide-[var(--card-border)]">
               {items.map((l) => {
@@ -609,30 +610,34 @@ export function CoverageContent({ rows }: Props) {
 
       <OperationalSignals rows={rows} filterProduct={filterProduct} />
 
-      <div className="flex flex-wrap gap-3">
-        <select
-          className="rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-3 py-2 text-sm"
-          value={filterProduct}
-          onChange={(e) => setFilterProduct(e.target.value)}
-        >
-          {products.map((p) => (
-            <option key={p} value={p}>
-              {PRODUCT_LABEL[p] ?? p}
-            </option>
-          ))}
-        </select>
-        <select
-          className="rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-3 py-2 text-sm"
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-        >
-          <option value="all">전체 상태</option>
-          <option value="covered">자동화(검증)</option>
-          <option value="partial">부분</option>
-          <option value="heuristic_only">추정</option>
-          <option value="manual_only">수동만</option>
-          <option value="none">미커버</option>
-        </select>
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="w-48">
+          <StyledSelect
+            aria-label="제품 필터"
+            value={filterProduct}
+            onChange={(e) => setFilterProduct(e.target.value)}
+          >
+            {products.map((p) => (
+              <option key={p} value={p}>
+                {PRODUCT_LABEL[p] ?? p}
+              </option>
+            ))}
+          </StyledSelect>
+        </div>
+        <div className="w-40">
+          <StyledSelect
+            aria-label="상태 필터"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="all">전체 상태</option>
+            <option value="covered">자동화(검증)</option>
+            <option value="partial">부분</option>
+            <option value="heuristic_only">추정</option>
+            <option value="manual_only">수동만</option>
+            <option value="none">미커버</option>
+          </StyledSelect>
+        </div>
         <button
           type="button"
           onClick={() =>
@@ -665,9 +670,18 @@ export function CoverageContent({ rows }: Props) {
                 className="flex w-full items-center justify-between gap-4 bg-slate-50 px-5 py-3 text-left hover:bg-slate-100"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-slate-400">
-                    {isCollapsed ? "▶" : "▼"}
-                  </span>
+                  <svg
+                    aria-hidden="true"
+                    className={`h-3.5 w-3.5 shrink-0 text-slate-500 transition-transform ${isCollapsed ? "-rotate-90" : ""}`}
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.24 4.5a.75.75 0 0 1-1.08 0l-4.24-4.5a.75.75 0 0 1 .02-1.06Z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                   <span className="text-xs font-semibold text-slate-500">
                     {PRODUCT_LABEL[g.product] ?? g.product}
                   </span>
@@ -715,8 +729,21 @@ export function CoverageContent({ rows }: Props) {
                             }`}
                             onClick={() => toggleRow(r.id)}
                           >
-                            <td className="px-4 py-2 text-xs text-slate-400">
-                              {r.linkCount > 0 ? (isExpanded ? "▼" : "▶") : ""}
+                            <td className="px-4 py-2 text-xs text-slate-500">
+                              {r.linkCount > 0 && (
+                                <svg
+                                  aria-hidden="true"
+                                  className={`h-3 w-3 shrink-0 transition-transform ${isExpanded ? "" : "-rotate-90"}`}
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.24 4.5a.75.75 0 0 1-1.08 0l-4.24-4.5a.75.75 0 0 1 .02-1.06Z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              )}
                             </td>
                             <td className="px-4 py-2">
                               <div className="font-mono text-xs text-slate-700">

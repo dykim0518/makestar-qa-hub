@@ -21,46 +21,46 @@ interface CompareData {
 
 const CATEGORY_CONFIG: Record<
   DiffCategory,
-  { label: string; icon: string; color: string; bg: string; border: string }
+  { label: string; dot: string; color: string; bg: string; border: string }
 > = {
   regression: {
     label: "새로 실패",
-    icon: "🔴",
+    dot: "bg-rose-500",
     color: "text-rose-700",
     bg: "bg-rose-50",
     border: "border-rose-200",
   },
   fixed: {
     label: "복구됨",
-    icon: "🟢",
+    dot: "bg-emerald-500",
     color: "text-emerald-700",
     bg: "bg-emerald-50",
     border: "border-emerald-200",
   },
   still_failing: {
     label: "계속 실패",
-    icon: "🟠",
+    dot: "bg-orange-500",
     color: "text-orange-700",
     bg: "bg-orange-50",
     border: "border-orange-200",
   },
   new: {
     label: "새 테스트",
-    icon: "🔵",
+    dot: "bg-blue-500",
     color: "text-blue-700",
     bg: "bg-blue-50",
     border: "border-blue-200",
   },
   removed: {
     label: "삭제됨",
-    icon: "⚪",
+    dot: "bg-slate-400",
     color: "text-slate-600",
     bg: "bg-slate-100",
     border: "border-slate-200",
   },
   stable: {
     label: "변동 없음",
-    icon: "",
+    dot: "",
     color: "text-slate-600",
     bg: "bg-slate-50",
     border: "border-[var(--card-border)]",
@@ -168,7 +168,12 @@ export function RunCompare({ data }: { data: CompareData }) {
                   : "border-[var(--card-border)] bg-slate-50 text-slate-500"
               } ${count === 0 ? "opacity-60" : "cursor-pointer hover:opacity-80"}`}
             >
-              {cfg.icon && <span>{cfg.icon}</span>}
+              {cfg.dot && (
+                <span
+                  aria-hidden="true"
+                  className={`inline-block h-2 w-2 rounded-full ${cfg.dot}`}
+                />
+              )}
               <span>{cfg.label}</span>
               <span
                 className={`ml-0.5 font-mono ${isActive ? cfg.color : "text-slate-500"}`}
@@ -218,9 +223,14 @@ export function RunCompare({ data }: { data: CompareData }) {
                   >
                     {/* Category badge */}
                     <span
-                      className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${cfg.bg} ${cfg.color} ${cfg.border}`}
+                      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${cfg.bg} ${cfg.color} ${cfg.border}`}
                     >
-                      {cfg.icon && <span>{cfg.icon}</span>}
+                      {cfg.dot && (
+                        <span
+                          aria-hidden="true"
+                          className={`inline-block h-1.5 w-1.5 rounded-full ${cfg.dot}`}
+                        />
+                      )}
                       {cfg.label}
                     </span>
 
@@ -236,7 +246,7 @@ export function RunCompare({ data }: { data: CompareData }) {
                           test.statusA
                             ? STATUS_ARROW_COLOR[test.statusA] ||
                               "text-slate-500"
-                            : "text-slate-400"
+                            : "text-slate-500"
                         }
                       >
                         {test.statusA ?? "—"}
@@ -247,7 +257,7 @@ export function RunCompare({ data }: { data: CompareData }) {
                           test.statusB
                             ? STATUS_ARROW_COLOR[test.statusB] ||
                               "text-slate-500"
-                            : "text-slate-400"
+                            : "text-slate-500"
                         }
                       >
                         {test.statusB ?? "—"}
@@ -272,9 +282,18 @@ export function RunCompare({ data }: { data: CompareData }) {
 
                     {/* Expand indicator */}
                     {hasError && (
-                      <span className="shrink-0 text-[var(--muted)] text-xs">
-                        {isExpanded ? "▲" : "▼"}
-                      </span>
+                      <svg
+                        aria-hidden="true"
+                        className={`h-4 w-4 shrink-0 text-[var(--muted)] transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.24 4.5a.75.75 0 0 1-1.08 0l-4.24-4.5a.75.75 0 0 1 .02-1.06Z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                     )}
                   </div>
 
