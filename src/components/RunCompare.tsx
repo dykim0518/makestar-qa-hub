@@ -26,52 +26,52 @@ const CATEGORY_CONFIG: Record<
   regression: {
     label: "새로 실패",
     icon: "🔴",
-    color: "text-rose-400",
-    bg: "bg-rose-500/10",
-    border: "border-rose-500/20",
+    color: "text-rose-700",
+    bg: "bg-rose-50",
+    border: "border-rose-200",
   },
   fixed: {
     label: "복구됨",
     icon: "🟢",
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10",
-    border: "border-emerald-500/20",
+    color: "text-emerald-700",
+    bg: "bg-emerald-50",
+    border: "border-emerald-200",
   },
   still_failing: {
     label: "계속 실패",
     icon: "🟠",
-    color: "text-orange-400",
-    bg: "bg-orange-500/10",
-    border: "border-orange-500/20",
+    color: "text-orange-700",
+    bg: "bg-orange-50",
+    border: "border-orange-200",
   },
   new: {
     label: "새 테스트",
     icon: "🔵",
-    color: "text-blue-400",
-    bg: "bg-blue-500/10",
-    border: "border-blue-500/20",
+    color: "text-blue-700",
+    bg: "bg-blue-50",
+    border: "border-blue-200",
   },
   removed: {
     label: "삭제됨",
     icon: "⚪",
-    color: "text-slate-400",
-    bg: "bg-slate-500/10",
-    border: "border-slate-500/20",
+    color: "text-slate-600",
+    bg: "bg-slate-100",
+    border: "border-slate-200",
   },
   stable: {
     label: "변동 없음",
     icon: "",
-    color: "text-slate-500",
-    bg: "bg-white/5",
+    color: "text-slate-600",
+    bg: "bg-slate-50",
     border: "border-[var(--card-border)]",
   },
 };
 
 const STATUS_ARROW_COLOR: Record<string, string> = {
-  passed: "text-emerald-400",
-  failed: "text-rose-400",
-  flaky: "text-amber-400",
-  skipped: "text-slate-400",
+  passed: "text-emerald-600",
+  failed: "text-rose-600",
+  flaky: "text-amber-600",
+  skipped: "text-slate-500",
 };
 
 function RunCard({ run, label }: { run: TestRun; label: string }) {
@@ -87,26 +87,26 @@ function RunCard({ run, label }: { run: TestRun; label: string }) {
       <div className="mb-2">
         <Link
           href={`/runs/${run.runId}`}
-          className="font-mono text-lg font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+          className="font-mono text-lg font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
         >
           #{run.runId}
         </Link>
-        <span className="ml-2 rounded-md border border-[var(--card-border)] bg-white/5 px-2 py-0.5 font-mono text-xs text-slate-300">
+        <span className="ml-2 rounded-md border border-[var(--card-border)] bg-slate-50 px-2 py-0.5 font-mono text-xs text-slate-600">
           {run.suite}
         </span>
       </div>
       <div className="flex items-center gap-4 text-sm">
         <span className="font-mono">
-          <span className="text-emerald-400">{run.passed}</span>
+          <span className="text-emerald-600">{run.passed}</span>
           <span className="text-[var(--muted)]"> / </span>
-          <span className="text-slate-300">{run.total}</span>
+          <span className="text-slate-700">{run.total}</span>
           <span
             className={`ml-1 font-semibold ${
               rate >= 90
-                ? "text-emerald-400"
+                ? "text-emerald-600"
                 : rate >= 70
-                  ? "text-amber-400"
-                  : "text-rose-400"
+                  ? "text-amber-600"
+                  : "text-rose-600"
             }`}
           >
             ({getPassRate(run.passed, run.total)})
@@ -126,7 +126,7 @@ function RunCard({ run, label }: { run: TestRun; label: string }) {
 
 export function RunCompare({ data }: { data: CompareData }) {
   const [activeFilters, setActiveFilters] = useState<Set<DiffCategory>>(
-    () => new Set(["regression", "fixed", "still_failing", "new", "removed"])
+    () => new Set(["regression", "fixed", "still_failing", "new", "removed"]),
   );
   const [expandedTest, setExpandedTest] = useState<string | null>(null);
 
@@ -165,13 +165,13 @@ export function RunCompare({ data }: { data: CompareData }) {
               className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-all ${
                 isActive
                   ? `${cfg.bg} ${cfg.color} ${cfg.border}`
-                  : "border-[var(--card-border)] bg-white/5 text-slate-600"
-              } ${count === 0 ? "opacity-50" : "cursor-pointer hover:opacity-80"}`}
+                  : "border-[var(--card-border)] bg-slate-50 text-slate-500"
+              } ${count === 0 ? "opacity-60" : "cursor-pointer hover:opacity-80"}`}
             >
               {cfg.icon && <span>{cfg.icon}</span>}
               <span>{cfg.label}</span>
               <span
-                className={`ml-0.5 font-mono ${isActive ? cfg.color : "text-slate-600"}`}
+                className={`ml-0.5 font-mono ${isActive ? cfg.color : "text-slate-500"}`}
               >
                 {count}
               </span>
@@ -209,7 +209,7 @@ export function RunCompare({ data }: { data: CompareData }) {
               return (
                 <div key={test.title}>
                   <div
-                    className={`flex items-center gap-3 px-5 py-3 text-sm ${hasError ? "cursor-pointer hover:bg-white/[0.02]" : ""}`}
+                    className={`flex items-center gap-3 px-5 py-3 text-sm ${hasError ? "cursor-pointer hover:bg-slate-50" : ""}`}
                     onClick={() => {
                       if (hasError) {
                         setExpandedTest(isExpanded ? null : test.title);
@@ -225,7 +225,7 @@ export function RunCompare({ data }: { data: CompareData }) {
                     </span>
 
                     {/* Test title */}
-                    <span className="flex-1 truncate text-slate-200">
+                    <span className="flex-1 truncate text-slate-800">
                       {test.title}
                     </span>
 
@@ -234,8 +234,9 @@ export function RunCompare({ data }: { data: CompareData }) {
                       <span
                         className={
                           test.statusA
-                            ? STATUS_ARROW_COLOR[test.statusA] || "text-slate-400"
-                            : "text-slate-600"
+                            ? STATUS_ARROW_COLOR[test.statusA] ||
+                              "text-slate-500"
+                            : "text-slate-400"
                         }
                       >
                         {test.statusA ?? "—"}
@@ -244,8 +245,9 @@ export function RunCompare({ data }: { data: CompareData }) {
                       <span
                         className={
                           test.statusB
-                            ? STATUS_ARROW_COLOR[test.statusB] || "text-slate-400"
-                            : "text-slate-600"
+                            ? STATUS_ARROW_COLOR[test.statusB] ||
+                              "text-slate-500"
+                            : "text-slate-400"
                         }
                       >
                         {test.statusB ?? "—"}
@@ -278,8 +280,8 @@ export function RunCompare({ data }: { data: CompareData }) {
 
                   {/* Error message (expanded) */}
                   {isExpanded && hasError && (
-                    <div className="border-t border-[var(--card-border)] bg-rose-500/[0.03] px-5 py-3">
-                      <pre className="whitespace-pre-wrap break-all font-mono text-xs text-rose-300/80 max-h-40 overflow-y-auto">
+                    <div className="border-t border-[var(--card-border)] bg-rose-50 px-5 py-3">
+                      <pre className="whitespace-pre-wrap break-all font-mono text-xs text-rose-700 max-h-40 overflow-y-auto">
                         {test.errorMessage}
                       </pre>
                     </div>

@@ -52,7 +52,7 @@ export default async function ComparePage({
           </p>
           <Link
             href="/dashboard"
-            className="mt-4 inline-block text-sm text-indigo-400 hover:text-indigo-300"
+            className="mt-4 inline-block text-sm text-indigo-600 hover:text-indigo-500"
           >
             ← 대시보드로 돌아가기
           </Link>
@@ -74,13 +74,13 @@ export default async function ComparePage({
   if (runsA.length === 0 || runsB.length === 0) {
     return (
       <div className="mx-auto max-w-5xl px-6 py-10">
-        <div className="rounded-xl border border-dashed border-rose-500/30 bg-rose-500/5 p-10 text-center">
-          <p className="text-rose-400">
+        <div className="rounded-xl border border-dashed border-rose-200 bg-rose-50 p-10 text-center">
+          <p className="text-rose-700">
             Run을 찾을 수 없습니다. (A: #{a}, B: #{b})
           </p>
           <Link
             href="/dashboard"
-            className="mt-4 inline-block text-sm text-indigo-400 hover:text-indigo-300"
+            className="mt-4 inline-block text-sm text-indigo-600 hover:text-indigo-500"
           >
             ← 대시보드로 돌아가기
           </Link>
@@ -131,12 +131,12 @@ export default async function ComparePage({
       <div className="mb-6 flex items-center gap-3">
         <Link
           href="/dashboard"
-          className="text-sm text-[var(--muted)] hover:text-white transition-colors"
+          className="text-sm text-[var(--muted)] hover:text-slate-900 transition-colors"
         >
           ← 대시보드
         </Link>
         <span className="text-[var(--muted)]">/</span>
-        <h1 className="text-lg font-semibold text-white">Run 비교</h1>
+        <h1 className="text-lg font-semibold text-slate-900">Run 비교</h1>
       </div>
       <RunCompare data={{ runA: runsA[0], runB: runsB[0], summary, tests }} />
     </div>
