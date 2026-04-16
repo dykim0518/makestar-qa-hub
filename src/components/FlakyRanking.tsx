@@ -167,7 +167,7 @@ export function FlakyRanking({
                         style={{ width: `${item.flakyRate}%` }}
                       />
                     </div>
-                    <span className="font-mono text-xs font-semibold text-amber-600">
+                    <span className="font-mono text-xs font-semibold text-amber-700">
                       {item.flakyRate}%
                     </span>
                   </div>

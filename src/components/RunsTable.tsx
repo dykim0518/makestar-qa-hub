@@ -41,16 +41,21 @@ function CheckboxButton({
   checked,
   disabled,
   onClick,
+  label,
 }: {
   checked: boolean;
   disabled: boolean;
   onClick: () => void;
+  label: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
+      role="checkbox"
+      aria-checked={checked}
+      aria-label={label}
       className={`inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-all duration-150
         ${
           checked
@@ -171,6 +176,7 @@ function RunCardMobile({
             checked={isSelected}
             disabled={!isSelected && !canSelect}
             onClick={onToggle}
+            label={`Run #${run.runId} 비교 선택`}
           />
         )}
       </div>
@@ -370,6 +376,7 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                       checked={isSelected}
                       disabled={!isSelected && selected.size >= 2}
                       onClick={() => toggleSelect(run.runId)}
+                      label={`Run #${run.runId} 비교 선택`}
                     />
                   </td>
                   <td className="relative whitespace-nowrap px-5 py-4 text-sm">
