@@ -40,7 +40,9 @@
   --color-danger: var(--danger);
   --color-info: var(--info);
   --color-glow-slate: var(--glow-slate);
-  --font-sans: var(--font-geist-sans);
+  --font-sans:
+    "Pretendard Variable", var(--font-geist-sans), -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
