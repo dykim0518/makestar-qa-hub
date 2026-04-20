@@ -81,6 +81,14 @@ const PRIORITY_META: Record<string, { label: string; cls: string }> = {
   low: { label: "Low", cls: "bg-slate-50 text-slate-500 border-slate-200" },
 };
 
+// 우선순위 가중치 (가중 커버리지 계산용)
+const PRIORITY_WEIGHT: Record<string, number> = {
+  critical: 3,
+  high: 2,
+  medium: 1,
+  low: 0.5,
+};
+
 function PriorityBadge({ priority }: { priority: string }) {
   const meta = PRIORITY_META[priority] ?? PRIORITY_META.medium;
   return (
@@ -445,6 +453,8 @@ export function CoverageContent({ rows }: Props) {
         heuristic: number;
         manual: number;
         none: number;
+        weightSum: number;
+        weightedScore: number;
       }
     >();
     for (const r of rows) {
@@ -455,13 +465,23 @@ export function CoverageContent({ rows }: Props) {
         heuristic: 0,
         manual: 0,
         none: 0,
+        weightSum: 0,
+        weightedScore: 0,
       };
       s.total += 1;
-      if (r.coverageStatus === "covered") s.covered += 1;
-      else if (r.coverageStatus === "partial") s.partial += 1;
-      else if (r.coverageStatus === "heuristic_only") s.heuristic += 1;
+      const w = PRIORITY_WEIGHT[r.priority] ?? 1;
+      s.weightSum += w;
+      let score = 0;
+      if (r.coverageStatus === "covered") {
+        s.covered += 1;
+        score = 1;
+      } else if (r.coverageStatus === "partial") {
+        s.partial += 1;
+        score = 0.5;
+      } else if (r.coverageStatus === "heuristic_only") s.heuristic += 1;
       else if (r.coverageStatus === "manual_only") s.manual += 1;
       else s.none += 1;
+      s.weightedScore += w * score;
       byProduct.set(r.product, s);
     }
     return byProduct;
@@ -505,13 +525,20 @@ export function CoverageContent({ rows }: Props) {
         let total = 0;
         let covered = 0;
         let partial = 0;
+        let weightSum = 0;
+        let weightedScore = 0;
         for (const s of summary.values()) {
           total += s.total;
           covered += s.covered;
           partial += s.partial;
+          weightSum += s.weightSum;
+          weightedScore += s.weightedScore;
         }
         const overallPct = total
           ? Math.round(((covered + partial * 0.5) / total) * 100)
+          : 0;
+        const weightedPct = weightSum
+          ? Math.round((weightedScore / weightSum) * 100)
           : 0;
         const productSummary = Array.from(summary.entries())
           .sort(([a], [b]) => productRank(a) - productRank(b))
@@ -519,11 +546,14 @@ export function CoverageContent({ rows }: Props) {
             const pct = s.total
               ? Math.round(((s.covered + s.partial * 0.5) / s.total) * 100)
               : 0;
+            const wpct = s.weightSum
+              ? Math.round((s.weightedScore / s.weightSum) * 100)
+              : 0;
             const label = (PRODUCT_LABEL[product] ?? product).replace(
               /^통합매니저_/,
               "",
             );
-            return `${label} ${pct}%`;
+            return `${label} ${pct}% (가중 ${wpct}%)`;
           })
           .join(" · ");
         return (
@@ -532,18 +562,47 @@ export function CoverageContent({ rows }: Props) {
               자동화 매핑 현황
             </h1>
             <p className="mt-2 text-sm text-[var(--muted)]">
-              {total}개 기능 중 {covered}개 검증 자동화 ({overallPct}%) ·{" "}
+              {total}개 기능 중 {covered}개 검증 자동화 · 단순 {overallPct}% ·{" "}
+              <span className="font-semibold text-slate-800">
+                가중 {weightedPct}%
+              </span>
+            </p>
+            <p className="mt-0.5 text-[11px] text-[var(--muted)]">
               {productSummary}
             </p>
             <p className="mt-0.5 text-[11px] text-[var(--muted)]">
-              검증 자동화 = 실제 테스트 실행으로 passed 확인된 기능.
-              추정(휴리스틱)은 별도 집계.
+              검증 자동화 = 실제 테스트 실행으로 passed 확인된 기능. 가중치
+              Critical×3 · High×2 · Medium×1 · Low×0.5 로 우선순위 반영.
             </p>
-            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-              <div
-                className="h-full bg-emerald-500 transition-all"
-                style={{ width: `${overallPct}%` }}
-              />
+            <div className="mt-3 flex gap-2 text-[10px] text-[var(--muted)]">
+              <div className="flex-1">
+                <div className="mb-0.5 flex justify-between">
+                  <span>단순 평균</span>
+                  <span className="font-semibold text-slate-700">
+                    {overallPct}%
+                  </span>
+                </div>
+                <div className="h-1 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full bg-slate-400 transition-all"
+                    style={{ width: `${overallPct}%` }}
+                  />
+                </div>
+              </div>
+              <div className="flex-1">
+                <div className="mb-0.5 flex justify-between">
+                  <span>우선순위 가중</span>
+                  <span className="font-semibold text-emerald-700">
+                    {weightedPct}%
+                  </span>
+                </div>
+                <div className="h-1 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full bg-emerald-500 transition-all"
+                    style={{ width: `${weightedPct}%` }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -555,6 +614,9 @@ export function CoverageContent({ rows }: Props) {
           .map(([product, s]) => {
             const pct = s.total
               ? Math.round(((s.covered + s.partial * 0.5) / s.total) * 100)
+              : 0;
+            const wpct = s.weightSum
+              ? Math.round((s.weightedScore / s.weightSum) * 100)
               : 0;
             const isActive = product === filterProduct;
             return (
@@ -575,10 +637,18 @@ export function CoverageContent({ rows }: Props) {
                   >
                     {PRODUCT_LABEL[product] ?? product}
                   </div>
-                  <div
-                    className={`text-2xl font-bold ${isActive ? "text-emerald-900" : "text-slate-900"}`}
-                  >
-                    {pct}%
+                  <div className="flex items-baseline gap-2">
+                    <div
+                      className={`text-2xl font-bold ${isActive ? "text-emerald-900" : "text-slate-900"}`}
+                    >
+                      {pct}%
+                    </div>
+                    <div
+                      className={`text-xs font-semibold ${isActive ? "text-emerald-700" : "text-slate-500"}`}
+                      title="우선순위 가중 커버리지"
+                    >
+                      · 가중 {wpct}%
+                    </div>
                   </div>
                 </div>
                 <div
