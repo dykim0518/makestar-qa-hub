@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { extractFeatureTags } from "./coverage-tag";
+import { extractFeatureTags, extractFeatureTagsFromList } from "./coverage-tag";
 
 describe("extractFeatureTags", () => {
   it("단일 태그 추출", () => {
@@ -24,5 +24,16 @@ describe("extractFeatureTags", () => {
 
   it("점·밑줄·하이픈 허용, 공백 전까지 캡처", () => {
     expect(extractFeatureTags("@feature:a_b.c-d.e foo")).toEqual(["a_b.c-d.e"]);
+  });
+
+  it("Playwright metadata tag 배열에서도 feature 태그만 추출한다", () => {
+    expect(
+      extractFeatureTagsFromList([
+        "feature:cmr.home",
+        "@feature:cmr.shop",
+        "smoke",
+        "feature:cmr.home",
+      ]),
+    ).toEqual(["cmr.home", "cmr.shop"]);
   });
 });

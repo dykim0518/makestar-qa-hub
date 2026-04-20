@@ -130,4 +130,38 @@ describe("parsePlaywrightResults — suite path 누적", () => {
     const parsed = parsePlaywrightResults(report);
     expect(parsed.testCases[0].status).toBe("flaky");
   });
+
+  it("Playwright JSON tags 필드를 유지한다", () => {
+    const report = mkReport([
+      {
+        title: "tmp_tag_probe.spec.ts",
+        suites: [
+          {
+            title: "tag probe group",
+            specs: [
+              {
+                title: "probe test title",
+                file: "tmp_tag_probe.spec.ts",
+                tags: ["feature:probe.group", "feature:probe.test", "smoke"],
+                tests: [
+                  {
+                    projectName: "chromium",
+                    results: [{ status: "passed", duration: 1 }],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+
+    const parsed = parsePlaywrightResults(report);
+
+    expect(parsed.testCases[0].tags).toEqual([
+      "feature:probe.group",
+      "feature:probe.test",
+      "smoke",
+    ]);
+  });
 });

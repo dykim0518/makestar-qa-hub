@@ -14,6 +14,45 @@
   },
   {
     "product": "cmr",
+    "category": "검색",
+    "pagePath": "/search",
+    "pageTitle": "글로벌 검색 오버레이 / 추천·최근 검색어",
+    "featureName": "검색 오버레이",
+    "priority": "medium",
+    "coverageStatus": "none",
+    "source": "manual",
+    "tag": "cmr.search.overlay",
+    "notes": "진입: 헤더 검색 아이콘 클릭, 추천 검색어/최근 검색어 노출",
+    "displayOrder": 58
+  },
+  {
+    "product": "cmr",
+    "category": "검색",
+    "pagePath": "/search/results",
+    "pageTitle": "검색 결과 목록",
+    "featureName": "검색 결과",
+    "priority": "high",
+    "coverageStatus": "none",
+    "source": "manual",
+    "tag": "cmr.search.results",
+    "notes": "진입: 검색어 입력 후 Enter, keyword 쿼리 기반 결과 목록",
+    "displayOrder": 59
+  },
+  {
+    "product": "cmr",
+    "category": "검색",
+    "pagePath": "/search/results/filter",
+    "pageTitle": "검색 결과 필터 / 탭 전환",
+    "featureName": "검색 결과 필터",
+    "priority": "medium",
+    "coverageStatus": "none",
+    "source": "manual",
+    "tag": "cmr.search.filters",
+    "notes": "진입: 검색 결과 페이지에서 카테고리/탭 전환",
+    "displayOrder": 60
+  },
+  {
+    "product": "cmr",
     "category": "샵",
     "pagePath": "/shop",
     "pageTitle": "전체 상품/샵 목록",
@@ -21,7 +60,7 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.shop",
+    "tag": "cmr.shop.list",
     "notes": "진입: GNB '쇼핑' 메뉴",
     "displayOrder": 2
   },
@@ -34,7 +73,7 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.shop",
+    "tag": "cmr.shop.detail",
     "notes": "진입: 샵 리스트에서 카드 클릭",
     "displayOrder": 3
   },
@@ -47,7 +86,7 @@
     "priority": "critical",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.product",
+    "tag": "cmr.product.detail",
     "notes": "진입: 샵/이벤트/검색 결과에서 상품 카드 클릭",
     "displayOrder": 4
   },
@@ -60,7 +99,7 @@
     "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.product",
+    "tag": "cmr.product.private",
     "notes": "진입: 외부 공유 링크 (코드 포함 URL)",
     "displayOrder": 5
   },
@@ -73,7 +112,7 @@
     "priority": "low",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.product",
+    "tag": "cmr.product.winner",
     "notes": "진입: 이벤트 종료 후 안내 링크, 마이페이지 응모 내역",
     "displayOrder": 6
   },
@@ -99,7 +138,7 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.event",
+    "tag": "cmr.event.list",
     "notes": "진입: GNB '이벤트' 메뉴",
     "displayOrder": 8
   },
@@ -112,7 +151,7 @@
     "priority": "low",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.event",
+    "tag": "cmr.event.partnership",
     "notes": "진입: 푸터 또는 이벤트 페이지 내 제휴 배너",
     "displayOrder": 9
   },
@@ -138,7 +177,7 @@
     "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.artist",
+    "tag": "cmr.artist.list",
     "notes": "진입: GNB '아티스트' 메뉴",
     "displayOrder": 11
   },
@@ -151,7 +190,7 @@
     "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.artist",
+    "tag": "cmr.artist.detail",
     "notes": "진입: 아티스트 리스트 클릭, 상품에서 아티스트 태그 클릭",
     "displayOrder": 12
   },
@@ -164,7 +203,7 @@
     "priority": "low",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.artist",
+    "tag": "cmr.artist.chemistry",
     "notes": "진입: 프로모션 배너, 마이페이지 케미스트리 메뉴",
     "displayOrder": 13
   },
@@ -177,7 +216,7 @@
     "priority": "low",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.artist",
+    "tag": "cmr.artist.chemistry.member",
     "notes": "진입: 케미스트리 진행 후 결과 페이지",
     "displayOrder": 14
   },
@@ -190,7 +229,7 @@
     "priority": "low",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.artist",
+    "tag": "cmr.artist.k-name-maker",
     "notes": "진입: 프로모션/SNS 공유 링크",
     "displayOrder": 15
   },
@@ -346,7 +385,7 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.main",
     "notes": "진입: 헤더 프로필 아이콘, 로그인 직후",
     "displayOrder": 27
   },
@@ -359,7 +398,7 @@
     "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.update",
     "notes": "진입: 마이페이지 내 '프로필 수정'",
     "displayOrder": 28
   },
@@ -372,7 +411,7 @@
     "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.password",
     "notes": "진입: 마이페이지 > 내 정보 수정",
     "displayOrder": 29
   },
@@ -385,7 +424,7 @@
     "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.notification",
     "notes": "진입: 마이페이지 메뉴 '알림 설정'",
     "displayOrder": 30
   },
@@ -398,7 +437,7 @@
     "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.follow",
     "notes": "진입: 마이페이지 메뉴 '팔로우'",
     "displayOrder": 31
   },
@@ -411,7 +450,7 @@
     "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.link",
     "notes": "진입: 마이페이지 메뉴 '연결 계정'",
     "displayOrder": 32
   },
@@ -424,7 +463,7 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.address",
     "notes": "진입: 마이페이지 메뉴 '배송지', 결제 시 배송지 변경",
     "displayOrder": 33
   },
@@ -437,7 +476,7 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.address.create",
     "notes": "진입: 배송지 목록 > '추가' 버튼",
     "displayOrder": 34
   },
@@ -450,7 +489,7 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.address.update",
     "notes": "진입: 배송지 목록에서 항목 편집",
     "displayOrder": 35
   },
@@ -463,7 +502,7 @@
     "priority": "critical",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.order-history",
     "notes": "진입: 마이페이지 메뉴 '주문 내역'",
     "displayOrder": 36
   },
@@ -476,7 +515,7 @@
     "priority": "critical",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.order-history.legacy",
     "notes": "진입: 주문 내역 페이지 내 '이전 주문 보기'",
     "displayOrder": 37
   },
@@ -489,7 +528,7 @@
     "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.event-submissions",
     "notes": "진입: 마이페이지 메뉴 '이벤트 응모'",
     "displayOrder": 38
   },
@@ -502,7 +541,7 @@
     "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.event-submissions.create",
     "notes": "진입: 이벤트 상세에서 '응모하기' 클릭",
     "displayOrder": 39
   },
@@ -515,7 +554,7 @@
     "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.event-submissions.update",
     "notes": "진입: 이벤트 응모 내역에서 항목 편집",
     "displayOrder": 40
   },
@@ -528,7 +567,7 @@
     "priority": "low",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.mypage",
+    "tag": "cmr.mypage.company.member-manage",
     "notes": "진입: 마이페이지 (기업회원 한정) 메뉴",
     "displayOrder": 41
   },
@@ -536,13 +575,13 @@
     "product": "cmr",
     "category": "주문/결제",
     "pagePath": "/payments",
-    "pageTitle": "결제 게이트웨이 분기/진입 화면",
-    "featureName": "결제 진입",
+    "pageTitle": "주문서 / 결제 진입",
+    "featureName": "주문서·결제 진입",
     "priority": "critical",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.payments",
-    "notes": "진입: 장바구니/상품에서 '결제하기' 클릭",
+    "tag": "cmr.payments.entry",
+    "notes": "진입: 상품 상세/장바구니에서 '결제하기' 클릭 후 주문서 로드, 동의/배송지/통화 확인",
     "displayOrder": 42
   },
   {
@@ -554,8 +593,8 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.payments",
-    "notes": "진입: 결제 진행 중 추가 정보 필요 시",
+    "tag": "cmr.payments.extra",
+    "notes": "진입: 결제 진행 중 추가 입력이 필요한 상품/회원 정보 보강 단계",
     "displayOrder": 43
   },
   {
@@ -567,8 +606,8 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.payments",
-    "notes": "진입: 결제 실패 시 리다이렉트",
+    "tag": "cmr.payments.error",
+    "notes": "진입: 결제 실패/중단/예외 시 오류 안내로 리다이렉트",
     "displayOrder": 44
   },
   {
@@ -580,7 +619,7 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.payments",
+    "tag": "cmr.payments.deposit.success",
     "notes": "진입: 무통장입금 결제 완료 후",
     "displayOrder": 45
   },
@@ -593,7 +632,7 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.payments",
+    "tag": "cmr.payments.direct.success",
     "notes": "진입: 직접결제 완료 후",
     "displayOrder": 46
   },
@@ -601,13 +640,13 @@
     "product": "cmr",
     "category": "주문/결제",
     "pagePath": "/payments/toss",
-    "pageTitle": "Toss 결제 처리(success/fail/processing/success-extra)",
-    "featureName": "Toss 결제",
+    "pageTitle": "Toss PG 진입 / 위젯 로드",
+    "featureName": "Toss 결제 진입",
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.payments",
-    "notes": "진입: Toss PG 결제 완료/실패 콜백",
+    "tag": "cmr.payments.toss.entry",
+    "notes": "진입: 주문서에서 Proceed 클릭 후 Toss payment-widget/payment-gateway 로드",
     "displayOrder": 47
   },
   {
@@ -619,7 +658,7 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.payments",
+    "tag": "cmr.payments.toss.success",
     "notes": "진입: Toss 결제 성공 후 리다이렉트",
     "displayOrder": 48
   },
@@ -632,7 +671,7 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.payments",
+    "tag": "cmr.payments.toss.extra",
     "notes": "진입: Toss 결제 일부 케이스 콜백",
     "displayOrder": 49
   },
@@ -645,7 +684,7 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.payments",
+    "tag": "cmr.payments.toss.fail",
     "notes": "진입: Toss 결제 실패 시 리다이렉트",
     "displayOrder": 50
   },
@@ -655,10 +694,10 @@
     "pagePath": "/payments/toss/processing",
     "pageTitle": "Toss 결제 진행 표시",
     "featureName": "Toss 결제 처리중",
-    "priority": "high",
+    "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.payments",
+    "tag": "cmr.payments.toss.processing",
     "notes": "진입: Toss 결제 진행 중 폴링/대기 화면",
     "displayOrder": 51
   },
@@ -667,12 +706,12 @@
     "category": "주문/결제",
     "pagePath": "/payments/eximbay",
     "pageTitle": "Eximbay PG 결제 진입",
-    "featureName": "Eximbay 결제",
+    "featureName": "Eximbay 결제 진입",
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.payments",
-    "notes": "진입: 해외 결제 선택 시",
+    "tag": "cmr.payments.eximbay.entry",
+    "notes": "진입: 해외 결제 선택 후 Eximbay PG 리다이렉트/복귀 단계",
     "displayOrder": 52
   },
   {
@@ -684,7 +723,7 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.payments",
+    "tag": "cmr.payments.eximbay.success",
     "notes": "진입: Eximbay 결제 성공 콜백",
     "displayOrder": 53
   },
@@ -697,7 +736,7 @@
     "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.payments",
+    "tag": "cmr.payments.eximbay.fail",
     "notes": "진입: Eximbay 결제 실패 콜백",
     "displayOrder": 54
   },
@@ -707,10 +746,10 @@
     "pagePath": "/payments/eximbay/processing",
     "pageTitle": "Eximbay 결제 진행 표시",
     "featureName": "Eximbay 결제 처리중",
-    "priority": "high",
+    "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.payments",
+    "tag": "cmr.payments.eximbay.processing",
     "notes": "진입: Eximbay 결제 진행 중 화면",
     "displayOrder": 55
   },

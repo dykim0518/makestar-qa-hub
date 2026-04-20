@@ -8,7 +8,7 @@
  * Playwright 테스트에서 describe tag 옵션으로 지정:
  *   test.describe("주문 취소", { tag: "@feature:admin.orders.cancel" }, () => { ... });
  *
- * tag는 test_cases.title에 문자열로 포함되거나 titlePath로 결합되어 들어옴.
+ * tag는 test title 문자열 또는 Playwright JSON metadata(tags)에서 들어온다.
  */
 import { db } from "@/db";
 import {
@@ -17,16 +17,46 @@ import {
   type NewQaCoverageTestLink,
 } from "@/db/schema";
 import { and, eq, inArray, sql } from "drizzle-orm";
-import { extractFeatureTags } from "./coverage-tag";
+import { extractFeatureTags, extractFeatureTagsFromList } from "./coverage-tag";
 import { computeCoverageStatus } from "./coverage-status";
 
-export { extractFeatureTags };
+export { extractFeatureTags, extractFeatureTagsFromList };
 
 type TestCaseForLink = {
   title: string;
   file: string | null;
   status: string;
+  tags?: string[];
 };
+
+export async function recomputeCoverageFeatures(
+  featureIds: Iterable<string>,
+): Promise<number> {
+  const uniqueIds = Array.from(new Set(featureIds)).filter(Boolean);
+  for (const featureId of uniqueIds) {
+    const all = await db
+      .select({
+        status: qaCoverageTestLinks.lastStatus,
+        src: qaCoverageTestLinks.linkSource,
+      })
+      .from(qaCoverageTestLinks)
+      .where(eq(qaCoverageTestLinks.featureId, featureId));
+
+    const next = computeCoverageStatus(
+      all.map((link) => ({
+        status: link.status,
+        source:
+          (link.src as "heuristic" | "manual" | "real" | "tag") ?? "real",
+      })),
+    );
+
+    await db
+      .update(qaCoverageFeatures)
+      .set({ coverageStatus: next, updatedAt: new Date() })
+      .where(eq(qaCoverageFeatures.id, featureId));
+  }
+  return uniqueIds.length;
+}
 
 /**
  * 주어진 run의 test cases에서 @feature: 태그를 추출하여
@@ -41,7 +71,11 @@ export async function linkCoverageForRun(
 ): Promise<{ linked: number; updatedFeatures: number; staleRemoved: number }> {
   const tagToCases = new Map<string, TestCaseForLink[]>();
   for (const tc of testCases) {
-    for (const tag of extractFeatureTags(tc.title)) {
+    const featureTags = new Set([
+      ...extractFeatureTags(tc.title),
+      ...extractFeatureTagsFromList(tc.tags ?? []),
+    ]);
+    for (const tag of featureTags) {
       if (!tagToCases.has(tag)) tagToCases.set(tag, []);
       tagToCases.get(tag)!.push(tc);
     }
@@ -115,10 +149,10 @@ export async function linkCoverageForRun(
       });
   }
 
-  // heuristic 중복 제거: 이번 run의 real link 중 heuristic이 이미 매핑한 것은 제거
+  // 정적(tag/heuristic) 중복 제거: 이번 run의 real link와 겹치면 정적 링크는 삭제
   for (const real of links) {
     if (!real.testFile) continue;
-    const heuristics = await db
+    const staticLinks = await db
       .select({
         id: qaCoverageTestLinks.id,
         testTitle: qaCoverageTestLinks.testTitle,
@@ -127,16 +161,16 @@ export async function linkCoverageForRun(
       .where(
         sql`${qaCoverageTestLinks.featureId} = ${real.featureId}
           AND ${qaCoverageTestLinks.testFile} = ${real.testFile}
-          AND ${qaCoverageTestLinks.linkSource} = 'heuristic'`,
+          AND ${qaCoverageTestLinks.linkSource} IN ('heuristic', 'tag')`,
       );
-    for (const h of heuristics) {
+    for (const staticLink of staticLinks) {
       if (
-        real.testTitle === h.testTitle ||
-        real.testTitle.endsWith(` > ${h.testTitle}`)
+        real.testTitle === staticLink.testTitle ||
+        real.testTitle.endsWith(` > ${staticLink.testTitle}`)
       ) {
         await db
           .delete(qaCoverageTestLinks)
-          .where(eq(qaCoverageTestLinks.id, h.id));
+          .where(eq(qaCoverageTestLinks.id, staticLink.id));
       }
     }
   }
@@ -171,35 +205,16 @@ export async function linkCoverageForRun(
     }
   }
 
-  // coverage_status 재계산 (새 규칙: heuristic/manual 분리, skipped-only → none)
-  const touchedFeatureIds = Array.from(
-    new Set([...links.map((l) => l.featureId as string), ...staleFeatureIds]),
-  );
-  for (const featureId of touchedFeatureIds) {
-    const all = await db
-      .select({
-        status: qaCoverageTestLinks.lastStatus,
-        src: qaCoverageTestLinks.linkSource,
-      })
-      .from(qaCoverageTestLinks)
-      .where(eq(qaCoverageTestLinks.featureId, featureId));
-
-    const next = computeCoverageStatus(
-      all.map((l) => ({
-        status: l.status,
-        source: (l.src as "real" | "heuristic" | "manual") ?? "real",
-      })),
-    );
-
-    await db
-      .update(qaCoverageFeatures)
-      .set({ coverageStatus: next, updatedAt: new Date() })
-      .where(eq(qaCoverageFeatures.id, featureId));
-  }
+  // coverage_status 재계산 (새 규칙: static/manual 분리, skipped-only → none)
+  const touchedFeatureIds = new Set<string>([
+    ...links.map((link) => link.featureId as string),
+    ...staleFeatureIds,
+  ]);
+  const updatedFeatures = await recomputeCoverageFeatures(touchedFeatureIds);
 
   return {
     linked: links.length,
-    updatedFeatures: touchedFeatureIds.length,
+    updatedFeatures,
     staleRemoved: staleFeatureIds.size,
   };
 }

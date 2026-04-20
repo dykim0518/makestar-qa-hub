@@ -47,6 +47,12 @@ describe("computeCoverageStatus", () => {
     ).toBe("heuristic_only");
   });
 
+  it("실측 없고 tag만 있어도 heuristic_only", () => {
+    expect(computeCoverageStatus([{ status: null, source: "tag" }])).toBe(
+      "heuristic_only",
+    );
+  });
+
   it("실측 없고 manual만 있으면 manual_only", () => {
     expect(computeCoverageStatus([{ status: null, source: "manual" }])).toBe(
       "manual_only",
@@ -66,6 +72,7 @@ describe("computeCoverageStatus", () => {
     expect(
       computeCoverageStatus([
         { status: "passed", source: "real" },
+        { status: null, source: "tag" },
         { status: "heuristic", source: "heuristic" },
       ]),
     ).toBe("covered");

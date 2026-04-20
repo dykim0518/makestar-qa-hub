@@ -1,29 +1,43 @@
 /**
- * 휴리스틱 매처 — 기존 Playwright 테스트 spec을 기능 inventory와 자동 매핑.
+ * 정적 매핑 생성기 — Playwright spec을 기능 inventory와 매핑.
  *
  * 2-phase:
- *  Phase 1 (기본): proposal JSON만 출력 — DB 미수정
+ *  Phase 1 (기본): proposal/warning JSON만 출력 — DB 미수정
  *    npx tsx scripts/coverage-heuristic.ts
- *  Phase 2 (--apply): 제안된 링크를 DB에 upsert
+ *  Phase 2 (--apply): 정적(tag/heuristic) 링크만 재생성하고 coverage_status 재계산
  *    npx tsx scripts/coverage-heuristic.ts --apply
  *
  * 매칭 규칙 (우선순위 순):
- *  1) 태그 매칭: describe 타이틀의 `@feature:<tag>` ↔ feature.tag 정확 일치
- *     → linkSource="real", lastStatus=null (수동 매핑에 준하는 신뢰)
- *  2) 키워드 매칭 (폴백): 파일명의 기능 키워드 → feature.pagePath 포함
- *     → linkSource="heuristic", lastStatus="heuristic"
- *  - 파일명 prefix → product 추정 (admin_poca → admin_pocaalbum 등)
- *  - test() title 추출하여 title로 저장
+ *  1) 정적 태그 매칭
+ *     - describe title / describe option.tag
+ *     - test title / test option.tag
+ *     - feature.tag 정확 일치 → linkSource="tag"
+ *  2) 키워드 매칭 (폴백)
+ *     - 파일명의 기능 키워드 → feature.pagePath 포함
+ *     - explicit @feature 가 없는 테스트만 대상 → linkSource="heuristic"
+ *
+ * 주의:
+ *  - 이 스크립트는 실행 결과(real)를 생성하지 않는다.
+ *  - real/manual 링크는 삭제/덮어쓰기 하지 않는다.
  */
 import * as fs from "fs";
 import * as path from "path";
+import { eq, inArray } from "drizzle-orm";
 import { db } from "../src/db";
 import {
   qaCoverageFeatures,
   qaCoverageTestLinks,
   type NewQaCoverageTestLink,
 } from "@/db/schema";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import {
+  buildCoverageStaticPlan,
+  parseCoverageSpec,
+  type CoverageStaticFeature,
+  type CoverageStaticProposal,
+  type CoverageStaticSpec,
+  type CoverageStaticWarning,
+} from "@/lib/coverage-static-map";
+import { recomputeCoverageFeatures } from "@/lib/coverage-linker";
 
 const TESTS_DIR = path.resolve(
   process.env.HOME!,
@@ -33,373 +47,182 @@ const OUTPUT_PATH = path.resolve(
   __dirname,
   "coverage-heuristic-proposals.json",
 );
+const WARNINGS_OUTPUT_PATH = path.resolve(
+  __dirname,
+  "coverage-heuristic-warnings.json",
+);
+const STATIC_LINK_SOURCES = ["heuristic", "tag"] as const;
 
-// 파일명 prefix → product
-const FILE_TO_PRODUCT: { pattern: RegExp; product: string; suite: string }[] = [
-  { pattern: /^admin_poca_/, product: "admin_pocaalbum", suite: "admin" },
-  { pattern: /^ab_/, product: "admin_albumbuddy", suite: "albumbuddy" },
-  { pattern: /^admin_/, product: "admin_makestar", suite: "admin" },
-  { pattern: /^cmr_/, product: "cmr", suite: "cmr" },
-];
+function readSpecs(): CoverageStaticSpec[] {
+  const files = fs
+    .readdirSync(TESTS_DIR)
+    .filter((file) => file.endsWith(".spec.ts"))
+    .sort();
 
-// 파일명 키워드 → pagePath 포함 검색 키
-// 주의: pageTitle/featureName 한글 단어는 교차 오염이 심해 pagePath 접두사만 유지
-const FILE_KEYWORD_MAP: Record<string, string[]> = {
-  order: ["/order"],
-  artist: ["/artist"],
-  product: ["/product"],
-  user: ["/user", "/customer"],
-  auth: ["/login"],
-  album: ["/album"],
-  content: ["/content", "/notice"],
-  shop: ["/shop"],
-  dashboard: ["/dashboard"],
-  monitoring: ["/dashboard"],
-  excel: ["/excel"],
-  readonly: [],
-};
-
-type DescribeBlock = {
-  title: string;
-  tags: string[];
-  startLine: number;
-  testTitles: string[];
-};
-type TestSpec = {
-  file: string;
-  titles: string[];
-  describes: DescribeBlock[];
-};
-
-const DESCRIBE_RE =
-  /\btest\.describe(?:\.serial|\.parallel)?\s*\(\s*[`'"]([^`'"]+)[`'"]/;
-const TEST_RE = /\btest\s*\(\s*[`'"]([^`'"]+)[`'"]/;
-const FEATURE_TAG_RE = /@feature:([\w.]+)/g;
-
-function extractDescribeBlocks(content: string): DescribeBlock[] {
-  const lines = content.split("\n");
-  const describes: DescribeBlock[] = [];
-  for (let i = 0; i < lines.length; i++) {
-    const dm = DESCRIBE_RE.exec(lines[i]);
-    if (!dm) continue;
-    const title = dm[1];
-    const tags = Array.from(title.matchAll(FEATURE_TAG_RE)).map((m) => m[1]);
-    describes.push({ title, tags, startLine: i, testTitles: [] });
-  }
-  // 각 test()를 가장 가까운 상위 describe에 배정 (선형 스캔)
-  for (let i = 0; i < lines.length; i++) {
-    if (DESCRIBE_RE.test(lines[i])) continue;
-    const tm = TEST_RE.exec(lines[i]);
-    if (!tm) continue;
-    let owner: DescribeBlock | null = null;
-    for (const d of describes) {
-      if (d.startLine <= i) owner = d;
-      else break;
-    }
-    if (owner) owner.testTitles.push(tm[1]);
-  }
-  return describes;
+  return files.map((file) => {
+    const content = fs.readFileSync(path.join(TESTS_DIR, file), "utf-8");
+    return parseCoverageSpec(file, content);
+  });
 }
 
-function extractTestTitles(content: string): string[] {
-  const titles = new Set<string>();
-  const re = /\btest\s*\(\s*['"`]([^'"`]+)['"`]/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(content)) !== null) {
-    titles.add(m[1]);
-  }
-  return Array.from(titles);
-}
-
-function readSpecs(): TestSpec[] {
-  const files = fs.readdirSync(TESTS_DIR).filter((f) => f.endsWith(".spec.ts"));
-  const specs: TestSpec[] = [];
-  for (const f of files) {
-    const content = fs.readFileSync(path.join(TESTS_DIR, f), "utf-8");
-    const titles = extractTestTitles(content);
-    const describes = extractDescribeBlocks(content);
-    if (titles.length > 0) {
-      specs.push({ file: f, titles, describes });
-    }
-  }
-  return specs;
-}
-
-function inferProduct(file: string): { product: string; suite: string } | null {
-  for (const { pattern, product, suite } of FILE_TO_PRODUCT) {
-    if (pattern.test(file)) return { product, suite };
-  }
-  return null;
-}
-
-function inferKeywords(file: string): string[] {
-  const keywords: string[] = [];
-  for (const [kw, hints] of Object.entries(FILE_KEYWORD_MAP)) {
-    if (file.includes(kw)) keywords.push(...hints);
-  }
-  return keywords;
-}
-
-type Proposal = {
-  file: string;
-  product: string;
-  suite: string;
-  keywords: string[];
-  // describe 단위 태그 매칭 결과
-  tagMatches: {
-    tag: string;
-    describeTitle: string;
-    featureId: string;
-    featureName: string;
-    pagePath: string;
-    testTitles: string[];
-  }[];
-  // 파일 단위 키워드 매칭 결과 (폴백)
-  keywordMatches: {
-    featureId: string;
-    featureName: string;
-    pagePath: string;
-    matchedKeyword: string;
-  }[];
-  // 키워드 매칭이 덮는 테스트 타이틀 (태그 매칭에 포함된 타이틀은 제외)
-  keywordTestTitles: string[];
-};
-
-async function buildProposals(): Promise<Proposal[]> {
+async function buildPlan(): Promise<{
+  proposals: CoverageStaticProposal[];
+  warnings: CoverageStaticWarning[];
+}> {
   const specs = readSpecs();
   const allFeatures = await db
     .select({
-      id: qaCoverageFeatures.id,
-      product: qaCoverageFeatures.product,
-      pagePath: qaCoverageFeatures.pagePath,
       featureName: qaCoverageFeatures.featureName,
+      id: qaCoverageFeatures.id,
+      pagePath: qaCoverageFeatures.pagePath,
       pageTitle: qaCoverageFeatures.pageTitle,
+      product: qaCoverageFeatures.product,
       tag: qaCoverageFeatures.tag,
     })
     .from(qaCoverageFeatures)
     .where(eq(qaCoverageFeatures.isActive, true));
 
-  const proposals: Proposal[] = [];
-  for (const spec of specs) {
-    const productHint = inferProduct(spec.file);
-    if (!productHint) continue;
-
-    const productFeatures = allFeatures.filter(
-      (f) => f.product === productHint.product,
-    );
-
-    // 1) 태그 매칭: describe.tags ↔ feature.tag 정확 일치
-    const tagMatches: Proposal["tagMatches"] = [];
-    const tagCoveredTitles = new Set<string>();
-    for (const d of spec.describes) {
-      if (d.tags.length === 0 || d.testTitles.length === 0) continue;
-      for (const tag of d.tags) {
-        const hits = productFeatures.filter((f) => f.tag === tag);
-        for (const f of hits) {
-          tagMatches.push({
-            tag,
-            describeTitle: d.title,
-            featureId: f.id,
-            featureName: f.featureName,
-            pagePath: f.pagePath,
-            testTitles: [...d.testTitles],
-          });
-          for (const t of d.testTitles) tagCoveredTitles.add(t);
-        }
-      }
-    }
-
-    // 2) 키워드 매칭 (폴백): 태그로 안 잡힌 테스트만 대상
-    const keywords = inferKeywords(spec.file);
-    const keywordMatches: Proposal["keywordMatches"] = [];
-    const keywordTestTitles = spec.titles.filter(
-      (t) => !tagCoveredTitles.has(t),
-    );
-    if (keywords.length > 0 && keywordTestTitles.length > 0) {
-      for (const f of productFeatures) {
-        for (const kw of keywords) {
-          const haystack = `${f.pagePath} ${f.featureName} ${f.pageTitle ?? ""}`;
-          if (haystack.includes(kw)) {
-            keywordMatches.push({
-              featureId: f.id,
-              featureName: f.featureName,
-              pagePath: f.pagePath,
-              matchedKeyword: kw,
-            });
-            break;
-          }
-        }
-      }
-    }
-
-    if (tagMatches.length > 0 || keywordMatches.length > 0) {
-      proposals.push({
-        file: spec.file,
-        product: productHint.product,
-        suite: productHint.suite,
-        keywords,
-        tagMatches,
-        keywordMatches,
-        keywordTestTitles,
-      });
-    }
-  }
-  return proposals;
+  return buildCoverageStaticPlan(specs, allFeatures as CoverageStaticFeature[]);
 }
 
-async function applyProposals(proposals: Proposal[]) {
-  const now = new Date();
-  const tagLinks: NewQaCoverageTestLink[] = [];
-  const kwLinks: NewQaCoverageTestLink[] = [];
-  const tagFeatureIds = new Set<string>();
-  const kwFeatureIds = new Set<string>();
+function buildStaticLinks(
+  proposals: CoverageStaticProposal[],
+): {
+  keywordLinks: NewQaCoverageTestLink[];
+  tagLinks: NewQaCoverageTestLink[];
+} {
+  const tagMap = new Map<string, NewQaCoverageTestLink>();
+  const keywordMap = new Map<string, NewQaCoverageTestLink>();
 
-  for (const p of proposals) {
-    for (const m of p.tagMatches) {
-      tagFeatureIds.add(m.featureId);
-      for (const title of m.testTitles) {
-        tagLinks.push({
-          featureId: m.featureId,
-          testTitle: title,
-          testFile: p.file,
-          suite: p.suite,
-          lastStatus: null,
-          linkSource: "real",
+  const makeKey = (featureId: string, testTitle: string, testFile: string) =>
+    `${featureId}::${testFile}::${testTitle}`;
+
+  for (const proposal of proposals) {
+    for (const match of proposal.tagMatches) {
+      for (const testTitle of match.testTitles) {
+        const key = makeKey(match.featureId, testTitle, proposal.file);
+        tagMap.set(key, {
+          featureId: match.featureId,
           lastRunAt: null,
+          lastStatus: null,
+          linkSource: "tag",
+          suite: proposal.suite,
+          testFile: proposal.file,
+          testTitle,
         });
       }
     }
-    for (const m of p.keywordMatches) {
-      kwFeatureIds.add(m.featureId);
-      for (const title of p.keywordTestTitles) {
-        kwLinks.push({
-          featureId: m.featureId,
-          testTitle: title,
-          testFile: p.file,
-          suite: p.suite,
+
+    for (const match of proposal.keywordMatches) {
+      for (const testTitle of proposal.keywordTestTitles) {
+        const key = makeKey(match.featureId, testTitle, proposal.file);
+        if (tagMap.has(key)) continue;
+        keywordMap.set(key, {
+          featureId: match.featureId,
+          lastRunAt: null,
           lastStatus: "heuristic",
           linkSource: "heuristic",
-          lastRunAt: now,
+          suite: proposal.suite,
+          testFile: proposal.file,
+          testTitle,
         });
       }
     }
-  }
-
-  // 태그 매칭 먼저 insert (real) → 키워드 매칭은 conflict 시 덮어쓰지 않음
-  const batchInsert = async (
-    links: NewQaCoverageTestLink[],
-    overrideOnConflict: boolean,
-  ) => {
-    for (let i = 0; i < links.length; i += 100) {
-      const chunk = links.slice(i, i + 100);
-      const q = db.insert(qaCoverageTestLinks).values(chunk);
-      if (overrideOnConflict) {
-        await q.onConflictDoUpdate({
-          target: [
-            qaCoverageTestLinks.featureId,
-            qaCoverageTestLinks.testTitle,
-            qaCoverageTestLinks.testFile,
-          ],
-          set: {
-            suite: sql`excluded.suite`,
-            lastStatus: sql`excluded.last_status`,
-            linkSource: sql`excluded.link_source`,
-            lastRunAt: sql`excluded.last_run_at`,
-          },
-        });
-      } else {
-        await q.onConflictDoNothing();
-      }
-    }
-  };
-  await batchInsert(tagLinks, true);
-  await batchInsert(kwLinks, false);
-
-  // coverage_status 승격 (downgrade 방지 가드)
-  //  - 태그 매칭: 'none' | 'heuristic_only' 인 feature만 'covered'로 승격
-  //    (partial / manual_only / covered 는 수동 설정된 상태이므로 보존)
-  //  - 키워드 매칭 전용: 'none' 인 feature만 'heuristic_only'로 승격
-  if (tagFeatureIds.size > 0) {
-    await db
-      .update(qaCoverageFeatures)
-      .set({ coverageStatus: "covered", updatedAt: now })
-      .where(
-        and(
-          inArray(qaCoverageFeatures.id, Array.from(tagFeatureIds)),
-          inArray(qaCoverageFeatures.coverageStatus, [
-            "none",
-            "heuristic_only",
-          ]),
-        ),
-      );
-  }
-  const kwOnly = Array.from(kwFeatureIds).filter(
-    (id) => !tagFeatureIds.has(id),
-  );
-  if (kwOnly.length > 0) {
-    await db
-      .update(qaCoverageFeatures)
-      .set({ coverageStatus: "heuristic_only", updatedAt: now })
-      .where(
-        and(
-          inArray(qaCoverageFeatures.id, kwOnly),
-          eq(qaCoverageFeatures.coverageStatus, "none"),
-        ),
-      );
   }
 
   return {
-    tagLinks: tagLinks.length,
-    kwLinks: kwLinks.length,
-    tagFeatures: tagFeatureIds.size,
-    kwOnlyFeatures: kwOnly.length,
+    keywordLinks: Array.from(keywordMap.values()),
+    tagLinks: Array.from(tagMap.values()),
   };
+}
+
+async function applyProposals(
+  proposals: CoverageStaticProposal[],
+): Promise<{
+  deletedStaticLinks: number;
+  insertedKeywordLinks: number;
+  insertedTagLinks: number;
+  updatedFeatures: number;
+}> {
+  const { keywordLinks, tagLinks } = buildStaticLinks(proposals);
+
+  const deleted = await db
+    .delete(qaCoverageTestLinks)
+    .where(inArray(qaCoverageTestLinks.linkSource, [...STATIC_LINK_SOURCES]))
+    .returning({ featureId: qaCoverageTestLinks.featureId });
+
+  const insertBatch = async (links: NewQaCoverageTestLink[]) => {
+    for (let index = 0; index < links.length; index += 100) {
+      await db
+        .insert(qaCoverageTestLinks)
+        .values(links.slice(index, index + 100))
+        .onConflictDoNothing();
+    }
+  };
+
+  await insertBatch(tagLinks);
+  await insertBatch(keywordLinks);
+
+  const touchedFeatureIds = new Set<string>([
+    ...deleted.map((row) => row.featureId),
+    ...tagLinks.map((link) => link.featureId as string),
+    ...keywordLinks.map((link) => link.featureId as string),
+  ]);
+
+  const updatedFeatures = await recomputeCoverageFeatures(touchedFeatureIds);
+
+  return {
+    deletedStaticLinks: deleted.length,
+    insertedKeywordLinks: keywordLinks.length,
+    insertedTagLinks: tagLinks.length,
+    updatedFeatures,
+  };
+}
+
+function logWarnings(warnings: CoverageStaticWarning[]) {
+  if (warnings.length === 0) return;
+  console.log(`   warnings: ${warnings.length}`);
+  for (const warning of warnings.slice(0, 10)) {
+    console.log(
+      `   - [${warning.kind}] ${warning.file}:${warning.line} ${warning.message}`,
+    );
+  }
+  if (warnings.length > 10) {
+    console.log(`   - ... ${warnings.length - 10}건 추가 경고는 JSON 참조`);
+  }
 }
 
 async function main() {
   const apply = process.argv.includes("--apply");
-  const proposals = await buildProposals();
+  const { proposals, warnings } = await buildPlan();
+  const { keywordLinks, tagLinks } = buildStaticLinks(proposals);
 
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(proposals, null, 2), "utf-8");
-
-  const predictedTagLinks = proposals.reduce(
-    (sum, p) => sum + p.tagMatches.reduce((s, m) => s + m.testTitles.length, 0),
-    0,
-  );
-  const predictedKwLinks = proposals.reduce(
-    (sum, p) => sum + p.keywordMatches.length * p.keywordTestTitles.length,
-    0,
-  );
-  const tagFeatures = new Set(
-    proposals.flatMap((p) => p.tagMatches.map((m) => m.featureId)),
-  );
-  const kwFeatures = new Set(
-    proposals.flatMap((p) => p.keywordMatches.map((m) => m.featureId)),
+  fs.writeFileSync(
+    WARNINGS_OUTPUT_PATH,
+    JSON.stringify(warnings, null, 2),
+    "utf-8",
   );
 
   console.log(`📋 proposals: ${proposals.length} specs`);
-  console.log(
-    `   tag links: ${predictedTagLinks} · tag features: ${tagFeatures.size}`,
-  );
-  console.log(
-    `   keyword links: ${predictedKwLinks} · keyword-only features: ${
-      Array.from(kwFeatures).filter((id) => !tagFeatures.has(id)).length
-    }`,
-  );
+  console.log(`   tag links: ${tagLinks.length}`);
+  console.log(`   keyword links: ${keywordLinks.length}`);
   console.log(`   → ${OUTPUT_PATH}`);
+  console.log(`   → ${WARNINGS_OUTPUT_PATH}`);
+  logWarnings(warnings);
 
   if (apply) {
     const result = await applyProposals(proposals);
     console.log(
-      `\n✅ applied: tag=${result.tagLinks} (feat ${result.tagFeatures}) · kw=${result.kwLinks} (feat ${result.kwOnlyFeatures})`,
+      `\n✅ applied: deleted static=${result.deletedStaticLinks} · tag=${result.insertedTagLinks} · kw=${result.insertedKeywordLinks} · recomputed features=${result.updatedFeatures}`,
     );
   } else {
-    console.log(`\n(dry-run) --apply 옵션을 붙이면 DB에 반영`);
+    console.log(`\n(dry-run) --apply 옵션을 붙이면 정적 링크만 재생성`);
   }
   process.exit(0);
 }
 
-main().catch((err) => {
-  console.error(err);
+main().catch((error) => {
+  console.error(error);
   process.exit(1);
 });

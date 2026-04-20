@@ -1,0 +1,58 @@
+[
+  {
+    "product": "cmr",
+    "pagePath": "/payments/toss/success",
+    "featureName": "Toss 결제 성공",
+    "testTitle": "수동검증 후보: Toss 결제 성공 콜백 도착 및 완료 화면 확인",
+    "testFile": "manual://cmr/payments/toss-success",
+    "suite": "cmr"
+  },
+  {
+    "product": "cmr",
+    "pagePath": "/payments/toss/success-extra",
+    "featureName": "Toss 결제 성공 (추가)",
+    "testTitle": "수동검증 후보: Toss 성공 후 추가 정보 처리 화면 확인",
+    "testFile": "manual://cmr/payments/toss-success-extra",
+    "suite": "cmr"
+  },
+  {
+    "product": "cmr",
+    "pagePath": "/payments/toss/fail",
+    "featureName": "Toss 결제 실패",
+    "testTitle": "수동검증 후보: Toss 결제 실패 콜백 및 오류 문구 확인",
+    "testFile": "manual://cmr/payments/toss-fail",
+    "suite": "cmr"
+  },
+  {
+    "product": "cmr",
+    "pagePath": "/payments/toss/processing",
+    "featureName": "Toss 결제 처리중",
+    "testTitle": "수동검증 후보: Toss 결제 처리중 화면 및 폴링 상태 확인",
+    "testFile": "manual://cmr/payments/toss-processing",
+    "suite": "cmr"
+  },
+  {
+    "product": "cmr",
+    "pagePath": "/payments/eximbay/success",
+    "featureName": "Eximbay 결제 성공",
+    "testTitle": "수동검증 후보: Eximbay 결제 성공 콜백 도착 및 완료 화면 확인",
+    "testFile": "manual://cmr/payments/eximbay-success",
+    "suite": "cmr"
+  },
+  {
+    "product": "cmr",
+    "pagePath": "/payments/eximbay/fail",
+    "featureName": "Eximbay 결제 실패",
+    "testTitle": "수동검증 후보: Eximbay 결제 실패 콜백 및 오류 문구 확인",
+    "testFile": "manual://cmr/payments/eximbay-fail",
+    "suite": "cmr"
+  },
+  {
+    "product": "cmr",
+    "pagePath": "/payments/eximbay/processing",
+    "featureName": "Eximbay 결제 처리중",
+    "testTitle": "수동검증 후보: Eximbay 결제 처리중 화면 및 중간 상태 확인",
+    "testFile": "manual://cmr/payments/eximbay-processing",
+    "suite": "cmr"
+  }
+]

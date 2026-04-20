@@ -84,7 +84,17 @@ export async function POST(request: NextRequest) {
   await db.delete(testCases).where(eq(testCases.runId, runId));
 
   if (parsed.testCases.length > 0) {
-    const cases = parsed.testCases.map((tc) => ({ ...tc, runId }));
+    const cases = parsed.testCases.map((testCase) => ({
+      runId,
+      title: testCase.title,
+      file: testCase.file,
+      project: testCase.project,
+      status: testCase.status,
+      durationMs: testCase.durationMs,
+      errorMessage: testCase.errorMessage,
+      errorStack: testCase.errorStack,
+      errorCategory: testCase.errorCategory,
+    }));
     for (let i = 0; i < cases.length; i += 100) {
       await db.insert(testCases).values(cases.slice(i, i + 100));
     }
@@ -98,6 +108,7 @@ export async function POST(request: NextRequest) {
       title: tc.title,
       file: tc.file ?? null,
       status: tc.status,
+      tags: tc.tags,
     })),
     new Date(),
     { reconcile: true }, // CI: 항상 full suite 실행 전제

@@ -1,34 +1,36 @@
 import type { NewTestCase } from "@/db/schema";
 import { classifyError } from "./error-classifier";
 
-interface PlaywrightResult {
+type PlaywrightResult = {
   status: string;
   duration: number;
   errors?: Array<{ message?: string; stack?: string }>;
-}
+};
 
-interface PlaywrightTest {
+type PlaywrightTest = {
   title?: string;
   titlePath?: string[];
+  tags?: string[];
   projectName?: string;
   results?: PlaywrightResult[];
-}
+};
 
-interface PlaywrightSpec {
+type PlaywrightSpec = {
   title?: string;
   titlePath?: string[];
+  tags?: string[];
   file?: string;
   line?: number;
   tests?: PlaywrightTest[];
-}
+};
 
-interface PlaywrightSuite {
+type PlaywrightSuite = {
   title?: string;
   specs?: PlaywrightSpec[];
   suites?: PlaywrightSuite[];
-}
+};
 
-interface PlaywrightReport {
+type PlaywrightReport = {
   stats?: {
     expected?: number;
     unexpected?: number;
@@ -37,9 +39,13 @@ interface PlaywrightReport {
     duration?: number;
   };
   suites?: PlaywrightSuite[];
-}
+};
 
-export interface ParsedResults {
+export type ParsedTestCase = Omit<NewTestCase, "runId"> & {
+  tags: string[];
+};
+
+export type ParsedResults = {
   total: number;
   passed: number;
   failed: number;
@@ -47,8 +53,8 @@ export interface ParsedResults {
   skipped: number;
   durationMs: number;
   status: "passed" | "failed";
-  testCases: Omit<NewTestCase, "runId">[];
-}
+  testCases: ParsedTestCase[];
+};
 
 const failedStates = new Set(["failed", "timedOut", "interrupted"]);
 
@@ -70,7 +76,7 @@ export function parsePlaywrightResults(
   report: PlaywrightReport,
 ): ParsedResults {
   const stats = report.stats || {};
-  const testCases: Omit<NewTestCase, "runId">[] = [];
+  const testCases: ParsedTestCase[] = [];
 
   function walkSuite(suite: PlaywrightSuite, parentPath: string[] = []) {
     // 파일명(.spec.ts)은 path에서 제외, describe 제목만 누적
@@ -114,6 +120,7 @@ export function parsePlaywrightResults(
           errorMessage: errorMsg,
           errorStack: errorInfo?.stack?.slice(0, 4000) || null,
           errorCategory: classifyError(errorMsg),
+          tags: Array.from(new Set([...(spec.tags || []), ...(test.tags || [])])),
         });
       }
     }

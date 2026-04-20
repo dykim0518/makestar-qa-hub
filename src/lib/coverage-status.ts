@@ -6,13 +6,13 @@
  *  - 실측 passed만 → covered
  *  - 실측 failed만(flaky 포함) → partial
  *  - 실측이 skipped만 → none (자동화로 인정 X)
- *  - 실측 없고 heuristic 존재 → heuristic_only (KPI 제외)
+ *  - 실측 없고 정적(tag/heuristic) 링크 존재 → heuristic_only (KPI 제외)
  *  - 실측/heuristic 없고 manual 존재 → manual_only
  *  - 아무 링크 없음 → none
  */
 export type CoverageLinkInput = {
   status: string | null;
-  source: "real" | "heuristic" | "manual";
+  source: "heuristic" | "manual" | "real" | "tag";
 };
 
 export type CoverageStatus =
@@ -26,7 +26,9 @@ export function computeCoverageStatus(
   links: CoverageLinkInput[],
 ): CoverageStatus {
   const real = links.filter((l) => l.source === "real");
-  const heuristic = links.filter((l) => l.source === "heuristic");
+  const heuristic = links.filter(
+    (l) => l.source === "heuristic" || l.source === "tag",
+  );
   const manual = links.filter((l) => l.source === "manual");
 
   const realPassed = real.some((l) => l.status === "passed");

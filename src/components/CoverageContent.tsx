@@ -101,13 +101,18 @@ function PriorityBadge({ priority }: { priority: string }) {
 }
 
 function TestRatioBar({ links }: { links: { lastStatus: string | null }[] }) {
-  if (links.length === 0) return <span className="text-[var(--muted)]">—</span>;
-  const passed = links.filter((l) => l.lastStatus === "passed").length;
-  const failed = links.filter(
+  const measuredLinks = links.filter((l) => l.lastStatus !== null);
+  if (measuredLinks.length === 0) {
+    return <span className="text-[var(--muted)]">—</span>;
+  }
+  const passed = measuredLinks.filter((l) => l.lastStatus === "passed").length;
+  const failed = measuredLinks.filter(
     (l) => l.lastStatus === "failed" || l.lastStatus === "flaky",
   ).length;
-  const heuristic = links.filter((l) => l.lastStatus === "heuristic").length;
-  const total = links.length;
+  const heuristic = measuredLinks.filter(
+    (l) => l.lastStatus === "heuristic",
+  ).length;
+  const total = measuredLinks.length;
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-2 text-xs">
@@ -234,7 +239,12 @@ function TestLinksList({ links }: { links: CoverageLink[] }) {
             <div className="divide-y divide-[var(--card-border)]">
               {items.map((l) => {
                 const srcBadge =
-                  l.linkSource === "heuristic"
+                  l.linkSource === "tag"
+                    ? {
+                        text: "태그",
+                        cls: "bg-teal-100 text-teal-700 border-teal-200",
+                      }
+                    : l.linkSource === "heuristic"
                     ? {
                         text: "추정",
                         cls: "bg-indigo-100 text-indigo-700 border-indigo-200",
@@ -302,18 +312,24 @@ function OperationalSignals({
   const failed: CoverageFeatureRow[] = [];
   const flaky: CoverageFeatureRow[] = [];
   const stale: CoverageFeatureRow[] = [];
-  const heuristicOnly: CoverageFeatureRow[] = [];
+  const staticOnly: CoverageFeatureRow[] = [];
 
   for (const r of scoped) {
     if (r.links.length === 0) continue;
-    const statuses = r.links.map((l) => l.lastStatus);
-    const hasFailed = statuses.includes("failed");
-    const hasFlaky = statuses.includes("flaky");
-    const hasReal =
-      statuses.includes("passed") ||
-      statuses.includes("failed") ||
-      statuses.includes("flaky");
-    const lastRealRun = r.links
+    const realMeasuredLinks = r.links.filter(
+      (l) =>
+        l.linkSource === "real" &&
+        (l.lastStatus === "passed" ||
+          l.lastStatus === "failed" ||
+          l.lastStatus === "flaky"),
+    );
+    const hasFailed = realMeasuredLinks.some((l) => l.lastStatus === "failed");
+    const hasFlaky = realMeasuredLinks.some((l) => l.lastStatus === "flaky");
+    const hasMeasuredReal = realMeasuredLinks.length > 0;
+    const hasStaticLinks = r.links.some(
+      (l) => l.linkSource === "heuristic" || l.linkSource === "tag",
+    );
+    const lastRealRun = realMeasuredLinks
       .filter(
         (l) =>
           l.lastStatus === "passed" ||
@@ -325,7 +341,7 @@ function OperationalSignals({
 
     if (hasFailed) failed.push(r);
     if (hasFlaky) flaky.push(r);
-    if (!hasReal) heuristicOnly.push(r);
+    if (!hasMeasuredReal && hasStaticLinks) staticOnly.push(r);
     else if (now - lastRealRun > STALE_MS) stale.push(r);
   }
 
@@ -349,10 +365,10 @@ function OperationalSignals({
       hint: "오래된 실행 결과",
     },
     {
-      label: "추정만",
-      n: heuristicOnly.length,
+      label: "정적 매핑만",
+      n: staticOnly.length,
       cls: "bg-indigo-50 border-indigo-200 text-indigo-800",
-      hint: "실측 없이 휴리스틱만",
+      hint: "실행 이력 없는 tag/heuristic 링크",
     },
   ];
 

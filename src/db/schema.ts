@@ -533,7 +533,7 @@ export const qaCoverageTestLinks = pgTable(
       { onDelete: "set null" },
     ),
     lastStatus: text("last_status"), // passed | failed | flaky | skipped | heuristic
-    linkSource: text("link_source").notNull().default("real"), // real | heuristic | manual
+    linkSource: text("link_source").notNull().default("real"), // real | tag | heuristic | manual
     lastRunAt: timestamp("last_run_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
