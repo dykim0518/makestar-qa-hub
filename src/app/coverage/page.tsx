@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { CoverageContent } from "@/components/CoverageContent";
 import { db } from "@/db";
@@ -99,7 +100,9 @@ export default async function CoveragePage() {
     <div className="min-h-screen bg-[var(--background)]">
       <AppHeader active="coverage" />
       <main id="main-content" className="mx-auto max-w-7xl px-6 py-8">
-        <CoverageContent rows={rows} />
+        <Suspense fallback={null}>
+          <CoverageContent rows={rows} />
+        </Suspense>
       </main>
     </div>
   );
