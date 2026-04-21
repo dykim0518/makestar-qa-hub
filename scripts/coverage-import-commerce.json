@@ -96,11 +96,11 @@
     "pagePath": "/product/private/:code",
     "pageTitle": "초대 코드 기반 비공개 상품",
     "featureName": "비공개 상품 상세",
-    "priority": "medium",
+    "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
     "tag": "cmr.product.private",
-    "notes": "진입: 외부 공유 링크 (코드 포함 URL)",
+    "notes": "자동화 backlog: 외부 공유 링크(코드 포함 URL). 현재 저장소/계정 기준 실제 private code 미확보",
     "displayOrder": 5
   },
   {
@@ -226,12 +226,13 @@
     "pagePath": "/k-name-maker",
     "pageTitle": "한국식 이름 생성 인터랙티브 페이지",
     "featureName": "K-Name Maker",
-    "priority": "low",
+    "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
     "tag": "cmr.artist.k-name-maker",
-    "notes": "진입: 프로모션/SNS 공유 링크",
-    "displayOrder": 15
+    "notes": "inactive: 2026-04-21 direct probe 기준 200 응답이지만 헤더/푸터 셸만 보이고 전용 콘텐츠·진입 링크를 확인하지 못함",
+    "displayOrder": 15,
+    "isActive": false
   },
   {
     "product": "cmr",
@@ -239,12 +240,13 @@
     "pagePath": "/b2b",
     "pageTitle": "B2B 파트너용 리스트/소개",
     "featureName": "B2B 메인",
-    "priority": "low",
+    "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
     "tag": "cmr.b2b",
-    "notes": "진입: B2B 전용 링크, 제휴 안내",
-    "displayOrder": 16
+    "notes": "inactive: 2026-04-21 direct probe 기준 /b2b 요청이 홈(/)으로 리다이렉트되고 공개 실사용 진입 링크를 확인하지 못함",
+    "displayOrder": 16,
+    "isActive": false
   },
   {
     "product": "cmr",
@@ -252,12 +254,13 @@
     "pagePath": "/b2b/:id",
     "pageTitle": "B2B 상품/패키지 상세",
     "featureName": "B2B 상세",
-    "priority": "low",
+    "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
     "tag": "cmr.b2b",
-    "notes": "진입: B2B 메인에서 카드 클릭",
-    "displayOrder": 17
+    "notes": "inactive: 상위 경로 /b2b가 2026-04-21 probe 기준 홈(/)으로 리다이렉트되어 상세 진입 흐름을 구성할 수 없음",
+    "displayOrder": 17,
+    "isActive": false
   },
   {
     "product": "cmr",
@@ -265,12 +268,13 @@
     "pagePath": "/b2b/artist/:id",
     "pageTitle": "B2B 컨텍스트의 아티스트 상세",
     "featureName": "B2B 아티스트 상세",
-    "priority": "low",
+    "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
     "tag": "cmr.b2b",
-    "notes": "진입: B2B 상세 내 아티스트 링크",
-    "displayOrder": 18
+    "notes": "inactive: /b2b 및 /b2b/:id가 2026-04-21 probe 기준 실경로로 확인되지 않아 하위 아티스트 상세 진입 근거가 없음",
+    "displayOrder": 18,
+    "isActive": false
   },
   {
     "product": "cmr",
@@ -281,7 +285,7 @@
     "priority": "low",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.notice",
+    "tag": "cmr.notice.list",
     "notes": "진입: 푸터/마이페이지 '공지사항'",
     "displayOrder": 19
   },
@@ -294,7 +298,7 @@
     "priority": "low",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.notice",
+    "tag": "cmr.notice.detail",
     "notes": "진입: 공지 리스트에서 항목 클릭",
     "displayOrder": 20
   },
@@ -307,7 +311,7 @@
     "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.notice",
+    "tag": "cmr.notification.list",
     "notes": "진입: 헤더 알림(벨) 아이콘",
     "displayOrder": 21
   },
@@ -317,12 +321,13 @@
     "pagePath": "/notification/:id",
     "pageTitle": "개별 알림 상세",
     "featureName": "알림 상세",
-    "priority": "medium",
+    "priority": "high",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.notice",
-    "notes": "진입: 알림 리스트 클릭",
-    "displayOrder": 22
+    "tag": "cmr.notification.detail",
+    "notes": "inactive: 2026-04-21 probe 기준 /notification/list의 실제 href는 /event 중심이며 /notification/:id 실경로·href를 확인하지 못함",
+    "displayOrder": 22,
+    "isActive": false
   },
   {
     "product": "cmr",
@@ -330,11 +335,11 @@
     "pagePath": "/userqna",
     "pageTitle": "사용자 문의/FAQ 진입",
     "featureName": "고객 문의(Q&A)",
-    "priority": "medium",
-    "coverageStatus": "none",
+    "priority": "high",
+    "coverageStatus": "manual_only",
     "source": "manual",
-    "tag": "cmr.notice",
-    "notes": "진입: 푸터 '고객센터/문의'",
+    "tag": "cmr.userqna",
+    "notes": "manual_only 후보 반영: 외부 Zendesk 도메인 + Cloudflare verification 의존",
     "displayOrder": 23
   },
   {
@@ -346,7 +351,7 @@
     "priority": "low",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.policy",
+    "tag": "cmr.policy.terms",
     "notes": "진입: 푸터 '이용약관', 회원가입/결제 동의 링크",
     "displayOrder": 24
   },
@@ -359,7 +364,7 @@
     "priority": "low",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.policy",
+    "tag": "cmr.policy.privacy",
     "notes": "진입: 푸터 '개인정보처리방침'",
     "displayOrder": 25
   },
@@ -372,7 +377,7 @@
     "priority": "low",
     "coverageStatus": "none",
     "source": "manual",
-    "tag": "cmr.policy",
+    "tag": "cmr.policy.video",
     "notes": "진입: 푸터 또는 영상 콘텐츠 내 안내",
     "displayOrder": 26
   },
@@ -451,8 +456,9 @@
     "coverageStatus": "none",
     "source": "manual",
     "tag": "cmr.mypage.link",
-    "notes": "진입: 마이페이지 메뉴 '연결 계정'",
-    "displayOrder": 32
+    "notes": "inactive: 2026-04-21 direct probe 기준 200 응답이지만 회사/정책 footer 셸만 보이고 외부 계정 연결 전용 콘텐츠를 확인하지 못함",
+    "displayOrder": 32,
+    "isActive": false
   },
   {
     "product": "cmr",
@@ -564,11 +570,11 @@
     "pagePath": "/my-page/company/member-manage",
     "pageTitle": "기업 계정의 멤버 관리",
     "featureName": "기업 멤버 관리",
-    "priority": "low",
+    "priority": "medium",
     "coverageStatus": "none",
     "source": "manual",
     "tag": "cmr.mypage.company.member-manage",
-    "notes": "진입: 마이페이지 (기업회원 한정) 메뉴",
+    "notes": "자동화 backlog: 기업회원 전용 기능으로 보이며 현재 계정 기준 /my-page 로 리다이렉트됨",
     "displayOrder": 41
   },
   {

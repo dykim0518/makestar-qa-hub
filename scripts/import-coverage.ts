@@ -2,7 +2,7 @@
  * 커버리지 기능 inventory 일괄 import.
  *
  * 입력: JSON 배열 [{ product, category, pagePath, pageTitle, featureName, priority,
- *                    coverageStatus, source, tag, notes }]
+ *                    coverageStatus, source, tag, notes, isActive }]
  *
  * unique key (product, page_path, feature_name) 기준 upsert.
  *
@@ -27,6 +27,7 @@ type Row = {
   tag?: string | null;
   notes?: string | null;
   displayOrder?: number;
+  isActive?: boolean;
 };
 
 async function main() {
@@ -54,6 +55,7 @@ async function main() {
       tag: r.tag ?? null,
       notes: r.notes ?? null,
       displayOrder: r.displayOrder ?? 0,
+      isActive: r.isActive ?? true,
     }));
     const result = await db
       .insert(qaCoverageFeatures)
@@ -72,6 +74,7 @@ async function main() {
           tag: sql`excluded.tag`,
           notes: sql`excluded.notes`,
           displayOrder: sql`excluded.display_order`,
+          isActive: sql`excluded.is_active`,
           updatedAt: new Date(),
         },
       })

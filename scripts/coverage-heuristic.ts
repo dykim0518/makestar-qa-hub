@@ -7,6 +7,10 @@
  *  Phase 2 (--apply): 정적(tag/heuristic) 링크만 재생성하고 coverage_status 재계산
  *    npx tsx scripts/coverage-heuristic.ts --apply
  *
+ *  Scoped 실행 예시:
+ *    npx tsx scripts/coverage-heuristic.ts --product=cmr --spec=cmr_monitoring_pom.spec.ts --exclude-page-path-prefix=/payments
+ *    npx tsx scripts/coverage-heuristic.ts --apply --product=cmr --spec=cmr_monitoring_pom.spec.ts --exclude-page-path-prefix=/payments
+ *
  * 매칭 규칙 (우선순위 순):
  *  1) 정적 태그 매칭
  *     - describe title / describe option.tag
@@ -22,7 +26,7 @@
  */
 import * as fs from "fs";
 import * as path from "path";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "../src/db";
 import {
   qaCoverageFeatures,
@@ -37,6 +41,12 @@ import {
   type CoverageStaticSpec,
   type CoverageStaticWarning,
 } from "@/lib/coverage-static-map";
+import {
+  describeCoverageHeuristicScope,
+  filterCoverageHeuristicFeaturesByPagePathPrefix,
+  parseCoverageHeuristicArgs,
+  type CoverageHeuristicArgs,
+} from "@/lib/coverage-heuristic-scope";
 import { recomputeCoverageFeatures } from "@/lib/coverage-linker";
 
 const TESTS_DIR = path.resolve(
@@ -53,24 +63,33 @@ const WARNINGS_OUTPUT_PATH = path.resolve(
 );
 const STATIC_LINK_SOURCES = ["heuristic", "tag"] as const;
 
-function readSpecs(): CoverageStaticSpec[] {
-  const files = fs
-    .readdirSync(TESTS_DIR)
-    .filter((file) => file.endsWith(".spec.ts"))
-    .sort();
+function readSpecs(specFiles: string[]): CoverageStaticSpec[] {
+  const files =
+    specFiles.length > 0
+      ? [...new Set(specFiles)]
+      : fs
+          .readdirSync(TESTS_DIR)
+          .filter((file) => file.endsWith(".spec.ts"))
+          .sort();
 
   return files.map((file) => {
-    const content = fs.readFileSync(path.join(TESTS_DIR, file), "utf-8");
+    const absPath = path.join(TESTS_DIR, file);
+    if (!fs.existsSync(absPath)) {
+      throw new Error(`spec file not found: ${absPath}`);
+    }
+    const content = fs.readFileSync(absPath, "utf-8");
     return parseCoverageSpec(file, content);
   });
 }
 
-async function buildPlan(): Promise<{
+async function buildPlan(args: CoverageHeuristicArgs): Promise<{
   proposals: CoverageStaticProposal[];
+  scopeFeatureIds: string[];
+  scopeSpecFiles: string[];
   warnings: CoverageStaticWarning[];
 }> {
-  const specs = readSpecs();
-  const allFeatures = await db
+  const specs = readSpecs(args.specFiles);
+  const featureQuery = db
     .select({
       featureName: qaCoverageFeatures.featureName,
       id: qaCoverageFeatures.id,
@@ -80,9 +99,29 @@ async function buildPlan(): Promise<{
       tag: qaCoverageFeatures.tag,
     })
     .from(qaCoverageFeatures)
-    .where(eq(qaCoverageFeatures.isActive, true));
+    .where(
+      args.product
+        ? and(
+            eq(qaCoverageFeatures.isActive, true),
+            eq(qaCoverageFeatures.product, args.product),
+          )
+        : eq(qaCoverageFeatures.isActive, true),
+    );
 
-  return buildCoverageStaticPlan(specs, allFeatures as CoverageStaticFeature[]);
+  const scopedFeatures = filterCoverageHeuristicFeaturesByPagePathPrefix(
+    await featureQuery,
+    args.excludePagePathPrefixes,
+  );
+  const plan = buildCoverageStaticPlan(
+    specs,
+    scopedFeatures as CoverageStaticFeature[],
+  );
+
+  return {
+    ...plan,
+    scopeFeatureIds: scopedFeatures.map((feature) => feature.id),
+    scopeSpecFiles: specs.map((spec) => spec.file),
+  };
 }
 
 function buildStaticLinks(
@@ -138,6 +177,11 @@ function buildStaticLinks(
 
 async function applyProposals(
   proposals: CoverageStaticProposal[],
+  scope: {
+    featureIds: string[];
+    isScoped: boolean;
+    specFiles: string[];
+  },
 ): Promise<{
   deletedStaticLinks: number;
   insertedKeywordLinks: number;
@@ -146,10 +190,30 @@ async function applyProposals(
 }> {
   const { keywordLinks, tagLinks } = buildStaticLinks(proposals);
 
-  const deleted = await db
-    .delete(qaCoverageTestLinks)
-    .where(inArray(qaCoverageTestLinks.linkSource, [...STATIC_LINK_SOURCES]))
-    .returning({ featureId: qaCoverageTestLinks.featureId });
+  let deleteWhere = inArray(
+    qaCoverageTestLinks.linkSource,
+    [...STATIC_LINK_SOURCES],
+  );
+  if (scope.isScoped) {
+    deleteWhere = and(
+      deleteWhere,
+      inArray(qaCoverageTestLinks.featureId, scope.featureIds),
+    )!;
+    if (scope.specFiles.length > 0) {
+      deleteWhere = and(
+        deleteWhere,
+        inArray(qaCoverageTestLinks.testFile, scope.specFiles),
+      )!;
+    }
+  }
+
+  const deleted =
+    scope.isScoped && scope.featureIds.length === 0
+      ? []
+      : await db
+          .delete(qaCoverageTestLinks)
+          .where(deleteWhere)
+          .returning({ featureId: qaCoverageTestLinks.featureId });
 
   const insertBatch = async (links: NewQaCoverageTestLink[]) => {
     for (let index = 0; index < links.length; index += 100) {
@@ -193,8 +257,10 @@ function logWarnings(warnings: CoverageStaticWarning[]) {
 }
 
 async function main() {
-  const apply = process.argv.includes("--apply");
-  const { proposals, warnings } = await buildPlan();
+  const args = parseCoverageHeuristicArgs(process.argv.slice(2));
+  const scopeLabel = describeCoverageHeuristicScope(args);
+  const { proposals, scopeFeatureIds, scopeSpecFiles, warnings } =
+    await buildPlan(args);
   const { keywordLinks, tagLinks } = buildStaticLinks(proposals);
 
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(proposals, null, 2), "utf-8");
@@ -205,14 +271,19 @@ async function main() {
   );
 
   console.log(`📋 proposals: ${proposals.length} specs`);
+  if (scopeLabel) console.log(`   scope: ${scopeLabel}`);
   console.log(`   tag links: ${tagLinks.length}`);
   console.log(`   keyword links: ${keywordLinks.length}`);
   console.log(`   → ${OUTPUT_PATH}`);
   console.log(`   → ${WARNINGS_OUTPUT_PATH}`);
   logWarnings(warnings);
 
-  if (apply) {
-    const result = await applyProposals(proposals);
+  if (args.apply) {
+    const result = await applyProposals(proposals, {
+      featureIds: scopeFeatureIds,
+      isScoped: scopeLabel !== null,
+      specFiles: scopeSpecFiles,
+    });
     console.log(
       `\n✅ applied: deleted static=${result.deletedStaticLinks} · tag=${result.insertedTagLinks} · kw=${result.insertedKeywordLinks} · recomputed features=${result.updatedFeatures}`,
     );
