@@ -3,6 +3,7 @@
 import { Fragment, useMemo, useState } from "react";
 import type { CoverageFeatureRow, CoverageLink } from "@/app/coverage/page";
 import { StyledSelect } from "@/components/ui/StyledSelect";
+import type { CoverageStatus } from "@/lib/coverage-status";
 
 type Props = {
   rows: CoverageFeatureRow[];
@@ -20,25 +21,25 @@ type LinkSummary = {
   skipped: number;
 };
 
-const STATUS_META: Record<string, { label: string; cls: string }> = {
+const STATUS_META: Record<CoverageStatus, { label: string; cls: string }> = {
   covered: {
-    label: "자동화(검증)",
+    label: "실측 통과",
     cls: "border-emerald-200 bg-emerald-100 text-emerald-800",
   },
   partial: {
-    label: "부분",
+    label: "부분 실측",
     cls: "border-amber-200 bg-amber-100 text-amber-800",
   },
   heuristic_only: {
-    label: "추정",
+    label: "테스트 연결",
     cls: "border-indigo-200 bg-indigo-100 text-indigo-800",
   },
   manual_only: {
-    label: "수동만",
+    label: "수동 확인",
     cls: "border-sky-200 bg-sky-100 text-sky-800",
   },
   none: {
-    label: "미커버",
+    label: "연결 대기",
     cls: "border-slate-200 bg-slate-100 text-slate-600",
   },
 };
@@ -68,15 +69,15 @@ const SOURCE_META: Record<string, { label: string; cls: string }> = {
     cls: "border-emerald-200 bg-emerald-100 text-emerald-700",
   },
   tag: {
-    label: "태그",
+    label: "태그 연결",
     cls: "border-teal-200 bg-teal-100 text-teal-700",
   },
   heuristic: {
-    label: "추정",
+    label: "정적 연결",
     cls: "border-indigo-200 bg-indigo-100 text-indigo-700",
   },
   manual: {
-    label: "수동",
+    label: "수동 확인",
     cls: "border-sky-200 bg-sky-100 text-sky-700",
   },
 };
@@ -110,7 +111,7 @@ const STATUS_GROUP_META: Record<
     dotCls: "bg-emerald-500",
   },
   heuristic: {
-    label: "휴리스틱(추정)",
+    label: "정적 연결",
     cls: "bg-indigo-50 text-indigo-700",
     dotCls: "bg-indigo-400",
   },
@@ -157,7 +158,8 @@ function summarizeSources(links: CoverageLink[]): Record<string, number> {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const meta = STATUS_META[status] ?? STATUS_META.none;
+  const meta =
+    STATUS_META[(status as CoverageStatus) ?? "none"] ?? STATUS_META.none;
   return (
     <span
       className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold ${meta.cls}`}
@@ -262,7 +264,7 @@ function TestRatioBar({ links }: { links: CoverageLink[] }) {
           <span className="text-rose-600">실패 {summary.failed}</span>
         )}
         {summary.heuristic > 0 && (
-          <span className="text-indigo-600">추정 {summary.heuristic}</span>
+          <span className="text-indigo-600">정적 {summary.heuristic}</span>
         )}
       </div>
       <ProgressTrack summary={summary} className="h-1 w-24" />
@@ -444,12 +446,18 @@ export function CoverageDetail({
     const total = all.length;
     const covered = all.filter((row) => row.coverageStatus === "covered").length;
     const partial = all.filter((row) => row.coverageStatus === "partial").length;
-    const remaining = total - covered - partial;
+    const heuristicOnly = all.filter(
+      (row) => row.coverageStatus === "heuristic_only",
+    ).length;
+    const manualOnly = all.filter(
+      (row) => row.coverageStatus === "manual_only",
+    ).length;
+    const pending = all.filter((row) => row.coverageStatus === "none").length;
     const pct = total
       ? Math.round(((covered + partial * 0.5) / total) * 100)
       : 0;
 
-    return { total, covered, partial, remaining, pct };
+    return { total, covered, partial, heuristicOnly, manualOnly, pending, pct };
   }, [rows, product, category]);
 
   const toggleRow = (id: string) => {
@@ -499,7 +507,7 @@ export function CoverageDetail({
               {category}
             </h1>
             <p className="mt-2 text-sm text-[var(--muted)]">
-              기능별 커버리지 근거와 최근 실행 상태를 확인할 수 있습니다.
+              기능별 테스트 연결, 수동 확인, 최근 실행 상태를 함께 확인합니다.
             </p>
           </div>
 
@@ -519,11 +527,25 @@ export function CoverageDetail({
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <SignalChip label="자동화" value={`${summary.covered}`} tone="emerald" />
+          <SignalChip label="실측 통과" value={`${summary.covered}`} tone="emerald" />
           {summary.partial > 0 && (
-            <SignalChip label="부분" value={`${summary.partial}`} tone="amber" />
+            <SignalChip label="부분 실측" value={`${summary.partial}`} tone="amber" />
           )}
-          <SignalChip label="남음" value={`${summary.remaining}`} tone="slate" />
+          {summary.heuristicOnly > 0 && (
+            <SignalChip
+              label="테스트 연결"
+              value={`${summary.heuristicOnly}`}
+              tone="indigo"
+            />
+          )}
+          {summary.manualOnly > 0 && (
+            <SignalChip
+              label="수동 확인"
+              value={`${summary.manualOnly}`}
+              tone="sky"
+            />
+          )}
+          <SignalChip label="연결 대기" value={`${summary.pending}`} tone="slate" />
           <SignalChip label="전체 기능" value={`${summary.total}`} tone="sky" />
         </div>
       </section>
@@ -536,11 +558,11 @@ export function CoverageDetail({
             onChange={(event) => setFilterStatus(event.target.value)}
           >
             <option value="all">전체 상태</option>
-            <option value="covered">자동화(검증)</option>
-            <option value="partial">부분</option>
-            <option value="heuristic_only">추정</option>
-            <option value="manual_only">수동만</option>
-            <option value="none">미커버</option>
+            <option value="covered">실측 통과</option>
+            <option value="partial">부분 실측</option>
+            <option value="heuristic_only">테스트 연결</option>
+            <option value="manual_only">수동 확인</option>
+            <option value="none">연결 대기</option>
           </StyledSelect>
         </div>
         <div className="text-sm text-[var(--muted)] sm:ml-auto">
@@ -621,7 +643,7 @@ export function CoverageDetail({
                       )}
                       {summaryByLink.heuristic > 0 && (
                         <SignalChip
-                          label="추정"
+                          label="정적"
                           value={`${summaryByLink.heuristic}`}
                           tone="indigo"
                         />

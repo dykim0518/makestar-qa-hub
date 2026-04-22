@@ -5,7 +5,7 @@
  *  - 실측 passed + failed 섞임 → partial
  *  - 실측 passed만 → covered
  *  - 실측 failed만(flaky 포함) → partial
- *  - 실측이 skipped만 → none (자동화로 인정 X)
+ *  - 실측이 skipped만 → 자동화 신호로는 인정하지 않고 다른 근거로 폴백
  *  - 실측 없고 정적(tag/heuristic) 링크 존재 → heuristic_only (KPI 제외)
  *  - 실측/heuristic 없고 manual 존재 → manual_only
  *  - 아무 링크 없음 → none
@@ -35,13 +35,10 @@ export function computeCoverageStatus(
   const realFailed = real.some(
     (l) => l.status === "failed" || l.status === "flaky",
   );
-  const realSkippedOnly =
-    real.length > 0 && real.every((l) => l.status === "skipped");
 
   if (realPassed && realFailed) return "partial";
   if (realPassed) return "covered";
   if (realFailed) return "partial";
-  if (realSkippedOnly) return "none";
   if (heuristic.length > 0) return "heuristic_only";
   if (manual.length > 0) return "manual_only";
   return "none";

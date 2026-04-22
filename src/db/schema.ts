@@ -496,7 +496,7 @@ export const qaCoverageFeatures = pgTable(
     featureName: text("feature_name").notNull(),
     description: text("description"),
     priority: text("priority").notNull().default("medium"), // critical | high | medium | low
-    coverageStatus: text("coverage_status").notNull().default("none"), // covered | partial | none | manual_only
+    coverageStatus: text("coverage_status").notNull().default("none"), // covered | partial | heuristic_only | manual_only | none
     source: text("source").notNull().default("manual"), // auto_crawl | manual | hybrid
     tag: text("tag"),
     notes: text("notes"),

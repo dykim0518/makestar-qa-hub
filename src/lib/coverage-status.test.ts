@@ -32,7 +32,7 @@ describe("computeCoverageStatus", () => {
     );
   });
 
-  it("실측이 skipped만이면 none (자동화로 인정 X)", () => {
+  it("실측이 skipped만이면 none", () => {
     expect(
       computeCoverageStatus([
         { status: "skipped", source: "real" },
@@ -82,14 +82,21 @@ describe("computeCoverageStatus", () => {
     expect(computeCoverageStatus([])).toBe("none");
   });
 
-  it("실측 skipped + heuristic 섞이면 heuristic_only (skipped는 KPI X)", () => {
-    // skipped만 있는 real은 무시되고 heuristic 존재로 폴백
-    // 현재 구현: realSkippedOnly → none. 개선 여지. 동작 확정.
+  it("실측 skipped + heuristic 섞이면 heuristic_only", () => {
     expect(
       computeCoverageStatus([
         { status: "skipped", source: "real" },
         { status: "heuristic", source: "heuristic" },
       ]),
-    ).toBe("none");
+    ).toBe("heuristic_only");
+  });
+
+  it("실측 skipped + manual 섞이면 manual_only", () => {
+    expect(
+      computeCoverageStatus([
+        { status: "skipped", source: "real" },
+        { status: null, source: "manual" },
+      ]),
+    ).toBe("manual_only");
   });
 });

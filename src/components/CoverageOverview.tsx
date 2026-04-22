@@ -15,6 +15,9 @@ type CategorySummary = {
   total: number;
   covered: number;
   partial: number;
+  heuristicOnly: number;
+  manualOnly: number;
+  pending: number;
   pct: number;
   critical: number;
   criticalCovered: number;
@@ -153,6 +156,9 @@ export function CoverageOverview({
     const total = scoped.length;
     let covered = 0;
     let partial = 0;
+    let heuristicOnly = 0;
+    let manualOnly = 0;
+    let pending = 0;
     let weightSum = 0;
     let weightedScore = 0;
 
@@ -163,6 +169,9 @@ export function CoverageOverview({
       weightedScore += w * s;
       if (r.coverageStatus === "covered") covered += 1;
       else if (r.coverageStatus === "partial") partial += 1;
+      else if (r.coverageStatus === "heuristic_only") heuristicOnly += 1;
+      else if (r.coverageStatus === "manual_only") manualOnly += 1;
+      else pending += 1;
     }
 
     const simplePct = total
@@ -173,7 +182,17 @@ export function CoverageOverview({
       : 0;
     const remaining = total - covered - partial;
 
-    return { total, covered, partial, remaining, simplePct, weightedPct };
+    return {
+      total,
+      covered,
+      partial,
+      heuristicOnly,
+      manualOnly,
+      pending,
+      remaining,
+      simplePct,
+      weightedPct,
+    };
   }, [scoped]);
 
   const critical = useMemo(() => {
@@ -269,6 +288,9 @@ export function CoverageOverview({
           total: 0,
           covered: 0,
           partial: 0,
+          heuristicOnly: 0,
+          manualOnly: 0,
+          pending: 0,
           pct: 0,
           critical: 0,
           criticalCovered: 0,
@@ -280,6 +302,9 @@ export function CoverageOverview({
       group.total += 1;
       if (r.coverageStatus === "covered") group.covered += 1;
       else if (r.coverageStatus === "partial") group.partial += 1;
+      else if (r.coverageStatus === "heuristic_only") group.heuristicOnly += 1;
+      else if (r.coverageStatus === "manual_only") group.manualOnly += 1;
+      else group.pending += 1;
       if (r.priority === "critical" || r.priority === "high") {
         group.critical += 1;
         if (r.coverageStatus === "covered") {
@@ -301,19 +326,17 @@ export function CoverageOverview({
   }, [scoped]);
 
   const signalTone =
-    hero.remaining === 0 && evidence.failedRealLinks === 0 ? "emerald" : "amber";
+    hero.pending === 0 && evidence.failedRealLinks === 0 ? "emerald" : "amber";
   const signalTitle =
-    hero.remaining === 0 && evidence.failedRealLinks === 0
+    hero.pending === 0 && evidence.failedRealLinks === 0
       ? "운영 신호 양호"
       : "점검 필요 항목 존재";
   const signalDescription =
-    hero.remaining === 0 && evidence.failedRealLinks === 0
-      ? `남은 기능이 없고 최근 실측 실패 링크도 없습니다. 최신 실측 ${formatDateLabel(
+    hero.pending === 0 && evidence.failedRealLinks === 0
+      ? `연결 대기 없음 · 수동 확인 ${hero.manualOnly} · 테스트 연결 ${hero.heuristicOnly} · 최신 실측 ${formatDateLabel(
           evidence.latestRealRunAt ?? evidence.latestAnyRunAt,
         )}`
-      : `남음 ${hero.remaining} · 실측 실패 링크 ${evidence.failedRealLinks}건 · 최신 기준 ${formatDateLabel(
-          evidence.latestRealRunAt ?? evidence.latestAnyRunAt,
-        )}`;
+      : `연결 대기 ${hero.pending} · 수동 확인 ${hero.manualOnly} · 테스트 연결 ${hero.heuristicOnly} · 실측 실패 ${evidence.failedRealLinks}건`;
 
   return (
     <div className="space-y-6">
@@ -332,11 +355,11 @@ export function CoverageOverview({
                   {productLabel}
                 </h2>
                 <p className="mt-2 text-lg font-semibold text-slate-900 md:text-xl">
-                  자동화 커버리지 운영 현황
+                  커버리지 운영 현황
                 </p>
               </div>
               <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
-                전체 기능 기준 {hero.simplePct}%
+                실측 기준 {hero.simplePct}%
               </div>
             </div>
 
@@ -354,15 +377,29 @@ export function CoverageOverview({
             </div>
 
             <div className="mt-4 flex flex-wrap gap-2">
-              <SignalChip label="완료" value={`${hero.covered}`} tone="emerald" />
+              <SignalChip label="실측 통과" value={`${hero.covered}`} tone="emerald" />
               {hero.partial > 0 && (
                 <SignalChip
-                  label="부분"
+                  label="부분 실측"
                   value={`${hero.partial}`}
                   tone="amber"
                 />
               )}
-              <SignalChip label="남음" value={`${hero.remaining}`} />
+              {hero.heuristicOnly > 0 && (
+                <SignalChip
+                  label="테스트 연결"
+                  value={`${hero.heuristicOnly}`}
+                  tone="indigo"
+                />
+              )}
+              {hero.manualOnly > 0 && (
+                <SignalChip
+                  label="수동 확인"
+                  value={`${hero.manualOnly}`}
+                  tone="sky"
+                />
+              )}
+              <SignalChip label="연결 대기" value={`${hero.pending}`} />
               <SignalChip
                 label="전체 기능"
                 value={`${hero.total}`}
@@ -386,7 +423,7 @@ export function CoverageOverview({
             <StatCard
               eyebrow="우선순위 가중 기준"
               value={`${hero.weightedPct}%`}
-              caption="Critical/High 가중치를 반영한 운영 점수"
+              caption="Critical/High를 반영한 실측 점수"
               tone="sky"
             />
             <StatCard
@@ -430,10 +467,10 @@ export function CoverageOverview({
               id="coverage-evidence-title"
               className="text-sm font-semibold text-slate-900"
             >
-              커버리지 근거
+              연결 근거 구성
             </h2>
             <p className="mt-1 text-sm text-[var(--muted)]">
-              현재 수치가 어떤 유형의 테스트 링크로 구성됐는지 보여줍니다.
+              실측, 정적 연결, 수동 확인이 현재 수치에 어떻게 반영됐는지 보여줍니다.
             </p>
           </div>
           <div className="text-xs text-[var(--muted)]">
@@ -444,11 +481,11 @@ export function CoverageOverview({
           <SignalChip label="실측" value={`${evidence.realLinks}`} tone="emerald" />
           <SignalChip label="태그 연결" value={`${evidence.tagLinks}`} tone="sky" />
           <SignalChip
-            label="추정 연결"
+            label="정적 연결"
             value={`${evidence.heuristicLinks}`}
             tone="indigo"
           />
-          <SignalChip label="수동 연결" value={`${evidence.manualLinks}`} />
+          <SignalChip label="수동 확인" value={`${evidence.manualLinks}`} />
         </div>
       </section>
 
@@ -493,11 +530,26 @@ export function CoverageOverview({
                     </div>
                     <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-600">
                       <span>
-                        검증 {category.covered + category.partial}/{category.total}
+                        실측 {category.covered + category.partial}/{category.total}
                       </span>
                       {category.partial > 0 && (
                         <span className="text-amber-700">
-                          부분 {category.partial}
+                          부분 실측 {category.partial}
+                        </span>
+                      )}
+                      {category.heuristicOnly > 0 && (
+                        <span className="text-indigo-700">
+                          테스트 연결 {category.heuristicOnly}
+                        </span>
+                      )}
+                      {category.manualOnly > 0 && (
+                        <span className="text-sky-700">
+                          수동 확인 {category.manualOnly}
+                        </span>
+                      )}
+                      {category.pending > 0 && (
+                        <span className="text-slate-600">
+                          연결 대기 {category.pending}
                         </span>
                       )}
                     </div>

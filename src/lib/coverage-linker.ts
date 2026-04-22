@@ -205,7 +205,7 @@ export async function linkCoverageForRun(
     }
   }
 
-  // coverage_status 재계산 (새 규칙: static/manual 분리, skipped-only → none)
+  // coverage_status 재계산 (새 규칙: static/manual 분리, skipped-only는 다른 근거로 폴백)
   const touchedFeatureIds = new Set<string>([
     ...links.map((link) => link.featureId as string),
     ...staleFeatureIds,
