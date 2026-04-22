@@ -6,7 +6,7 @@ const steps = [
   {
     num: 1,
     title: "Suite 필터",
-    desc: '상단 필터로 전체 / CMR / 앨범버디 / Admin 스위트별 데이터를 필터링. 실행 중인 테스트가 있으면 녹색 "실행 중" 뱃지 표시.',
+    desc: '상단 필터로 전체 / CMR / 앨범버디 / 통합매니저 스위트별 데이터를 필터링. 실행 중인 테스트가 있으면 녹색 "실행 중" 뱃지 표시.',
     color: "text-slate-600",
     border: "border-slate-200",
     bg: "bg-slate-50",

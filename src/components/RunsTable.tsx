@@ -12,6 +12,7 @@ import {
   getPassRateNumber,
   shortRunId,
 } from "@/lib/format";
+import { getSuiteLabel } from "@/lib/suite-label";
 
 function PassRateBar({ rate }: { rate: number }) {
   const color =
@@ -124,7 +125,7 @@ function RunCardMobile({
             </Link>
             <StatusBadge status={run.status} />
             <span className="rounded-md border border-[var(--card-border)] bg-slate-50 px-1.5 py-0.5 font-mono text-[10px] text-slate-600">
-              {run.suite}
+              {getSuiteLabel(run.suite)}
             </span>
             <span
               className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
@@ -395,7 +396,7 @@ export function RunsTable({ runs }: { runs: TestRun[] }) {
                   <td className="whitespace-nowrap px-5 py-4 text-sm">
                     <span className="inline-flex items-center gap-1.5">
                       <span className="rounded-md border border-[var(--card-border)] bg-slate-50 px-2.5 py-1 font-mono text-xs text-slate-600">
-                        {run.suite}
+                        {getSuiteLabel(run.suite)}
                       </span>
                       <span
                         className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold ${

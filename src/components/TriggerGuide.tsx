@@ -6,7 +6,7 @@ const steps = [
   {
     num: 1,
     title: "Suite 선택",
-    desc: "CMR(메인 사이트) / 앨범버디(구매 대행) / Admin(관리자, VPN 필요) / All(전체, admin 제외) 중 실행할 스위트를 선택.",
+    desc: "CMR(메인 사이트) / 앨범버디(구매 대행) / 통합매니저(관리자, VPN 필요) / 전체(통합매니저 제외) 중 실행할 스위트를 선택.",
     color: "text-slate-600",
     border: "border-slate-200",
     bg: "bg-slate-50",
@@ -153,7 +153,7 @@ export function TriggerGuide() {
                   특정 TC만 실행 (예: CMR-HOME, CMR-SEARCH)
                 </li>
                 <li>
-                  • <strong className="text-slate-700">Admin</strong> suite는
+                  • <strong className="text-slate-700">통합매니저</strong> suite는
                   VPN 연결 필요 (GitHub Runner에서 실패)
                 </li>
                 <li>

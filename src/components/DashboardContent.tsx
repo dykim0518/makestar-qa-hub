@@ -13,7 +13,7 @@ const SUITES = [
   { value: "", label: "전체" },
   { value: "cmr", label: "CMR" },
   { value: "albumbuddy", label: "앨범버디" },
-  { value: "admin", label: "Admin" },
+  { value: "admin", label: "통합매니저" },
 ] as const;
 
 const ENVIRONMENTS = [

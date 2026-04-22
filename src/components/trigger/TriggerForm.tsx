@@ -10,11 +10,11 @@ const SUITES = [
   { value: "albumbuddy", label: "앨범버디", desc: "구매 대행 모니터링" },
   {
     value: "admin",
-    label: "Admin",
-    desc: "관리자 페이지 (VPN 필요)",
+    label: "통합매니저",
+    desc: "통합매니저 관리자 페이지 (VPN 필요)",
     warn: true,
   },
-  { value: "all", label: "All", desc: "전체 실행 (admin 제외)" },
+  { value: "all", label: "전체", desc: "전체 실행 (통합매니저 제외)" },
 ];
 
 type TriggerFormProps = {
@@ -181,7 +181,7 @@ export function TriggerForm({
                   d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
                 />
               </svg>
-              Admin suite는 GitHub Hosted Runner에서 VPN/IP 제한으로 실패합니다.
+              통합매니저 suite는 GitHub Hosted Runner에서 VPN/IP 제한으로 실패합니다.
             </p>
           </div>
         )}

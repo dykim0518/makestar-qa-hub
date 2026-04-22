@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { RunSummary, TestCaseResult } from "@/lib/types/trigger";
 import { RunStatusDot } from "./RunStatusDot";
 import { CaseGroup } from "./CaseGroup";
+import { getSuiteLabel } from "@/lib/suite-label";
 
 type TestResultsPanelProps = {
   latestRun: RunSummary | null;
@@ -178,7 +179,7 @@ export function TestResultsPanel({
                   Run #{latestRun.runId}
                 </span>
                 <span className="ml-2 rounded border border-[var(--card-border)] bg-slate-50 px-1.5 py-0.5 text-[10px] font-mono text-slate-500">
-                  {latestRun.suite}
+                  {getSuiteLabel(latestRun.suite)}
                 </span>
               </div>
             </div>

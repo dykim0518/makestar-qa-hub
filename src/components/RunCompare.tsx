@@ -11,6 +11,7 @@ import {
   getPassRate,
   getPassRateNumber,
 } from "@/lib/format";
+import { getSuiteLabel } from "@/lib/suite-label";
 
 interface CompareData {
   runA: TestRun;
@@ -92,7 +93,7 @@ function RunCard({ run, label }: { run: TestRun; label: string }) {
           #{run.runId}
         </Link>
         <span className="ml-2 rounded-md border border-[var(--card-border)] bg-slate-50 px-2 py-0.5 font-mono text-xs text-slate-600">
-          {run.suite}
+          {getSuiteLabel(run.suite)}
         </span>
       </div>
       <div className="flex items-center gap-4 text-sm">

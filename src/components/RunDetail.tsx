@@ -12,6 +12,7 @@ import {
   getPassRate,
   getPassRateNumber,
 } from "@/lib/format";
+import { getSuiteLabel } from "@/lib/suite-label";
 import {
   ERROR_CATEGORY_DISPLAY,
   type ErrorCategory,
@@ -171,7 +172,7 @@ export function RunDetail({ run, initialCases }: RunDetailProps) {
               </h2>
               <StatusBadge status={run.status} />
               <span className="rounded-md border border-[var(--card-border)] bg-slate-50 px-2.5 py-1 font-mono text-xs text-slate-600">
-                {run.suite}
+                {getSuiteLabel(run.suite)}
               </span>
             </div>
           </div>

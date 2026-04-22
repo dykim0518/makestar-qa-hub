@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { CoverageFeatureRow } from "@/app/coverage/page";
 import { CoverageOverview } from "@/components/CoverageOverview";
@@ -12,7 +12,6 @@ type Props = {
 
 const PRODUCT_LABEL: Record<string, string> = {
   cmr: "커머스",
-  admin: "어드민",
   albumbuddy: "앨범버디",
   admin_makestar: "통합매니저 · 메이크스타",
   admin_pocaalbum: "통합매니저 · 포카앨범",
@@ -24,7 +23,6 @@ const PRODUCT_ORDER = [
   "admin_pocaalbum",
   "admin_albumbuddy",
   "cmr",
-  "admin",
   "albumbuddy",
 ];
 
@@ -45,9 +43,33 @@ export function CoverageContent({ rows }: Props) {
     [rows],
   );
 
+  const requestedProduct = searchParams.get("product");
   const product =
-    searchParams.get("product") ?? products[0] ?? "admin_makestar";
+    requestedProduct && products.includes(requestedProduct)
+      ? requestedProduct
+      : products[0] ?? "admin_makestar";
   const category = searchParams.get("category");
+
+  useEffect(() => {
+    if (products.length === 0) return;
+
+    const validCategories = new Set(
+      rows
+        .filter((row) => row.product === product)
+        .map((row) => row.category ?? "기타"),
+    );
+    const hasInvalidProduct = requestedProduct !== null && requestedProduct !== product;
+    const hasInvalidCategory = category !== null && !validCategories.has(category);
+
+    if (!hasInvalidProduct && !hasInvalidCategory) return;
+
+    const sp = new URLSearchParams(searchParams.toString());
+    sp.set("product", product);
+    if (hasInvalidCategory) {
+      sp.delete("category");
+    }
+    router.replace(`/coverage?${sp.toString()}`, { scroll: false });
+  }, [category, product, products, requestedProduct, router, rows, searchParams]);
 
   const setProduct = useCallback(
     (next: string) => {
