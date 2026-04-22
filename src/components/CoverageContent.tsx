@@ -13,7 +13,7 @@ type Props = {
 const PRODUCT_LABEL: Record<string, string> = {
   cmr: "커머스",
   admin: "어드민",
-  albumbuddy: "AlbumBuddy",
+  albumbuddy: "앨범버디",
   admin_makestar: "통합매니저 · 메이크스타",
   admin_pocaalbum: "통합매니저 · 포카앨범",
   admin_albumbuddy: "통합매니저 · 앨범버디",

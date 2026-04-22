@@ -24,7 +24,7 @@ export const FILE_TO_PRODUCT: {
   suite: string;
 }[] = [
   { pattern: /^admin_poca_/, product: "admin_pocaalbum", suite: "admin" },
-  { pattern: /^ab_/, product: "admin_albumbuddy", suite: "albumbuddy" },
+  { pattern: /^ab_/, product: "albumbuddy", suite: "albumbuddy" },
   { pattern: /^admin_/, product: "admin_makestar", suite: "admin" },
   { pattern: /^cmr_/, product: "cmr", suite: "cmr" },
 ];

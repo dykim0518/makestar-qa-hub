@@ -170,4 +170,42 @@ describe("buildCoverageStaticPlan", () => {
       },
     ]);
   });
+
+  it("ab_ 스펙은 프론트 AlbumBuddy product로 분류한다", () => {
+    const spec = parseCoverageSpec(
+      "ab_monitoring_pom.spec.ts",
+      `
+        import { test } from "@playwright/test";
+
+        test.describe("홈페이지 @feature:albumbuddy.home", () => {
+          test("AB-PAGE-01", async () => {});
+        });
+      `,
+    );
+    const features: CoverageStaticFeature[] = [
+      {
+        featureName: "홈/메인",
+        id: "albumbuddy-home",
+        pagePath: "/shop",
+        pageTitle: "AlbumBuddy 홈/샵 메인",
+        product: "albumbuddy",
+        tag: "albumbuddy.home",
+      },
+    ];
+
+    const plan = buildCoverageStaticPlan([spec], features);
+
+    expect(plan.warnings).toEqual([]);
+    expect(plan.proposals[0].tagMatches).toEqual([
+      {
+        featureId: "albumbuddy-home",
+        featureName: "홈/메인",
+        ownerKind: "describe",
+        ownerTitle: "홈페이지 @feature:albumbuddy.home",
+        pagePath: "/shop",
+        tag: "albumbuddy.home",
+        testTitles: ["AB-PAGE-01"],
+      },
+    ]);
+  });
 });

@@ -6,7 +6,7 @@ const steps = [
   {
     num: 1,
     title: "Suite 선택",
-    desc: "CMR(메인 사이트) / AlbumBuddy(구매 대행) / Admin(관리자, VPN 필요) / All(전체, admin 제외) 중 실행할 스위트를 선택.",
+    desc: "CMR(메인 사이트) / 앨범버디(구매 대행) / Admin(관리자, VPN 필요) / All(전체, admin 제외) 중 실행할 스위트를 선택.",
     color: "text-slate-600",
     border: "border-slate-200",
     bg: "bg-slate-50",

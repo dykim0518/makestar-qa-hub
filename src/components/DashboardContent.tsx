@@ -12,7 +12,7 @@ const PAGE_SIZE = 10;
 const SUITES = [
   { value: "", label: "전체" },
   { value: "cmr", label: "CMR" },
-  { value: "albumbuddy", label: "AlbumBuddy" },
+  { value: "albumbuddy", label: "앨범버디" },
   { value: "admin", label: "Admin" },
 ] as const;
 

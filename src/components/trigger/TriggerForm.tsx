@@ -7,7 +7,7 @@ import type { TriggerResult } from "@/lib/types/trigger";
 
 const SUITES = [
   { value: "cmr", label: "CMR (Makestar)", desc: "메인 사이트 모니터링" },
-  { value: "albumbuddy", label: "AlbumBuddy", desc: "구매 대행 모니터링" },
+  { value: "albumbuddy", label: "앨범버디", desc: "구매 대행 모니터링" },
   {
     value: "admin",
     label: "Admin",
