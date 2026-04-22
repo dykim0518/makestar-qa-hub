@@ -94,30 +94,32 @@ export function CoverageContent({ rows }: Props) {
   return (
     <div className="space-y-6">
       {/* 제품 스위처 */}
-      <div
-        className="flex flex-wrap items-center gap-1 rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-1"
-        role="tablist"
-        aria-label="제품 선택"
-      >
-        {products.map((p) => {
-          const isActive = p === product;
-          return (
-            <button
-              key={p}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              onClick={() => setProduct(p)}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                isActive
-                  ? "bg-emerald-500 text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-100"
-              }`}
-            >
-              {PRODUCT_LABEL[p] ?? p}
-            </button>
-          );
-        })}
+      <div className="overflow-x-auto pb-1">
+        <div
+          className="flex w-max min-w-full items-center gap-1 rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-1 shadow-sm"
+          role="tablist"
+          aria-label="제품 선택"
+        >
+          {products.map((p) => {
+            const isActive = p === product;
+            return (
+              <button
+                key={p}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setProduct(p)}
+                className={`rounded-xl px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors ${
+                  isActive
+                    ? "bg-emerald-500 text-white shadow-sm"
+                    : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                {PRODUCT_LABEL[p] ?? p}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {category ? (
