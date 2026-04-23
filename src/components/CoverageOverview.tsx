@@ -451,9 +451,13 @@ export function CoverageOverview({
             />
             <StatCard
               eyebrow="핵심 기능 연결"
-              value={`${critical.connectedPct}%`}
-              caption={`Critical + High 연결 ${critical.connected}/${critical.total} · 실측 ${critical.verifiedPct}%`}
-              tone="sky"
+              value={critical.total === 0 ? "미설정" : `${critical.connectedPct}%`}
+              caption={
+                critical.total === 0
+                  ? "Critical + High 우선순위가 아직 지정되지 않았습니다."
+                  : `Critical + High 연결 ${critical.connected}/${critical.total} · 실측 ${critical.verifiedPct}%`
+              }
+              tone={critical.total === 0 ? "slate" : "sky"}
             />
             <StatCard
               eyebrow="실측 기준"
