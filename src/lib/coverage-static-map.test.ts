@@ -208,4 +208,42 @@ describe("buildCoverageStaticPlan", () => {
       },
     ]);
   });
+
+  it("admin_albumbuddy_ 스펙은 AlbumBuddy Admin product로 분류한다", () => {
+    const spec = parseCoverageSpec(
+      "admin_albumbuddy_core_pom.spec.ts",
+      `
+        import { test } from "@playwright/test";
+
+        test.describe("앨범버디 상품 목록 @feature:admin_albumbuddy.goods.list", () => {
+          test("AB-CORE-03", async () => {});
+        });
+      `,
+    );
+    const features: CoverageStaticFeature[] = [
+      {
+        featureName: "상품 목록 - 목록",
+        id: "admin-albumbuddy-goods-list",
+        pagePath: "/albumbuddy/goods/list",
+        pageTitle: "앨범버디 상품 목록",
+        product: "admin_albumbuddy",
+        tag: "admin_albumbuddy.goods.list",
+      },
+    ];
+
+    const plan = buildCoverageStaticPlan([spec], features);
+
+    expect(plan.warnings).toEqual([]);
+    expect(plan.proposals[0].tagMatches).toEqual([
+      {
+        featureId: "admin-albumbuddy-goods-list",
+        featureName: "상품 목록 - 목록",
+        ownerKind: "describe",
+        ownerTitle: "앨범버디 상품 목록 @feature:admin_albumbuddy.goods.list",
+        pagePath: "/albumbuddy/goods/list",
+        tag: "admin_albumbuddy.goods.list",
+        testTitles: ["AB-CORE-03"],
+      },
+    ]);
+  });
 });

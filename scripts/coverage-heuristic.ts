@@ -50,8 +50,8 @@ import {
 import { recomputeCoverageFeatures } from "@/lib/coverage-linker";
 
 const TESTS_DIR = path.resolve(
-  process.env.HOME!,
-  "Projects/my-playwright-tests/tests",
+  process.env.COVERAGE_TESTS_DIR ??
+    path.resolve(process.env.HOME!, "Projects/my-playwright-tests/tests"),
 );
 const OUTPUT_PATH = path.resolve(
   __dirname,
