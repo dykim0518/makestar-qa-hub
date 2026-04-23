@@ -13,13 +13,15 @@ type Props = {
 type CategorySummary = {
   category: string;
   total: number;
+  connected: number;
   covered: number;
   partial: number;
   heuristicOnly: number;
   manualOnly: number;
   pending: number;
-  pct: number;
+  connectedPct: number;
   critical: number;
+  criticalConnected: number;
   criticalCovered: number;
   minOrder: number;
 };
@@ -46,6 +48,14 @@ function score(status: string): number {
   if (status === "covered") return 1;
   if (status === "partial") return 0.5;
   return 0;
+}
+
+function isConnectedStatus(status: string): boolean {
+  return (
+    status === "covered" ||
+    status === "partial" ||
+    status === "heuristic_only"
+  );
 }
 
 function formatDateLabel(date: Date | null): string {
@@ -154,6 +164,7 @@ export function CoverageOverview({
 
   const hero = useMemo(() => {
     const total = scoped.length;
+    let connected = 0;
     let covered = 0;
     let partial = 0;
     let heuristicOnly = 0;
@@ -167,6 +178,7 @@ export function CoverageOverview({
       weightSum += w;
       const s = score(r.coverageStatus);
       weightedScore += w * s;
+      if (isConnectedStatus(r.coverageStatus)) connected += 1;
       if (r.coverageStatus === "covered") covered += 1;
       else if (r.coverageStatus === "partial") partial += 1;
       else if (r.coverageStatus === "heuristic_only") heuristicOnly += 1;
@@ -174,23 +186,24 @@ export function CoverageOverview({
       else pending += 1;
     }
 
-    const simplePct = total
+    const connectedPct = total ? Math.round((connected / total) * 100) : 0;
+    const verifiedPct = total
       ? Math.round(((covered + partial * 0.5) / total) * 100)
       : 0;
     const weightedPct = weightSum
       ? Math.round((weightedScore / weightSum) * 100)
       : 0;
-    const remaining = total - covered - partial;
 
     return {
       total,
+      connected,
       covered,
       partial,
       heuristicOnly,
       manualOnly,
       pending,
-      remaining,
-      simplePct,
+      connectedPct,
+      verifiedPct,
       weightedPct,
     };
   }, [scoped]);
@@ -200,16 +213,20 @@ export function CoverageOverview({
       (r) => r.priority === "critical" || r.priority === "high",
     );
     const total = criticalRows.length;
+    const connected = criticalRows.filter((r) =>
+      isConnectedStatus(r.coverageStatus),
+    ).length;
     const covered = criticalRows.filter(
       (r) => r.coverageStatus === "covered",
     ).length;
     const partial = criticalRows.filter(
       (r) => r.coverageStatus === "partial",
     ).length;
-    const pct = total
+    const connectedPct = total ? Math.round((connected / total) * 100) : 0;
+    const verifiedPct = total
       ? Math.round(((covered + partial * 0.5) / total) * 100)
       : 0;
-    return { total, covered, partial, pct };
+    return { total, connected, covered, partial, connectedPct, verifiedPct };
   }, [scoped]);
 
   const evidence = useMemo<EvidenceSummary>(() => {
@@ -286,13 +303,15 @@ export function CoverageOverview({
         map.set(category, {
           category,
           total: 0,
+          connected: 0,
           covered: 0,
           partial: 0,
           heuristicOnly: 0,
           manualOnly: 0,
           pending: 0,
-          pct: 0,
+          connectedPct: 0,
           critical: 0,
+          criticalConnected: 0,
           criticalCovered: 0,
           minOrder: Number.MAX_SAFE_INTEGER,
         });
@@ -300,6 +319,7 @@ export function CoverageOverview({
 
       const group = map.get(category)!;
       group.total += 1;
+      if (isConnectedStatus(r.coverageStatus)) group.connected += 1;
       if (r.coverageStatus === "covered") group.covered += 1;
       else if (r.coverageStatus === "partial") group.partial += 1;
       else if (r.coverageStatus === "heuristic_only") group.heuristicOnly += 1;
@@ -307,6 +327,9 @@ export function CoverageOverview({
       else group.pending += 1;
       if (r.priority === "critical" || r.priority === "high") {
         group.critical += 1;
+        if (isConnectedStatus(r.coverageStatus)) {
+          group.criticalConnected += 1;
+        }
         if (r.coverageStatus === "covered") {
           group.criticalCovered += 1;
         }
@@ -317,8 +340,8 @@ export function CoverageOverview({
     }
 
     for (const group of map.values()) {
-      group.pct = group.total
-        ? Math.round(((group.covered + group.partial * 0.5) / group.total) * 100)
+      group.connectedPct = group.total
+        ? Math.round((group.connected / group.total) * 100)
         : 0;
     }
 
@@ -333,10 +356,10 @@ export function CoverageOverview({
       : "점검 필요 항목 존재";
   const signalDescription =
     hero.pending === 0 && evidence.failedRealLinks === 0
-      ? `연결 대기 없음 · 수동 확인 ${hero.manualOnly} · 테스트 연결 ${hero.heuristicOnly} · 최신 실측 ${formatDateLabel(
+      ? `연결율 ${hero.connectedPct}% · 실측 ${hero.verifiedPct}% · 수동 확인 ${hero.manualOnly} · 최신 실측 ${formatDateLabel(
           evidence.latestRealRunAt ?? evidence.latestAnyRunAt,
         )}`
-      : `연결 대기 ${hero.pending} · 수동 확인 ${hero.manualOnly} · 테스트 연결 ${hero.heuristicOnly} · 실측 실패 ${evidence.failedRealLinks}건`;
+      : `연결율 ${hero.connectedPct}% · 실측 ${hero.verifiedPct}% · 연결 대기 ${hero.pending} · 실측 실패 ${evidence.failedRealLinks}건`;
 
   return (
     <div className="space-y-6">
@@ -359,13 +382,13 @@ export function CoverageOverview({
                 </p>
               </div>
               <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
-                실측 기준 {hero.simplePct}%
+                실측 기준 {hero.verifiedPct}%
               </div>
             </div>
 
             <div className="mt-6 flex items-end gap-3">
               <div className="text-6xl font-bold tracking-tight text-slate-950 md:text-7xl">
-                {hero.simplePct}
+                {hero.connectedPct}
               </div>
               <div className="pb-2 text-2xl font-semibold text-slate-400 md:text-3xl">
                 %
@@ -373,7 +396,7 @@ export function CoverageOverview({
             </div>
 
             <div className="mt-4">
-              <ProgressBar pct={hero.simplePct} height="h-3" />
+              <ProgressBar pct={hero.connectedPct} height="h-3" />
             </div>
 
             <div className="mt-4 flex flex-wrap gap-2">
@@ -427,19 +450,19 @@ export function CoverageOverview({
               tone="sky"
             />
             <StatCard
-              eyebrow="핵심 기능"
-              value={`${critical.covered}/${critical.total}`}
-              caption={
-                critical.partial > 0
-                  ? `Critical + High ${critical.pct}% · 부분 ${critical.partial}`
-                  : `Critical + High ${critical.pct}%`
-              }
-              tone="emerald"
+              eyebrow="핵심 기능 연결"
+              value={`${critical.connectedPct}%`}
+              caption={`Critical + High 연결 ${critical.connected}/${critical.total} · 실측 ${critical.verifiedPct}%`}
+              tone="sky"
             />
             <StatCard
               eyebrow="실측 기준"
-              value={`${evidence.realFeatures}/${hero.total}`}
-              caption={`실측 링크 ${evidence.realLinks}건 · 실패 ${evidence.failedRealLinks}건`}
+              value={`${hero.verifiedPct}%`}
+              caption={
+                hero.partial > 0
+                  ? `실측 통과 ${hero.covered}/${hero.total} · 부분 실측 ${hero.partial} · 실패 ${evidence.failedRealLinks}건`
+                  : `실측 통과 ${hero.covered}/${hero.total} · 실패 ${evidence.failedRealLinks}건`
+              }
               tone={evidence.failedRealLinks > 0 ? "amber" : "slate"}
             />
             <StatCard
@@ -524,7 +547,7 @@ export function CoverageOverview({
                       </div>
                       {category.critical > 0 && (
                         <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
-                          핵심 {category.criticalCovered}/{category.critical}
+                          핵심 연결 {category.criticalConnected}/{category.critical}
                         </span>
                       )}
                     </div>
@@ -557,8 +580,9 @@ export function CoverageOverview({
 
                   <div className="flex items-end justify-between gap-4 md:block md:text-right">
                     <div className="text-3xl font-bold tracking-tight text-slate-950">
-                      {category.pct}%
+                      {category.connectedPct}%
                     </div>
+                    <div className="mt-1 text-xs text-slate-500">연결율</div>
                     <div className="mt-2 inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700 transition group-hover:border-emerald-200 group-hover:text-emerald-700">
                       상세 보기
                       <svg
@@ -578,7 +602,7 @@ export function CoverageOverview({
                 </div>
 
                 <div className="mt-4">
-                  <ProgressBar pct={category.pct} height="h-2.5" />
+                  <ProgressBar pct={category.connectedPct} height="h-2.5" />
                 </div>
               </button>
             </li>
