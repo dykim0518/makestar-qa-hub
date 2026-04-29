@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-type ActivePage = "dashboard" | "trigger" | "coverage";
+type ActivePage = "dashboard" | "trigger" | "coverage" | "okr";
 
 type AppHeaderProps = {
   active?: ActivePage;
@@ -68,6 +68,13 @@ export function AppHeader({ active }: AppHeaderProps) {
               : {})}
           >
             커버리지
+          </Link>
+          <Link
+            href="/okr"
+            className={`focus-ring ${active === "okr" ? navActive : navInactive}`}
+            {...(active === "okr" ? { "aria-current": "page" as const } : {})}
+          >
+            OKR
           </Link>
         </nav>
       </div>

@@ -4,6 +4,7 @@ import {
   integer,
   bigint,
   timestamp,
+  date,
   index,
   uniqueIndex,
   uuid,
@@ -553,3 +554,27 @@ export type QaCoverageFeature = typeof qaCoverageFeatures.$inferSelect;
 export type NewQaCoverageFeature = typeof qaCoverageFeatures.$inferInsert;
 export type QaCoverageTestLink = typeof qaCoverageTestLinks.$inferSelect;
 export type NewQaCoverageTestLink = typeof qaCoverageTestLinks.$inferInsert;
+
+export const qaOkrMetrics = pgTable(
+  "qa_okr_metrics",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    milestone: text("milestone").notNull(),
+    periodStart: date("period_start").notNull(),
+    periodEnd: date("period_end").notNull(),
+    tcCount: integer("tc_count").notNull(),
+    totalDefects: integer("total_defects").notNull(),
+    openDefects: integer("open_defects").notNull(),
+    postReleaseDefects: integer("post_release_defects").notNull(),
+    comment: text("comment"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("uq_qa_okr_metrics_milestone").on(table.milestone),
+    index("idx_qa_okr_metrics_period_start").on(table.periodStart),
+  ],
+);
+
+export type QaOkrMetric = typeof qaOkrMetrics.$inferSelect;
+export type NewQaOkrMetric = typeof qaOkrMetrics.$inferInsert;
