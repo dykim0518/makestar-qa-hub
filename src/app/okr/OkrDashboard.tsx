@@ -12,7 +12,6 @@ import {
 } from "recharts";
 import {
   formatPercent,
-  formatRatio,
   type EnrichedMetric,
   type KrStatus,
   type SignalLevel,
@@ -52,14 +51,12 @@ const KR_STROKE: Record<KrMetric, string> = {
   testEffectiveness: "#6366f1",
 };
 
-function formatValue(metric: KrMetric, value: number | null): string {
-  if (value === null) return "—";
-  if (metric === "defectRate") return formatRatio(value, 3);
-  return formatPercent(value, 1);
+function formatValue(_metric: KrMetric, value: number | null): string {
+  return formatPercent(value);
 }
 
 function formatRemaining(
-  metric: KrMetric,
+  _metric: KrMetric,
   remaining: number | null,
   direction: "lower" | "higher",
 ): string {
@@ -70,10 +67,7 @@ function formatRemaining(
     (direction === "lower" && remaining >= 0);
   if (reached) return "목표 도달";
   const magnitude = Math.abs(remaining);
-  const formatted =
-    metric === "defectRate"
-      ? magnitude.toFixed(3)
-      : `${(magnitude * 100).toFixed(1)}%p`;
+  const formatted = `${Math.trunc(magnitude * 100)}%p`;
   return direction === "lower"
     ? `${formatted} 더 낮춰야 함`
     : `${formatted} 더 높여야 함`;
@@ -262,11 +256,7 @@ function TrendCard({
               tick={{ fontSize: 11, fill: "var(--muted)" }}
               axisLine={false}
               tickLine={false}
-              tickFormatter={(v: number) =>
-                kr.metric === "defectRate"
-                  ? v.toFixed(2)
-                  : `${Math.round(v * 100)}%`
-              }
+              tickFormatter={(v: number) => `${Math.trunc(v * 100)}%`}
               width={42}
               domain={kr.metric === "defectRate" ? [0, "auto"] : [0, 1]}
             />
@@ -378,13 +368,13 @@ function MilestoneTable({ metrics }: { metrics: EnrichedMetric[] }) {
                   {m.postReleaseDefects}
                 </Td>
                 <Td className="text-right tabular-nums">
-                  {formatRatio(m.defectRate, 3)}
+                  {formatPercent(m.defectRate)}
                 </Td>
                 <Td className="text-right tabular-nums">
-                  {formatPercent(m.defectRemovalRate, 1)}
+                  {formatPercent(m.defectRemovalRate)}
                 </Td>
                 <Td className="text-right tabular-nums">
-                  {formatPercent(m.testEffectiveness, 1)}
+                  {formatPercent(m.testEffectiveness)}
                 </Td>
                 <Td className="max-w-[260px] truncate text-xs text-[var(--muted)]">
                   {m.comment ?? "—"}
