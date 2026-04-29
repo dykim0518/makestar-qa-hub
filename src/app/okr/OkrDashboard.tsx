@@ -1,10 +1,7 @@
 "use client";
 
 import {
-  Bar,
-  BarChart,
   CartesianGrid,
-  Cell,
   Line,
   LineChart,
   ReferenceLine,
@@ -15,70 +12,86 @@ import {
 } from "recharts";
 import {
   formatPercent,
+  formatPercentPoint,
   type EnrichedMetric,
   type KrStatus,
   type SignalLevel,
+  type TrendDirection,
 } from "@/lib/okr-calculations";
-import type { KrMetric } from "@/lib/okr-config";
+import { OKR_2026_H1, type KrMetric } from "@/lib/okr-config";
 
 const SIGNAL_TONE: Record<
   SignalLevel,
-  { bg: string; text: string; border: string; bar: string; label: string }
+  { bg: string; text: string; border: string; label: string }
 > = {
   green: {
     bg: "bg-emerald-50",
     text: "text-emerald-700",
     border: "border-emerald-200",
-    bar: "bg-emerald-500",
-    label: "On Track",
+    label: "달성 중",
   },
   yellow: {
     bg: "bg-amber-50",
     text: "text-amber-700",
     border: "border-amber-200",
-    bar: "bg-amber-500",
-    label: "At Risk",
+    label: "임계치 근접",
   },
   red: {
     bg: "bg-rose-50",
     text: "text-rose-700",
     border: "border-rose-200",
-    bar: "bg-rose-500",
-    label: "Behind",
+    label: "미달",
   },
 };
 
 const KR_STROKE: Record<KrMetric, string> = {
-  defectRate: "#e11d48",
-  defectRemovalRate: "#059669",
-  testEffectiveness: "#6366f1",
+  defectRate: "#475569",
+  defectRemovalRate: "#475569",
+  testEffectiveness: "#475569",
 };
 
-function formatValue(_metric: KrMetric, value: number | null): string {
-  return formatPercent(value);
-}
-
-function formatRemaining(
-  _metric: KrMetric,
-  remaining: number | null,
-  direction: "lower" | "higher",
-): string {
-  if (remaining === null) return "데이터 부족";
-  if (Math.abs(remaining) < 1e-9) return "목표 도달";
-  const reached =
-    (direction === "higher" && remaining <= 0) ||
-    (direction === "lower" && remaining >= 0);
-  if (reached) return "목표 도달";
-  const magnitude = Math.abs(remaining);
-  const formatted = `${Math.trunc(magnitude * 100)}%p`;
-  return direction === "lower"
-    ? `${formatted} 더 낮춰야 함`
-    : `${formatted} 더 높여야 함`;
-}
+const TARGET_HIT = "#059669";
+const TARGET_MISS = "#e11d48";
 
 function shortPeriod(periodStart: string): string {
   const [, month, day] = periodStart.split("-");
   return `${Number(month)}/${day}`;
+}
+
+function periodPhrase(now: Date): string {
+  const start = new Date(OKR_2026_H1.period.start);
+  const end = new Date(OKR_2026_H1.period.end);
+  if (now < start) return `시작 전 (평가: ${OKR_2026_H1.period.end})`;
+  if (now > end) return `평가 완료 (${OKR_2026_H1.period.end})`;
+  const m = now.getMonth() + 1;
+  return `1~${m}월 진행 중 (평가: ${OKR_2026_H1.period.end})`;
+}
+
+function trendArrow(trend: TrendDirection | null): {
+  glyph: string;
+  className: string;
+  label: string;
+} {
+  if (trend === "improving")
+    return { glyph: "↑", className: "text-emerald-600", label: "개선" };
+  if (trend === "worsening")
+    return { glyph: "↓", className: "text-rose-600", label: "악화" };
+  if (trend === "flat")
+    return { glyph: "→", className: "text-[var(--muted)]", label: "유지" };
+  return { glyph: "—", className: "text-[var(--muted)]", label: "데이터 부족" };
+}
+
+function gapMessage(targetValue: number | null, gap: number | null): string {
+  if (gap === null) return "데이터 부족";
+  if (gap >= 0)
+    return `목표 ${formatPercent(targetValue)}보다 ${formatPercentPoint(gap)} 여유`;
+  return `목표까지 ${formatPercentPoint(gap)} 부족`;
+}
+
+function metricLabel(metric: KrMetric): string {
+  if (metric === "defectRate") return "결함률";
+  if (metric === "defectRemovalRate") return "결함 제거율";
+  return "테스트 효과성";
 }
 
 export function OkrDashboard({
@@ -102,11 +115,13 @@ export function OkrDashboard({
     );
   }
 
+  const phrase = periodPhrase(new Date());
+
   return (
     <div className="space-y-8">
       <section className="grid gap-4 md:grid-cols-3">
         {krStatuses.map((status) => (
-          <KrCard key={status.kr.id} status={status} />
+          <KrCard key={status.kr.id} status={status} periodPhrase={phrase} />
         ))}
       </section>
 
@@ -131,25 +146,31 @@ export function OkrDashboard({
   );
 }
 
-function KrCard({ status }: { status: KrStatus }) {
+function KrCard({
+  status,
+  periodPhrase,
+}: {
+  status: KrStatus;
+  periodPhrase: string;
+}) {
   const tone = SIGNAL_TONE[status.signal];
-  const attainmentPct =
-    status.attainment === null ? 0 : Math.round(status.attainment * 100);
   const kr = status.kr;
+  const agg = status.aggregation;
+  const arrow = trendArrow(agg.trend);
 
   return (
     <article className="flex flex-col rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-5 shadow-sm transition-all hover:border-[var(--accent)]/30 hover:shadow-lg sm:p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
-            {kr.id.toUpperCase()}
+            {kr.id.toUpperCase()} · {metricLabel(kr.metric)}
           </p>
           <h3 className="mt-1 text-base font-semibold text-[var(--foreground)]">
             {kr.name}
           </h3>
         </div>
         <span
-          className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${tone.bg} ${tone.text} ${tone.border}`}
+          className={`whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-semibold ${tone.bg} ${tone.text} ${tone.border}`}
         >
           {tone.label}
         </span>
@@ -157,56 +178,91 @@ function KrCard({ status }: { status: KrStatus }) {
 
       <div className="mt-5">
         <p className="text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
-          현재
+          기간 평균 ({agg.count} 릴리스)
         </p>
-        <p className="mt-1 text-4xl font-bold tracking-tight text-[var(--foreground)]">
-          {formatValue(kr.metric, status.current)}
-        </p>
-      </div>
-
-      <dl className="mt-4 grid grid-cols-2 gap-3 text-xs">
-        <div>
-          <dt className="font-medium uppercase tracking-wider text-[var(--muted)]">
-            {kr.type === "absolute" ? "목표" : "Baseline"}
-          </dt>
-          <dd className="mt-1 text-sm font-semibold text-[var(--foreground)]">
-            {kr.type === "absolute"
-              ? formatValue(kr.metric, kr.target)
-              : formatValue(kr.metric, status.baseline)}
-          </dd>
-        </div>
-        <div>
-          <dt className="font-medium uppercase tracking-wider text-[var(--muted)]">
-            {kr.type === "absolute" ? "임계치" : "목표"}
-          </dt>
-          <dd className="mt-1 text-sm font-semibold text-[var(--foreground)]">
-            {formatValue(kr.metric, status.targetValue)}
-          </dd>
-        </div>
-      </dl>
-
-      <div className="mt-5">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-medium text-[var(--muted)]">달성률</span>
-          <span className="font-semibold text-[var(--foreground)]">
-            {status.attainment === null ? "—" : `${attainmentPct}%`}
+        <div className="mt-1 flex items-baseline gap-2">
+          <p className="text-4xl font-bold tracking-tight text-[var(--foreground)]">
+            {formatPercent(agg.average)}
+          </p>
+          <span
+            className={`text-xl font-semibold ${arrow.className}`}
+            aria-label={`최근 ${arrow.label}`}
+            title={`최근 1건이 직전 평균 대비 ${arrow.label}`}
+          >
+            {arrow.glyph}
           </span>
         </div>
-        <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-          <div
-            className={`h-full rounded-full transition-all ${tone.bar}`}
-            style={{ width: `${attainmentPct}%` }}
-          />
-        </div>
-        <p className="mt-2 text-xs text-[var(--muted)]">
-          {formatRemaining(kr.metric, status.remaining, kr.direction)}
-        </p>
       </div>
 
-      <p className="mt-4 text-xs text-[var(--muted)]">
-        <span className="font-medium">공식</span>: {kr.formula}
+      <BaselineTargetBar status={status} />
+
+      <p className="mt-3 text-xs text-[var(--muted)]">
+        {gapMessage(status.targetValue, status.gap)}
+      </p>
+
+      <p className="mt-3 text-xs text-[var(--muted)]">
+        범위 {formatPercent(agg.min)} ~ {formatPercent(agg.max)} · 최근{" "}
+        {formatPercent(agg.latest)}
+      </p>
+
+      <p className="mt-4 border-t border-[var(--card-border)] pt-3 text-xs text-[var(--muted)]">
+        {periodPhrase}
       </p>
     </article>
+  );
+}
+
+function BaselineTargetBar({ status }: { status: KrStatus }) {
+  const kr = status.kr;
+  const baseline = status.baseline;
+  const target = status.targetValue;
+  const average = status.aggregation.average;
+  if (baseline === null || target === null || average === null) return null;
+
+  const lo = Math.min(baseline, target, average);
+  const hi = Math.max(baseline, target, average);
+  const span = hi - lo;
+  const padding = span > 0 ? span * 0.15 : 0.05;
+  const min = Math.max(0, lo - padding);
+  const max = Math.min(1, hi + padding);
+  const range = max - min || 1;
+
+  const pct = (v: number) => ((v - min) / range) * 100;
+
+  return (
+    <div className="mt-4">
+      <div className="flex items-center justify-between text-[10px] font-medium uppercase tracking-wider text-[var(--muted)]">
+        <span>Baseline {formatPercent(baseline)}</span>
+        <span>Target {formatPercent(target)}</span>
+      </div>
+      <div className="relative mt-2 h-1.5 w-full rounded-full bg-slate-100">
+        <span
+          className="absolute top-1/2 h-3 w-px -translate-y-1/2 bg-slate-400"
+          style={{ left: `${pct(baseline)}%` }}
+          aria-hidden
+        />
+        <span
+          className="absolute top-1/2 h-3 w-px -translate-y-1/2 bg-slate-700"
+          style={{ left: `${pct(target)}%` }}
+          aria-hidden
+        />
+        <span
+          className={`absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow ${
+            status.signal === "green"
+              ? "bg-emerald-500"
+              : status.signal === "yellow"
+                ? "bg-amber-500"
+                : "bg-rose-500"
+          }`}
+          style={{ left: `${pct(average)}%` }}
+          aria-label={`평균 ${formatPercent(average)}`}
+          title={`평균 ${formatPercent(average)}`}
+        />
+      </div>
+      <p className="mt-1 text-[10px] text-[var(--muted)]">
+        {kr.direction === "lower" ? "← 좋음" : "좋음 →"}
+      </p>
+    </div>
   );
 }
 
@@ -218,139 +274,125 @@ function TrendCard({
   metrics: EnrichedMetric[];
 }) {
   const kr = status.kr;
-  const data = metrics.map((m) => ({
-    period: shortPeriod(m.periodStart),
-    milestone: m.milestone,
-    value: m[kr.metric],
-  }));
-  const stroke = KR_STROKE[kr.metric];
-  const baseline = status.baseline;
   const target = status.targetValue;
-  const useBar = kr.type === "absolute";
+  const baseline = status.baseline;
+  const stroke = KR_STROKE[kr.metric];
 
-  const xAxis = (
-    <XAxis
-      dataKey="period"
-      tick={{ fontSize: 11, fill: "var(--muted)" }}
-      axisLine={{ stroke: "var(--card-border)" }}
-      tickLine={false}
-      interval="preserveStartEnd"
-    />
-  );
-  const yAxis = (
-    <YAxis
-      tick={{ fontSize: 11, fill: "var(--muted)" }}
-      axisLine={false}
-      tickLine={false}
-      tickFormatter={(v: number) => `${Math.trunc(v * 100)}%`}
-      width={42}
-      domain={kr.metric === "defectRate" ? [0, "auto"] : [0, 1]}
-    />
-  );
-  const grid = (
-    <CartesianGrid
-      strokeDasharray="3 3"
-      stroke="var(--card-border)"
-      vertical={false}
-    />
-  );
-  const baselineLine =
-    baseline !== null ? (
-      <ReferenceLine
-        y={baseline}
-        stroke="#94a3b8"
-        strokeDasharray="4 4"
-        strokeOpacity={0.6}
-        label={{
-          value: "Baseline",
-          position: "insideTopLeft",
-          fill: "#475569",
-          fontSize: 10,
-        }}
-      />
-    ) : null;
-  const targetLine =
-    target !== null ? (
-      <ReferenceLine
-        y={target}
-        stroke={stroke}
-        strokeDasharray="4 4"
-        strokeOpacity={0.6}
-        label={{
-          value: "Target",
-          position: "insideBottomRight",
-          fill: stroke,
-          fontSize: 10,
-        }}
-      />
-    ) : null;
-  const tooltip = (
-    <Tooltip
-      content={<TrendTooltip metric={kr.metric} />}
-      cursor={{ fill: "var(--card-border)", fillOpacity: 0.2 }}
-    />
-  );
-
-  const targetMet = (v: number) =>
-    target === null
-      ? true
-      : kr.direction === "higher"
-        ? v >= target
-        : v <= target;
+  const data = metrics.map((m) => {
+    const value = m[kr.metric];
+    const hit =
+      target === null
+        ? true
+        : kr.direction === "higher"
+          ? value >= target
+          : value <= target;
+    return {
+      period: shortPeriod(m.periodStart),
+      milestone: m.milestone,
+      value,
+      hit,
+    };
+  });
 
   return (
     <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 transition-colors hover:border-[var(--accent)]/20">
       <div className="mb-3 flex items-center justify-between gap-2">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-          {kr.id.toUpperCase()} · {kr.name.split(" ")[0]}
+          {kr.id.toUpperCase()} · {metricLabel(kr.metric)}
         </h3>
         <span className="text-xs text-[var(--muted)]">
-          {kr.metric === "defectRate" ? "낮을수록 좋음" : "높을수록 좋음"}
+          {kr.direction === "lower" ? "낮을수록 좋음" : "높을수록 좋음"}
         </span>
       </div>
       <div className="h-[200px]">
         <ResponsiveContainer width="100%" height="100%">
-          {useBar ? (
-            <BarChart
-              data={data}
-              margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
-            >
-              {grid}
-              {xAxis}
-              {yAxis}
-              {baselineLine}
-              {targetLine}
-              {tooltip}
-              <Bar dataKey="value" radius={[3, 3, 0, 0]}>
-                {data.map((d, i) => (
-                  <Cell
-                    key={i}
-                    fill={targetMet(d.value) ? "#059669" : "#e11d48"}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          ) : (
-            <LineChart
-              data={data}
-              margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
-            >
-              {grid}
-              {xAxis}
-              {yAxis}
-              {baselineLine}
-              {targetLine}
-              {tooltip}
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke={stroke}
-                strokeWidth={2}
-                dot={{ r: 3, fill: stroke }}
-                activeDot={{ r: 5 }}
+          <LineChart
+            data={data}
+            margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="var(--card-border)"
+              vertical={false}
+            />
+            <XAxis
+              dataKey="period"
+              tick={{ fontSize: 11, fill: "var(--muted)" }}
+              axisLine={{ stroke: "var(--card-border)" }}
+              tickLine={false}
+              interval="preserveStartEnd"
+            />
+            <YAxis
+              tick={{ fontSize: 11, fill: "var(--muted)" }}
+              axisLine={false}
+              tickLine={false}
+              tickFormatter={(v: number) => `${Math.trunc(v * 100)}%`}
+              width={42}
+              domain={kr.metric === "defectRate" ? [0, "auto"] : [0, 1]}
+            />
+            {baseline !== null ? (
+              <ReferenceLine
+                y={baseline}
+                stroke="#94a3b8"
+                strokeDasharray="4 4"
+                strokeOpacity={0.6}
+                label={{
+                  value: "Baseline",
+                  position: "insideTopLeft",
+                  fill: "#475569",
+                  fontSize: 10,
+                }}
               />
-            </LineChart>
-          )}
+            ) : null}
+            {target !== null ? (
+              <ReferenceLine
+                y={target}
+                stroke={TARGET_HIT}
+                strokeDasharray="4 4"
+                strokeOpacity={0.7}
+                label={{
+                  value: "Target",
+                  position: "insideBottomRight",
+                  fill: TARGET_HIT,
+                  fontSize: 10,
+                }}
+              />
+            ) : null}
+            <Tooltip
+              content={<TrendTooltip />}
+              cursor={{ stroke: "var(--card-border)" }}
+            />
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke={stroke}
+              strokeWidth={2}
+              dot={(props: {
+                cx?: number;
+                cy?: number;
+                index?: number;
+                payload?: { hit: boolean };
+              }) => {
+                const cx = props.cx ?? 0;
+                const cy = props.cy ?? 0;
+                const hit = props.payload?.hit ?? true;
+                const idx = props.index ?? 0;
+                return (
+                  <circle
+                    key={idx}
+                    cx={cx}
+                    cy={cy}
+                    r={hit ? 3.5 : 5}
+                    fill={hit ? TARGET_HIT : TARGET_MISS}
+                    stroke="white"
+                    strokeWidth={1.5}
+                  />
+                );
+              }}
+              activeDot={{ r: 6 }}
+              isAnimationActive={false}
+            />
+          </LineChart>
         </ResponsiveContainer>
       </div>
     </div>
@@ -360,13 +402,13 @@ function TrendCard({
 function TrendTooltip({
   active,
   payload,
-  metric,
 }: {
   active?: boolean;
-  payload?: Array<{ payload: { milestone: string; value: number } }>;
-  metric?: KrMetric;
+  payload?: Array<{
+    payload: { milestone: string; value: number; hit: boolean };
+  }>;
 }) {
-  if (!active || !payload?.length || !metric) return null;
+  if (!active || !payload?.length) return null;
   const point = payload[0].payload;
   return (
     <div className="rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-3 py-2 shadow-xl">
@@ -374,7 +416,10 @@ function TrendTooltip({
         {point.milestone}
       </p>
       <p className="mt-1 text-xs text-[var(--muted)]">
-        {formatValue(metric, point.value)}
+        {formatPercent(point.value)}{" "}
+        <span className={point.hit ? "text-emerald-600" : "text-rose-600"}>
+          ({point.hit ? "도달" : "미달"})
+        </span>
       </p>
     </div>
   );
