@@ -6,36 +6,30 @@ import type { QaOkrMetric } from "@/db/schema";
 
 type FormState = {
   milestone: string;
-  periodStart: string;
-  periodEnd: string;
+  releaseDate: string;
   tcCount: string;
   totalDefects: string;
   openDefects: string;
   postReleaseDefects: string;
-  comment: string;
 };
 
 const EMPTY: FormState = {
   milestone: "",
-  periodStart: "",
-  periodEnd: "",
+  releaseDate: "",
   tcCount: "",
   totalDefects: "",
   openDefects: "",
   postReleaseDefects: "",
-  comment: "",
 };
 
 function fromMetric(metric: QaOkrMetric): FormState {
   return {
     milestone: metric.milestone,
-    periodStart: metric.periodStart,
-    periodEnd: metric.periodEnd,
+    releaseDate: metric.periodStart,
     tcCount: String(metric.tcCount),
     totalDefects: String(metric.totalDefects),
     openDefects: String(metric.openDefects),
     postReleaseDefects: String(metric.postReleaseDefects),
-    comment: metric.comment ?? "",
   };
 }
 
@@ -72,13 +66,11 @@ export function MetricForm({ existing }: Props) {
     try {
       const payload = {
         milestone: form.milestone.trim(),
-        periodStart: form.periodStart,
-        periodEnd: form.periodEnd,
+        periodStart: form.releaseDate,
         tcCount: Number(form.tcCount),
         totalDefects: Number(form.totalDefects),
         openDefects: Number(form.openDefects),
         postReleaseDefects: Number(form.postReleaseDefects),
-        comment: form.comment.trim() === "" ? null : form.comment.trim(),
       };
       const res = await fetch("/api/okr-metrics", {
         method: "POST",
@@ -117,7 +109,7 @@ export function MetricForm({ existing }: Props) {
         className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-5 shadow-sm sm:p-6"
       >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Field label="마일스톤" hint="예: Sprint 12 (3월 1차)">
+          <Field label="릴리스" hint="예: SPR-04-1 Event WM-Phase1">
             <input
               type="text"
               value={form.milestone}
@@ -127,20 +119,11 @@ export function MetricForm({ existing }: Props) {
               className={inputClass}
             />
           </Field>
-          <Field label="기간 시작" hint="YYYY-MM-DD">
+          <Field label="배포일" hint="YYYY-MM-DD">
             <input
               type="date"
-              value={form.periodStart}
-              onChange={(e) => update("periodStart", e.target.value)}
-              required
-              className={inputClass}
-            />
-          </Field>
-          <Field label="기간 끝" hint="YYYY-MM-DD">
-            <input
-              type="date"
-              value={form.periodEnd}
-              onChange={(e) => update("periodEnd", e.target.value)}
+              value={form.releaseDate}
+              onChange={(e) => update("releaseDate", e.target.value)}
               required
               className={inputClass}
             />
@@ -189,14 +172,6 @@ export function MetricForm({ existing }: Props) {
               className={inputClass}
             />
           </Field>
-          <Field label="코멘트" hint="이번 마일스톤 특이사항 (선택)">
-            <textarea
-              value={form.comment}
-              onChange={(e) => update("comment", e.target.value)}
-              rows={2}
-              className={`${inputClass} resize-none`}
-            />
-          </Field>
         </div>
 
         {error ? <p className="mt-4 text-sm text-rose-700">{error}</p> : null}
@@ -236,10 +211,10 @@ export function MetricForm({ existing }: Props) {
       {existing.length > 0 ? (
         <section className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-5 shadow-sm sm:p-6">
           <h2 className="text-lg font-semibold text-[var(--foreground)]">
-            기존 마일스톤 ({existing.length})
+            기존 릴리스 ({existing.length})
           </h2>
           <p className="mt-1 text-xs text-[var(--muted)]">
-            행을 클릭하면 폼에 값이 채워집니다. 같은 마일스톤 이름으로 저장하면
+            행을 클릭하면 폼에 값이 채워집니다. 같은 릴리스 이름으로 저장하면
             갱신됩니다.
           </p>
           <ul className="mt-4 divide-y divide-[var(--card-border)]">
@@ -255,8 +230,7 @@ export function MetricForm({ existing }: Props) {
                       {m.milestone}
                     </p>
                     <p className="text-xs text-[var(--muted)]">
-                      {m.periodStart} ~ {m.periodEnd} · TC {m.tcCount} · 결함{" "}
-                      {m.totalDefects}
+                      {m.periodStart} · TC {m.tcCount} · 결함 {m.totalDefects}
                     </p>
                   </div>
                   <span className="shrink-0 text-xs text-indigo-600">편집</span>

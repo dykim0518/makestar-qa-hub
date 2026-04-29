@@ -1,7 +1,10 @@
 "use client";
 
 import {
+  Bar,
+  BarChart,
   CartesianGrid,
+  Cell,
   Line,
   LineChart,
   ReferenceLine,
@@ -89,11 +92,11 @@ export function OkrDashboard({
     return (
       <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-8 text-center shadow-sm">
         <p className="text-sm font-semibold text-[var(--foreground)]">
-          아직 입력된 마일스톤이 없습니다
+          아직 입력된 릴리스가 없습니다
         </p>
         <p className="mt-1 text-sm text-[var(--muted)]">
           관리자 페이지(<code className="font-mono">/admin/metrics</code>)에서
-          첫 마일스톤을 입력하면 KR 진행률이 계산됩니다.
+          첫 릴리스를 입력하면 KR 진행률이 계산됩니다.
         </p>
       </div>
     );
@@ -120,9 +123,9 @@ export function OkrDashboard({
 
       <section>
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-[var(--muted)]">
-          마일스톤 ({metrics.length})
+          릴리스 ({metrics.length})
         </h2>
-        <MilestoneTable metrics={metrics} />
+        <ReleaseTable metrics={metrics} />
       </section>
     </div>
   );
@@ -223,6 +226,77 @@ function TrendCard({
   const stroke = KR_STROKE[kr.metric];
   const baseline = status.baseline;
   const target = status.targetValue;
+  const useBar = kr.type === "absolute";
+
+  const xAxis = (
+    <XAxis
+      dataKey="period"
+      tick={{ fontSize: 11, fill: "var(--muted)" }}
+      axisLine={{ stroke: "var(--card-border)" }}
+      tickLine={false}
+      interval="preserveStartEnd"
+    />
+  );
+  const yAxis = (
+    <YAxis
+      tick={{ fontSize: 11, fill: "var(--muted)" }}
+      axisLine={false}
+      tickLine={false}
+      tickFormatter={(v: number) => `${Math.trunc(v * 100)}%`}
+      width={42}
+      domain={kr.metric === "defectRate" ? [0, "auto"] : [0, 1]}
+    />
+  );
+  const grid = (
+    <CartesianGrid
+      strokeDasharray="3 3"
+      stroke="var(--card-border)"
+      vertical={false}
+    />
+  );
+  const baselineLine =
+    baseline !== null ? (
+      <ReferenceLine
+        y={baseline}
+        stroke="#94a3b8"
+        strokeDasharray="4 4"
+        strokeOpacity={0.6}
+        label={{
+          value: "Baseline",
+          position: "insideTopLeft",
+          fill: "#475569",
+          fontSize: 10,
+        }}
+      />
+    ) : null;
+  const targetLine =
+    target !== null ? (
+      <ReferenceLine
+        y={target}
+        stroke={stroke}
+        strokeDasharray="4 4"
+        strokeOpacity={0.6}
+        label={{
+          value: "Target",
+          position: "insideBottomRight",
+          fill: stroke,
+          fontSize: 10,
+        }}
+      />
+    ) : null;
+  const tooltip = (
+    <Tooltip
+      content={<TrendTooltip metric={kr.metric} />}
+      cursor={{ fill: "var(--card-border)", fillOpacity: 0.2 }}
+    />
+  );
+
+  const targetMet = (v: number) =>
+    target === null
+      ? true
+      : kr.direction === "higher"
+        ? v >= target
+        : v <= target;
 
   return (
     <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 transition-colors hover:border-[var(--accent)]/20">
@@ -236,71 +310,47 @@ function TrendCard({
       </div>
       <div className="h-[200px]">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={data}
-            margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
-          >
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="var(--card-border)"
-              vertical={false}
-            />
-            <XAxis
-              dataKey="period"
-              tick={{ fontSize: 11, fill: "var(--muted)" }}
-              axisLine={{ stroke: "var(--card-border)" }}
-              tickLine={false}
-              interval="preserveStartEnd"
-            />
-            <YAxis
-              tick={{ fontSize: 11, fill: "var(--muted)" }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(v: number) => `${Math.trunc(v * 100)}%`}
-              width={42}
-              domain={kr.metric === "defectRate" ? [0, "auto"] : [0, 1]}
-            />
-            {baseline !== null ? (
-              <ReferenceLine
-                y={baseline}
-                stroke="#94a3b8"
-                strokeDasharray="4 4"
-                strokeOpacity={0.6}
-                label={{
-                  value: "Baseline",
-                  position: "insideTopLeft",
-                  fill: "#475569",
-                  fontSize: 10,
-                }}
-              />
-            ) : null}
-            {target !== null ? (
-              <ReferenceLine
-                y={target}
+          {useBar ? (
+            <BarChart
+              data={data}
+              margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
+            >
+              {grid}
+              {xAxis}
+              {yAxis}
+              {baselineLine}
+              {targetLine}
+              {tooltip}
+              <Bar dataKey="value" radius={[3, 3, 0, 0]}>
+                {data.map((d, i) => (
+                  <Cell
+                    key={i}
+                    fill={targetMet(d.value) ? "#059669" : "#e11d48"}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          ) : (
+            <LineChart
+              data={data}
+              margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
+            >
+              {grid}
+              {xAxis}
+              {yAxis}
+              {baselineLine}
+              {targetLine}
+              {tooltip}
+              <Line
+                type="monotone"
+                dataKey="value"
                 stroke={stroke}
-                strokeDasharray="4 4"
-                strokeOpacity={0.6}
-                label={{
-                  value: "Target",
-                  position: "insideBottomRight",
-                  fill: stroke,
-                  fontSize: 10,
-                }}
+                strokeWidth={2}
+                dot={{ r: 3, fill: stroke }}
+                activeDot={{ r: 5 }}
               />
-            ) : null}
-            <Tooltip
-              content={<TrendTooltip metric={kr.metric} />}
-              cursor={{ stroke: "var(--card-border)" }}
-            />
-            <Line
-              type="monotone"
-              dataKey="value"
-              stroke={stroke}
-              strokeWidth={2}
-              dot={{ r: 3, fill: stroke }}
-              activeDot={{ r: 5 }}
-            />
-          </LineChart>
+            </LineChart>
+          )}
         </ResponsiveContainer>
       </div>
     </div>
@@ -330,7 +380,7 @@ function TrendTooltip({
   );
 }
 
-function MilestoneTable({ metrics }: { metrics: EnrichedMetric[] }) {
+function ReleaseTable({ metrics }: { metrics: EnrichedMetric[] }) {
   const reversed = [...metrics].reverse();
   return (
     <div className="overflow-hidden rounded-xl border border-[var(--card-border)] bg-[var(--card)] shadow-sm">
@@ -338,8 +388,8 @@ function MilestoneTable({ metrics }: { metrics: EnrichedMetric[] }) {
         <table className="min-w-full divide-y divide-[var(--card-border)] text-sm">
           <thead className="bg-slate-50 text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
             <tr>
-              <Th>마일스톤</Th>
-              <Th>기간</Th>
+              <Th>릴리스</Th>
+              <Th>배포일</Th>
               <Th className="text-right">TC</Th>
               <Th className="text-right">총 결함</Th>
               <Th className="text-right">미해결</Th>
@@ -347,7 +397,6 @@ function MilestoneTable({ metrics }: { metrics: EnrichedMetric[] }) {
               <Th className="text-right">결함률</Th>
               <Th className="text-right">제거율</Th>
               <Th className="text-right">효과성</Th>
-              <Th>코멘트</Th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--card-border)]">
@@ -359,7 +408,7 @@ function MilestoneTable({ metrics }: { metrics: EnrichedMetric[] }) {
                   </span>
                 </Td>
                 <Td className="whitespace-nowrap text-xs text-[var(--muted)]">
-                  {m.periodStart} ~ {m.periodEnd}
+                  {m.periodStart}
                 </Td>
                 <Td className="text-right tabular-nums">{m.tcCount}</Td>
                 <Td className="text-right tabular-nums">{m.totalDefects}</Td>
@@ -375,9 +424,6 @@ function MilestoneTable({ metrics }: { metrics: EnrichedMetric[] }) {
                 </Td>
                 <Td className="text-right tabular-nums">
                   {formatPercent(m.testEffectiveness)}
-                </Td>
-                <Td className="max-w-[260px] truncate text-xs text-[var(--muted)]">
-                  {m.comment ?? "—"}
                 </Td>
               </tr>
             ))}

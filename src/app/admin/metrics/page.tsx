@@ -33,11 +33,11 @@ export default async function AdminMetricsPage() {
             관리자 전용
           </p>
           <h1 className="mt-1 text-2xl font-bold text-[var(--foreground)] md:text-3xl">
-            QA 지표 입력
+            릴리스 지표 입력
           </h1>
           <p className="mt-2 text-sm text-[var(--muted)]">
-            스프린트가 완료될 때마다 마일스톤 지표를 입력합니다. 같은 마일스톤
-            이름으로 다시 입력하면 최신 값으로 갱신됩니다.
+            릴리스가 배포될 때마다 지표를 입력합니다. 같은 릴리스 이름으로 다시
+            입력하면 최신 값으로 갱신됩니다.
           </p>
         </header>
 
