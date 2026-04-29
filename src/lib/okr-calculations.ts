@@ -1,5 +1,5 @@
 import type { QaOkrMetric } from "@/db/schema";
-import { OKR_2026_H1, type KrConfig, type KrMetric } from "@/lib/okr-config";
+import { OKR_2026_H1, type KrConfig } from "@/lib/okr-config";
 
 export type MetricValues = {
   defectRate: number;
@@ -9,17 +9,29 @@ export type MetricValues = {
 
 export type SignalLevel = "green" | "yellow" | "red";
 
+export type TrendDirection = "improving" | "worsening" | "flat";
+
+export type KrAggregation = {
+  count: number;
+  average: number | null;
+  min: number | null;
+  max: number | null;
+  latest: number | null;
+  trend: TrendDirection | null;
+};
+
 export type KrStatus = {
   kr: KrConfig;
   baseline: number | null;
-  current: number | null;
   targetValue: number | null;
-  attainment: number | null;
-  remaining: number | null;
+  aggregation: KrAggregation;
+  gap: number | null;
   signal: SignalLevel;
 };
 
 export type EnrichedMetric = QaOkrMetric & MetricValues;
+
+export const SIGNAL_BUFFER = 0.1;
 
 export function computeMetricValues(
   row: Pick<
@@ -43,57 +55,63 @@ export function enrichMetrics(rows: QaOkrMetric[]): EnrichedMetric[] {
   return rows.map((row) => ({ ...row, ...computeMetricValues(row) }));
 }
 
-export function pickValue(
-  values: MetricValues | null | undefined,
-  metric: KrMetric,
-): number | null {
-  if (!values) return null;
-  return values[metric];
-}
-
 export function targetValueFor(kr: KrConfig, baseline: number | null): number {
   if (kr.type === "absolute") return kr.target;
   if (baseline === null) return 0;
-  if (kr.direction === "lower") return baseline * (1 + kr.target);
   return baseline * (1 + kr.target);
 }
 
-export function attainmentFor(
-  kr: KrConfig,
-  baseline: number | null,
-  current: number | null,
-): number | null {
-  if (current === null) return null;
-  if (kr.type === "absolute") {
-    if (kr.direction === "higher") {
-      return Math.max(0, Math.min(1, current / kr.target));
-    }
-    return Math.max(0, Math.min(1, kr.target / Math.max(current, 1e-9)));
+function aggregate(
+  values: number[],
+  direction: "lower" | "higher",
+): KrAggregation {
+  if (values.length === 0) {
+    return {
+      count: 0,
+      average: null,
+      min: null,
+      max: null,
+      latest: null,
+      trend: null,
+    };
   }
-  if (baseline === null || baseline === 0) return null;
-  const target = targetValueFor(kr, baseline);
-  const totalDelta = target - baseline;
-  const currentDelta = current - baseline;
-  if (totalDelta === 0) return current === target ? 1 : 0;
-  return Math.max(0, Math.min(1, currentDelta / totalDelta));
+  const sum = values.reduce((a, b) => a + b, 0);
+  const average = sum / values.length;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const latest = values[values.length - 1];
+
+  let trend: TrendDirection | null = null;
+  if (values.length >= 2) {
+    const prior = values.slice(0, -1);
+    const priorAvg = prior.reduce((a, b) => a + b, 0) / prior.length;
+    const delta = latest - priorAvg;
+    const isFlat = Math.abs(delta) < 1e-3;
+    if (isFlat) {
+      trend = "flat";
+    } else if (direction === "lower") {
+      trend = delta < 0 ? "improving" : "worsening";
+    } else {
+      trend = delta > 0 ? "improving" : "worsening";
+    }
+  }
+
+  return { count: values.length, average, min, max, latest, trend };
 }
 
-export function remainingFor(
+export function gapFor(
   kr: KrConfig,
-  baseline: number | null,
-  current: number | null,
+  average: number | null,
+  target: number | null,
 ): number | null {
-  if (current === null) return null;
-  const target =
-    kr.type === "absolute" ? kr.target : targetValueFor(kr, baseline);
-  if (kr.type === "relative" && baseline === null) return null;
-  return target - current;
+  if (average === null || target === null) return null;
+  return kr.direction === "lower" ? target - average : average - target;
 }
 
-export function signalFor(attainment: number | null): SignalLevel {
-  if (attainment === null) return "red";
-  if (attainment >= OKR_2026_H1.thresholds.green) return "green";
-  if (attainment >= OKR_2026_H1.thresholds.yellow) return "yellow";
+export function signalForGap(gap: number | null): SignalLevel {
+  if (gap === null) return "red";
+  if (gap >= SIGNAL_BUFFER) return "green";
+  if (gap >= -SIGNAL_BUFFER) return "yellow";
   return "red";
 }
 
@@ -101,28 +119,26 @@ export function buildKrStatuses(metrics: EnrichedMetric[]): KrStatus[] {
   const sorted = [...metrics].sort((a, b) =>
     a.periodStart < b.periodStart ? -1 : a.periodStart > b.periodStart ? 1 : 0,
   );
-  const baselineRow = sorted[0] ?? null;
-  const currentRow = sorted[sorted.length - 1] ?? null;
 
   return OKR_2026_H1.krs.map((kr: KrConfig) => {
-    const baseline = kr.baseline ?? pickValue(baselineRow, kr.metric);
-    const current = pickValue(currentRow, kr.metric);
+    const values = sorted.map((m) => m[kr.metric]);
+    const aggregation = aggregate(values, kr.direction);
+    const baseline =
+      kr.baseline ?? (sorted.length > 0 ? sorted[0][kr.metric] : null);
     const targetValue =
       kr.type === "absolute"
         ? kr.target
         : baseline !== null
           ? targetValueFor(kr, baseline)
           : null;
-    const attainment = attainmentFor(kr, baseline, current);
-    const remaining = remainingFor(kr, baseline, current);
+    const gap = gapFor(kr, aggregation.average, targetValue);
     return {
       kr,
       baseline,
-      current,
       targetValue,
-      attainment,
-      remaining,
-      signal: signalFor(attainment),
+      aggregation,
+      gap,
+      signal: signalForGap(gap),
     };
   });
 }
@@ -130,4 +146,16 @@ export function buildKrStatuses(metrics: EnrichedMetric[]): KrStatus[] {
 export function formatPercent(value: number | null): string {
   if (value === null || Number.isNaN(value)) return "—";
   return `${Math.trunc(value * 100)}%`;
+}
+
+export function formatPercentPoint(
+  value: number | null,
+  withSign = false,
+): string {
+  if (value === null || Number.isNaN(value)) return "—";
+  const pp = Math.trunc(Math.abs(value) * 100);
+  if (!withSign) return `${pp}%p`;
+  if (value > 0) return `+${pp}%p`;
+  if (value < 0) return `-${pp}%p`;
+  return `${pp}%p`;
 }
