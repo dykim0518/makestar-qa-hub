@@ -39,7 +39,7 @@ export default async function OkrPage() {
       <main className="mx-auto max-w-7xl px-6 py-8">
         <header className="mb-6">
           <p className="text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
-            QA OKR · {OKR_2026_H1.period.start} ~ {OKR_2026_H1.period.end}
+            품질 지표 · {OKR_2026_H1.period.start} ~ {OKR_2026_H1.period.end}
           </p>
           <h1 className="mt-1 text-2xl font-bold text-[var(--foreground)] md:text-3xl">
             2026 상반기 QA 품질 지표

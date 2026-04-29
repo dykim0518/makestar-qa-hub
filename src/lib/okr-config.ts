@@ -50,7 +50,7 @@ export const OKR_2026_H1 = {
       target: 0.95,
       direction: "higher",
       baseline: 0.95,
-      formula: "(총 결함 수 - 배포 후 결함 수) / 총 결함 수",
+      formula: "총 결함 수 / (총 결함 수 + 배포 후 결함 수)",
       description: "1월 baseline 95% 유지 — 절대 목표 95% 이상 (회귀 방지)",
     },
   ] as const satisfies readonly KrConfig[],

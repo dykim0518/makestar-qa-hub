@@ -33,10 +33,8 @@ export function computeMetricValues(
   const defectRate = tcCount > 0 ? totalDefects / tcCount : 0;
   const defectRemovalRate =
     totalDefects > 0 ? (totalDefects - row.openDefects) / totalDefects : 0;
-  const testEffectiveness =
-    totalDefects > 0
-      ? (totalDefects - row.postReleaseDefects) / totalDefects
-      : 0;
+  const denom = totalDefects + row.postReleaseDefects;
+  const testEffectiveness = denom > 0 ? totalDefects / denom : 0;
 
   return { defectRate, defectRemovalRate, testEffectiveness };
 }
