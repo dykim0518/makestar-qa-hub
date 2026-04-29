@@ -127,15 +127,7 @@ export function buildKrStatuses(metrics: EnrichedMetric[]): KrStatus[] {
   });
 }
 
-export function formatPercent(
-  value: number | null,
-  fractionDigits = 1,
-): string {
+export function formatPercent(value: number | null): string {
   if (value === null || Number.isNaN(value)) return "—";
-  return `${(value * 100).toFixed(fractionDigits)}%`;
-}
-
-export function formatRatio(value: number | null, fractionDigits = 3): string {
-  if (value === null || Number.isNaN(value)) return "—";
-  return value.toFixed(fractionDigits);
+  return `${Math.trunc(value * 100)}%`;
 }
