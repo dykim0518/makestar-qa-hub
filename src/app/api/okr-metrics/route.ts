@@ -12,7 +12,6 @@ type IncomingMetric = {
   totalDefects: number;
   openDefects: number;
   postReleaseDefects: number;
-  comment: string | null;
 };
 
 function isIsoDate(value: unknown): value is string {
@@ -29,13 +28,9 @@ function parseBody(body: unknown): IncomingMetric | { error: string } {
   const o = body as Record<string, unknown>;
 
   if (typeof o.milestone !== "string" || o.milestone.trim().length === 0)
-    return { error: "milestone은 필수입니다." };
+    return { error: "릴리스 이름은 필수입니다." };
   if (!isIsoDate(o.periodStart))
-    return { error: "periodStart는 YYYY-MM-DD 형식이어야 합니다." };
-  if (!isIsoDate(o.periodEnd))
-    return { error: "periodEnd는 YYYY-MM-DD 형식이어야 합니다." };
-  if (o.periodStart > o.periodEnd)
-    return { error: "periodStart는 periodEnd보다 이전이어야 합니다." };
+    return { error: "배포일은 YYYY-MM-DD 형식이어야 합니다." };
 
   const numericFields = [
     "tcCount",
@@ -56,24 +51,18 @@ function parseBody(body: unknown): IncomingMetric | { error: string } {
   }
 
   if (numbers.openDefects > numbers.totalDefects)
-    return { error: "openDefects는 totalDefects를 초과할 수 없습니다." };
+    return { error: "미해결 결함 수는 총 결함 수를 초과할 수 없습니다." };
   if (numbers.postReleaseDefects > numbers.totalDefects)
-    return { error: "postReleaseDefects는 totalDefects를 초과할 수 없습니다." };
-
-  const comment =
-    typeof o.comment === "string" && o.comment.trim().length > 0
-      ? o.comment.trim()
-      : null;
+    return { error: "배포 후 결함 수는 총 결함 수를 초과할 수 없습니다." };
 
   return {
     milestone: o.milestone.trim(),
     periodStart: o.periodStart,
-    periodEnd: o.periodEnd,
+    periodEnd: o.periodStart,
     tcCount: numbers.tcCount,
     totalDefects: numbers.totalDefects,
     openDefects: numbers.openDefects,
     postReleaseDefects: numbers.postReleaseDefects,
-    comment,
   };
 }
 
@@ -115,7 +104,6 @@ export async function POST(req: Request) {
       totalDefects: parsed.totalDefects,
       openDefects: parsed.openDefects,
       postReleaseDefects: parsed.postReleaseDefects,
-      comment: parsed.comment,
     })
     .onConflictDoUpdate({
       target: qaOkrMetrics.milestone,
@@ -126,7 +114,6 @@ export async function POST(req: Request) {
         totalDefects: parsed.totalDefects,
         openDefects: parsed.openDefects,
         postReleaseDefects: parsed.postReleaseDefects,
-        comment: parsed.comment,
         updatedAt: new Date(),
       },
     })
