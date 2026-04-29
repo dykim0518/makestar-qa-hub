@@ -74,7 +74,7 @@ export function AppHeader({ active }: AppHeaderProps) {
             className={`focus-ring ${active === "okr" ? navActive : navInactive}`}
             {...(active === "okr" ? { "aria-current": "page" as const } : {})}
           >
-            OKR
+            품질 지표
           </Link>
         </nav>
       </div>
