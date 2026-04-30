@@ -22,7 +22,7 @@ export const OKR_2026_H1 = {
   krs: [
     {
       id: "kr1",
-      name: "결함률 20% 개선",
+      name: "1월 대비 6월 결함률 20% 개선",
       metric: "defectRate",
       type: "relative",
       target: -0.2,
@@ -33,7 +33,7 @@ export const OKR_2026_H1 = {
     },
     {
       id: "kr2",
-      name: "결함 제거율 90% 이상",
+      name: "결함 제거율 90% 이상 확보",
       metric: "defectRemovalRate",
       type: "absolute",
       target: 0.9,
