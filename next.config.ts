@@ -23,6 +23,15 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: "/okr",
+        destination: "/quality-metrics",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
