@@ -31,7 +31,7 @@ export type KrStatus = {
 
 export type EnrichedMetric = QaOkrMetric & MetricValues;
 
-export const SIGNAL_BUFFER = 0.1;
+export const SIGNAL_BUFFER = 0.05;
 
 export function computeMetricValues(
   row: Pick<
