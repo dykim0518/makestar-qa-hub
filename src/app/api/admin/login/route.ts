@@ -1,9 +1,19 @@
+import { timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
 import {
   clearAdminCookie,
   getAdminToken,
   setAdminCookie,
 } from "@/lib/admin-auth";
+
+function constantTimeStringEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  try {
+    return timingSafeEqual(Buffer.from(a), Buffer.from(b));
+  } catch {
+    return false;
+  }
+}
 
 export async function POST(req: Request) {
   const expected = getAdminToken();
@@ -32,7 +42,7 @@ export async function POST(req: Request) {
       ? (payload as { token: string }).token
       : "";
 
-  if (!token || token !== expected) {
+  if (!token || !constantTimeStringEqual(token, expected)) {
     return NextResponse.json(
       { error: "토큰이 올바르지 않습니다." },
       { status: 401 },

@@ -50,6 +50,7 @@ function parseBody(body: unknown): IncomingMetric | { error: string } {
     numbers[key] = value;
   }
 
+  if (numbers.tcCount === 0) return { error: "TC 수는 1 이상이어야 합니다." };
   if (numbers.openDefects > numbers.totalDefects)
     return { error: "미해결 결함 수는 총 결함 수를 초과할 수 없습니다." };
   if (numbers.postReleaseDefects > numbers.totalDefects)

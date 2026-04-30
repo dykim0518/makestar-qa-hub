@@ -13,24 +13,28 @@ import { OkrDashboard } from "./OkrDashboard";
 
 export const dynamic = "force-dynamic";
 
-async function loadEnriched(): Promise<{
+type LoadResult = {
   metrics: EnrichedMetric[];
   krStatuses: KrStatus[];
-}> {
+  error: boolean;
+};
+
+async function loadEnriched(): Promise<LoadResult> {
   try {
     const rows = await db
       .select()
       .from(qaOkrMetrics)
       .orderBy(asc(qaOkrMetrics.periodStart));
     const metrics = enrichMetrics(rows);
-    return { metrics, krStatuses: buildKrStatuses(metrics) };
-  } catch {
-    return { metrics: [], krStatuses: buildKrStatuses([]) };
+    return { metrics, krStatuses: buildKrStatuses(metrics), error: false };
+  } catch (err) {
+    console.error("[quality-metrics] DB fetch failed:", err);
+    return { metrics: [], krStatuses: buildKrStatuses([]), error: true };
   }
 }
 
 export default async function OkrPage() {
-  const { metrics, krStatuses } = await loadEnriched();
+  const { metrics, krStatuses, error } = await loadEnriched();
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
@@ -49,8 +53,24 @@ export default async function OkrPage() {
           </p>
         </header>
 
-        <OkrDashboard metrics={metrics} krStatuses={krStatuses} />
+        {error ? (
+          <DataError />
+        ) : (
+          <OkrDashboard metrics={metrics} krStatuses={krStatuses} />
+        )}
       </main>
+    </div>
+  );
+}
+
+function DataError() {
+  return (
+    <div className="rounded-xl border border-rose-200 bg-rose-50 p-5 text-rose-700 shadow-sm">
+      <p className="text-sm font-semibold">데이터를 불러오지 못했습니다.</p>
+      <p className="mt-1 text-sm">
+        DB 연결이 일시적으로 불안정할 수 있습니다. 잠시 후 다시 새로고침
+        해주세요. 문제가 계속되면 관리자에게 알려주세요.
+      </p>
     </div>
   );
 }

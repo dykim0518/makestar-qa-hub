@@ -8,21 +8,25 @@ import { MetricForm } from "./MetricForm";
 
 export const dynamic = "force-dynamic";
 
-async function loadMetrics(): Promise<QaOkrMetric[]> {
+type LoadResult = { metrics: QaOkrMetric[]; error: boolean };
+
+async function loadMetrics(): Promise<LoadResult> {
   try {
-    return await db
+    const rows = await db
       .select()
       .from(qaOkrMetrics)
       .orderBy(asc(qaOkrMetrics.periodStart));
-  } catch {
-    return [];
+    return { metrics: rows, error: false };
+  } catch (err) {
+    console.error("[admin/metrics] DB fetch failed:", err);
+    return { metrics: [], error: true };
   }
 }
 
 export default async function AdminMetricsPage() {
   const tokenConfigured = getAdminToken() !== null;
   const isAdmin = tokenConfigured && (await verifyAdmin());
-  const metrics = isAdmin ? await loadMetrics() : [];
+  const result = isAdmin ? await loadMetrics() : { metrics: [], error: false };
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
@@ -45,10 +49,26 @@ export default async function AdminMetricsPage() {
           <ConfigError />
         ) : !isAdmin ? (
           <LoginForm />
+        ) : result.error ? (
+          <DataError />
         ) : (
-          <MetricForm existing={metrics} />
+          <MetricForm existing={result.metrics} />
         )}
       </main>
+    </div>
+  );
+}
+
+function DataError() {
+  return (
+    <div className="rounded-xl border border-rose-200 bg-rose-50 p-5 text-rose-700 shadow-sm">
+      <p className="text-sm font-semibold">
+        기존 릴리스 목록을 불러오지 못했습니다.
+      </p>
+      <p className="mt-1 text-sm">
+        DB 연결이 일시적으로 불안정할 수 있습니다. 잠시 후 다시
+        새로고침해주세요.
+      </p>
     </div>
   );
 }
